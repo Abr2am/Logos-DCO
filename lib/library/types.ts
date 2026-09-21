@@ -1,4 +1,8 @@
-import type { FileFormat, ResourceTypeCode } from '@/lib/domain/resource';
+import type {
+  AudienceCode,
+  FileFormat,
+  ResourceTypeCode,
+} from '@/lib/domain/resource';
 
 export type Subcategory = {
   id: number;
@@ -25,6 +29,13 @@ export type ResourceSummary = {
   format: FileFormat | null;
   pageCount: number | null;
   slideCount: number | null;
+};
+
+/** Ce que la fiche ressource affiche — ni plus, ni moins. */
+export type ResourceDetail = ResourceSummary & {
+  description: string;
+  audiences: AudienceCode[];
+  flags: string[];
 };
 
 export type LibraryFilters = {

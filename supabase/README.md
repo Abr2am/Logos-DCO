@@ -53,6 +53,14 @@ trois vues, dont le filtre et la liste de colonnes sont internes :
 - `published_resource_flags`
 - `published_resource_files`
 
+Deux fonctions complètent cette surface pour le rôle anonyme :
+`search_published_resources` / `published_flags` (bibliothèque) et
+`get_published_resource` (fiche).
+
+`get_published_file` fait exception : elle renvoie le **chemin de stockage** et
+n'est accordée **qu'à `service_role`**, pour la seule route serveur de
+téléchargement. Ne jamais l'accorder à `anon`.
+
 N'y figurent ni `depositor_id`, ni `admin_comment`, ni `status`, ni
 `storage_path`, ni `filename`, ni aucune colonne de `users`. La RLS de
 PostgreSQL étant au niveau de la **ligne** et non de la **colonne**, ce

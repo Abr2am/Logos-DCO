@@ -1,7 +1,16 @@
-import type { FileFormat, ResourceTypeCode } from '@/lib/domain/resource';
+import type {
+  AudienceCode,
+  FileFormat,
+  ResourceTypeCode,
+} from '@/lib/domain/resource';
 import { publicClient } from '@/lib/supabase/public-client';
 
-import type { Category, LibraryFilters, ResourceSummary } from './types';
+import type {
+  Category,
+  LibraryFilters,
+  ResourceDetail,
+  ResourceSummary,
+} from './types';
 
 /*
  * Accès à la bibliothèque publique.
@@ -81,6 +90,48 @@ export async function searchResources(
     pageCount: row.page_count,
     slideCount: row.slide_count,
   }));
+}
+
+type ResourceDetailRow = ResourceRow & {
+  description: string;
+  audiences: AudienceCode[];
+  flags: string[];
+};
+
+/**
+ * Détail d'une ressource PUBLIÉE.
+ *
+ * Renvoie `null` aussi bien pour une ressource inexistante que pour une
+ * ressource non publiée : l'appelant ne peut pas distinguer les deux cas, et
+ * ne doit pas essayer de le faire.
+ */
+export async function getPublishedResource(
+  id: string,
+): Promise<ResourceDetail | null> {
+  const { data, error } = await publicClient().rpc('get_published_resource', {
+    p_id: id,
+  });
+
+  if (error) throw new Error(`Lecture de la ressource : ${error.message}`);
+
+  const row = (data as ResourceDetailRow[])[0];
+  if (!row) return null;
+
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    categorySlug: row.category_slug,
+    categoryName: row.category_name,
+    subcategorySlug: row.subcategory_slug,
+    subcategoryName: row.subcategory_name,
+    resourceType: row.resource_type,
+    audiences: row.audiences ?? [],
+    flags: row.flags ?? [],
+    format: row.format,
+    pageCount: row.page_count,
+    slideCount: row.slide_count,
+  };
 }
 
 /**

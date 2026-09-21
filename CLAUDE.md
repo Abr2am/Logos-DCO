@@ -85,6 +85,10 @@ modification par un administrateur.
 
 **Interdits :** `/categories` (page d'index indépendante) · `/admin/flags`.
 
+Les routes techniques sous `/api/` ne sont pas des pages : elles ne figurent
+pas dans cette liste. À ce jour, une seule existe —
+`/api/telechargement/[id]`, qui délivre le fichier d'une ressource publiée.
+
 > Les routes de branche `/bibliotheque/[categorie]` et
 > `/bibliotheque/[categorie]/[sous-categorie]` sont une **décision validée**
 > (audit du 21/09/2026) : le cahier des charges impose le parcours
@@ -445,7 +449,7 @@ Avant tout commit : `npm run lint && npm run typecheck && npm run build`.
 | 2   | Fondations visuelles (tokens, polices, primitives) | ✅      |
 | 3   | Modèle de données + Supabase + RLS                 | ✅      |
 | 4   | Bibliothèque publique                              | ✅      |
-| 5   | Fiche ressource + téléchargement sécurisé          | à faire |
+| 5   | Fiche ressource + téléchargement sécurisé          | ✅      |
 | 6   | Authentification + espace serviteur                | à faire |
 | 7   | Soumission + workflow admin                        | à faire |
 | 8   | Questions + durcissement + tests                   | à faire |
