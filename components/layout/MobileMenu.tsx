@@ -20,9 +20,12 @@ import type { NavItem } from './nav-items';
 export function MobileMenu({
   items,
   currentPath,
+  action,
 }: {
   items: ReadonlyArray<NavItem>;
   currentPath?: string;
+  /** Action de compte, lorsqu'elle remplace le lien (ex. : déconnexion). */
+  action?: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -129,6 +132,7 @@ export function MobileMenu({
                 );
               })}
             </ul>
+            {action ? <div className="pt-16">{action}</div> : null}
             <div
               aria-hidden
               className="mt-[8px] h-px bg-[rgb(195_154_84/0.6)]"

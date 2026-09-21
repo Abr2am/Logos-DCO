@@ -66,6 +66,29 @@ N'y figurent ni `depositor_id`, ni `admin_comment`, ni `status`, ni
 PostgreSQL étant au niveau de la **ligne** et non de la **colonne**, ce
 masquage ne pouvait pas être obtenu par une policy.
 
+## Configuration Supabase requise
+
+Deux réglages ne vivent pas dans les migrations et doivent être posés sur le
+projet Supabase :
+
+1. **Désactiver l'inscription** (`Authentication → Sign Up`). L'absence de
+   formulaire d'inscription dans l'application **n'est pas une protection** :
+   l'API d'authentification reste joignable. Les comptes sont créés par le
+   diocèse.
+2. **Bucket `resources` privé** — créé par migration, mais vérifier qu'aucune
+   politique de projet ne le rend public.
+
+Un compte créé dans `auth.users` reçoit automatiquement un profil
+`public.users` au rôle `SERVANT` (déclencheur `on_auth_user_created`). Passer
+un compte en `ADMIN` est une opération d'administration :
+
+```sql
+update public.users set role = 'ADMIN' where email = '…';
+```
+
+Aucune policy ne permet à un client de le faire, et un déclencheur refuse tout
+changement de rôle émanant d'un utilisateur authentifié non administrateur.
+
 ## Ce qui n'est pas encore là
 
 - **Questions et réponses** — étape ultérieure. Les tables `questions` et

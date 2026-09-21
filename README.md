@@ -119,7 +119,7 @@ L'échelle d'espacement est nommée d'après ses valeurs en pixels — `p-22` va
 | 3   | Modèle de données + Supabase + RLS                 | ✅      |
 | 4   | Bibliothèque publique                              | ✅      |
 | 5   | Fiche ressource + téléchargement sécurisé          | ✅      |
-| 6   | Authentification + espace serviteur                | à faire |
+| 6   | Authentification + espace serviteur                | ✅      |
 | 7   | Soumission + workflow admin                        | à faire |
 | 8   | Questions + durcissement + tests                   | à faire |
 

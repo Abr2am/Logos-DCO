@@ -15,12 +15,25 @@ import { DEFAULT_ACCOUNT_ITEM, NAV_ITEMS, type NavItem } from './nav-items';
 export function Header({
   currentPath,
   account = DEFAULT_ACCOUNT_ITEM,
+  accountAction,
 }: {
   currentPath?: string;
   /** Entrée de compte ; « Connexion » tant que l'utilisateur n'est pas connecté. */
   account?: NavItem;
+  /**
+   * Remplace le lien de compte lorsqu'il est fourni — la déconnexion, pour un
+   * utilisateur authentifié.
+   *
+   * ⚠️ Conséquence du point ouvert « T » : le Design System indique que le
+   * libellé bascule sur « Mon compte » une fois connecté, mais aucune route de
+   * compte n'existe dans la liste fermée. Tant que la destination n'est pas
+   * tranchée, afficher un lien sans cible serait pire qu'une action utile.
+   */
+  accountAction?: React.ReactNode;
 }) {
-  const items: ReadonlyArray<NavItem> = [...NAV_ITEMS, account];
+  const items: ReadonlyArray<NavItem> = accountAction
+    ? NAV_ITEMS
+    : [...NAV_ITEMS, account];
 
   return (
     <header className="border-b border-line bg-surface">
@@ -65,15 +78,21 @@ export function Header({
               </Link>
             );
           })}
-          <Link
-            href={account.href}
-            className="rounded-control border border-line-field px-16 py-[8px] transition-colors duration-[150ms] ease-logos hover:bg-cover-plate focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-burgundy"
-          >
-            {account.label}
-          </Link>
+          {accountAction ?? (
+            <Link
+              href={account.href}
+              className="rounded-control border border-line-field px-16 py-[8px] transition-colors duration-[150ms] ease-logos hover:bg-cover-plate focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-burgundy"
+            >
+              {account.label}
+            </Link>
+          )}
         </nav>
 
-        <MobileMenu items={items} currentPath={currentPath} />
+        <MobileMenu
+          items={items}
+          currentPath={currentPath}
+          action={accountAction}
+        />
       </div>
     </header>
   );

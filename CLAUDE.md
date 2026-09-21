@@ -259,6 +259,15 @@ directement, sans passer par l'interface.
 11. L'architecture d'authentification reste **isolée et remplaçable**
     (`lib/auth/`), pour pouvoir passer au SSO / OIDC du diocèse sans
     reconstruire l'application.
+    En pratique : les pages ne connaissent que `currentUser`, `requireMember`
+    et `requireAdmin`. Le rôle est **relu en base à chaque appel**, sous la
+    RLS — jamais lu dans un jeton ni dans des métadonnées modifiables. On
+    emploie `getUser()` et non `getSession()` : le premier fait valider le
+    jeton par Supabase, le second se contente de lire un cookie.
+    `proxy.ts` rafraîchit les cookies de session et écarte un visiteur sans
+    session des routes authentifiées. **Ce n'est qu'un filtre de confort** :
+    chaque page revérifie identité et rôle. Retirer le proxy ne doit ouvrir
+    aucun accès.
 
 Chaque policy RLS s'écrit **en même temps que sa table**, avec ses tests
 négatifs. La sécurité n'est jamais rattrapée à la fin.
@@ -375,23 +384,23 @@ dans le cahier des charges.** Si ce n'est pas le cas, ne pas l'ajouter.
 
 Ces points **n'ont pas été décidés**. Les signaler plutôt que de choisir.
 
-| Réf. | Point                                                                                                                                                                                                                                                 |
-| ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| C    | Parcours « mot de passe oublié »                                                                                                                                                                                                                      |
-| D    | Navigation entre les deux écrans d'administration                                                                                                                                                                                                     |
-| E    | Miniature extraite du fichier réel (1ʳᵉ page du PDF)                                                                                                                                                                                                  |
-| F    | **Canal de réponse du dépositaire aux questions** — aucune route ni écran n'existe                                                                                                                                                                    |
-| G    | Police de secours pour les caractères coptes / arabes                                                                                                                                                                                                 |
-| H    | Favicon et vignette de partage                                                                                                                                                                                                                        |
-| J    | Règle de « Tous les publics » combiné à d'autres publics                                                                                                                                                                                              |
-| K    | **Écran de modération des questions** — aucun n'est défini                                                                                                                                                                                            |
-| L    | Valeurs de `Question.status`                                                                                                                                                                                                                          |
-| M    | **Service d'envoi des notifications par e-mail** — absent de la stack                                                                                                                                                                                 |
-| N    | Couverture : déterminisme par identifiant _vs_ contraintes de rythme par rangée                                                                                                                                                                       |
-| O    | Format d'optimisation de la rosace (SVG vectorisé / WebP multi-tailles)                                                                                                                                                                               |
-| R    | Anti-spam du formulaire de question anonyme                                                                                                                                                                                                           |
-| S    | Renommage du fichier du Design System (espaces dans le chemin)                                                                                                                                                                                        |
-| T    | **Destination de l'entrée « Mon compte »** une fois connecté — aucune route de compte n'existe dans la liste fermée (le Design System indique seulement que le libellé bascule depuis « Connexion »). `Header` reçoit donc cette entrée en propriété. |
+| Réf. | Point                                                                                                                                                                                                                                                                                                                                  |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C    | Parcours « mot de passe oublié »                                                                                                                                                                                                                                                                                                       |
+| D    | Navigation entre les deux écrans d'administration                                                                                                                                                                                                                                                                                      |
+| E    | Miniature extraite du fichier réel (1ʳᵉ page du PDF)                                                                                                                                                                                                                                                                                   |
+| F    | **Canal de réponse du dépositaire aux questions** — aucune route ni écran n'existe                                                                                                                                                                                                                                                     |
+| G    | Police de secours pour les caractères coptes / arabes                                                                                                                                                                                                                                                                                  |
+| H    | Favicon et vignette de partage                                                                                                                                                                                                                                                                                                         |
+| J    | Règle de « Tous les publics » combiné à d'autres publics                                                                                                                                                                                                                                                                               |
+| K    | **Écran de modération des questions** — aucun n'est défini                                                                                                                                                                                                                                                                             |
+| L    | Valeurs de `Question.status`                                                                                                                                                                                                                                                                                                           |
+| M    | **Service d'envoi des notifications par e-mail** — absent de la stack                                                                                                                                                                                                                                                                  |
+| N    | Couverture : déterminisme par identifiant _vs_ contraintes de rythme par rangée                                                                                                                                                                                                                                                        |
+| O    | Format d'optimisation de la rosace (SVG vectorisé / WebP multi-tailles)                                                                                                                                                                                                                                                                |
+| R    | Anti-spam du formulaire de question anonyme                                                                                                                                                                                                                                                                                            |
+| S    | Renommage du fichier du Design System (espaces dans le chemin)                                                                                                                                                                                                                                                                         |
+| T    | **Destination de l'entrée « Mon compte »** une fois connecté — aucune route de compte n'existe dans la liste fermée (le Design System indique seulement que le libellé bascule depuis « Connexion »). En attendant, `Header` accepte `accountAction` : les pages authentifiées y placent la déconnexion, plutôt qu'un lien sans cible. |
 
 > **F, K et M forment un même trou fonctionnel** : le cycle
 > question → notification → réponse décrit au §12 du cahier des charges n'a ni
@@ -459,7 +468,7 @@ Avant tout commit : `npm run lint && npm run typecheck && npm run build`.
 | 3   | Modèle de données + Supabase + RLS                 | ✅      |
 | 4   | Bibliothèque publique                              | ✅      |
 | 5   | Fiche ressource + téléchargement sécurisé          | ✅      |
-| 6   | Authentification + espace serviteur                | à faire |
+| 6   | Authentification + espace serviteur                | ✅      |
 | 7   | Soumission + workflow admin                        | à faire |
 | 8   | Questions + durcissement + tests                   | à faire |
 
