@@ -78,6 +78,7 @@ components/
   ui/             primitives (boutons, champs, flags, statuts…)
   brand/          marque, bandeau, rosace
   library/        cartes, couvertures, recherche, filtres
+  contribution/   formulaire de ressource
   layout/         header, menu mobile, breadcrumb, pied
 lib/
   auth/           couche d'authentification isolée et remplaçable
@@ -120,7 +121,7 @@ L'échelle d'espacement est nommée d'après ses valeurs en pixels — `p-22` va
 | 4   | Bibliothèque publique                              | ✅      |
 | 5   | Fiche ressource + téléchargement sécurisé          | ✅      |
 | 6   | Authentification + espace serviteur                | ✅      |
-| 7   | Soumission + workflow admin                        | à faire |
+| 7   | Soumission + workflow admin                        | ✅      |
 | 8   | Questions + durcissement + tests                   | à faire |
 
 `app/page.tsx` est un **marqueur technique**, pas la page d'accueil : il sera

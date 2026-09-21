@@ -89,6 +89,10 @@ Les routes techniques sous `/api/` ne sont pas des pages : elles ne figurent
 pas dans cette liste. À ce jour, une seule existe —
 `/api/telechargement/[id]`, qui délivre le fichier d'une ressource publiée.
 
+La correction d'une ressource « À corriger » réutilise `/partager?ressource=<id>` :
+le cahier des charges prévoit « Modifier la ressource » sans définir de route
+distincte, et la liste ci-dessus est fermée.
+
 > Les routes de branche `/bibliotheque/[categorie]` et
 > `/bibliotheque/[categorie]/[sous-categorie]` sont une **décision validée**
 > (audit du 21/09/2026) : le cahier des charges impose le parcours
@@ -256,6 +260,14 @@ directement, sans passer par l'interface.
     `Content-Disposition: attachment`.
     ⚠️ PPTX, DOCX et XLSX **sont** des conteneurs ZIP : ne pas les rejeter par
     une détection générique « c'est une archive ».
+    En pratique : `lib/files/validate.ts` contrôle l'extension, le type MIME
+    **et la signature** des premiers octets, puis borne la taille à
+    `MAX_UPLOAD_BYTES`. L'attribut `accept` du champ et tout ce qu'affiche le
+    navigateur sont du confort, jamais un contrôle.
+    ⚠️ **La taille maximale n'est pas spécifiée** par le cahier des charges :
+    10 Mo est une valeur d'attente, à deux endroits qui vont de pair —
+    `lib/files/formats.ts` et `serverActions.bodySizeLimit` dans
+    `next.config.ts`.
 11. L'architecture d'authentification reste **isolée et remplaçable**
     (`lib/auth/`), pour pouvoir passer au SSO / OIDC du diocèse sans
     reconstruire l'application.
@@ -437,7 +449,7 @@ Supabase (PostgreSQL + Auth + Storage) · Vercel.**
 
 ```
 app/              routes (App Router)
-components/       ui · brand · library · layout
+components/       ui · brand · library · layout · contribution
 lib/              auth · supabase · domain · search · cover
 styles/           tokens du Design System
 supabase/         migrations SQL + seed
@@ -469,7 +481,7 @@ Avant tout commit : `npm run lint && npm run typecheck && npm run build`.
 | 4   | Bibliothèque publique                              | ✅      |
 | 5   | Fiche ressource + téléchargement sécurisé          | ✅      |
 | 6   | Authentification + espace serviteur                | ✅      |
-| 7   | Soumission + workflow admin                        | à faire |
+| 7   | Soumission + workflow admin                        | ✅      |
 | 8   | Questions + durcissement + tests                   | à faire |
 
 <!-- BEGIN:nextjs-agent-rules -->
