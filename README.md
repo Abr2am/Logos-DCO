@@ -56,6 +56,8 @@ npm run dev                  # http://localhost:3000
 | `npm run typecheck`    | `tsc --noEmit`           |
 | `npm run format`       | Prettier (écriture)      |
 | `npm run format:check` | Prettier (vérification)  |
+| `npm run assets:brand` | Régénère `public/brand/` |
+| `npm run db:verify`    | Migrations + tests SQL   |
 
 Avant tout commit :
 
@@ -114,7 +116,7 @@ L'échelle d'espacement est nommée d'après ses valeurs en pixels — `p-22` va
 | --- | -------------------------------------------------- | ------- |
 | 1   | Initialisation technique                           | ✅      |
 | 2   | Fondations visuelles (tokens, polices, primitives) | ✅      |
-| 3   | Modèle de données + Supabase + RLS                 | à faire |
+| 3   | Modèle de données + Supabase + RLS                 | ✅      |
 | 4   | Bibliothèque publique                              | à faire |
 | 5   | Fiche ressource + téléchargement sécurisé          | à faire |
 | 6   | Authentification + espace serviteur                | à faire |
@@ -156,3 +158,17 @@ La rosace n'a que **quatre usages autorisés** — marque, hero, couverture,
 `/design-system` confronte chaque primitive à sa spécification. Cette route
 **n'existe qu'en développement** : elle répond 404 en production, la liste des
 routes publiques reste fermée.
+
+---
+
+## Base de données
+
+Le schéma, les migrations et les tests vivent dans [`supabase/`](supabase/) —
+voir [`supabase/README.md`](supabase/README.md).
+
+```bash
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres npm run db:verify
+```
+
+La base indiquée est recréée dans l'état attendu : **n'utiliser qu'une base
+jetable**.

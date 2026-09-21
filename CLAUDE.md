@@ -233,6 +233,20 @@ directement, sans passer par l'interface.
 Chaque policy RLS s'écrit **en même temps que sa table**, avec ses tests
 négatifs. La sécurité n'est jamais rattrapée à la fin.
 
+### Surface publique — liste fermée
+
+Le rôle anonyme n'a **aucun accès aux tables**. Il ne voit que la taxonomie et
+trois vues, dont le filtre et la liste de colonnes sont internes :
+`published_resources`, `published_resource_flags`, `published_resource_files`.
+
+Toute donnée à exposer publiquement passe par ces vues. **Ne jamais accorder au
+rôle anonyme un accès direct à une table** : la RLS est au niveau de la ligne,
+pas de la colonne, et autoriser la ligne exposerait `depositor_id`,
+`admin_comment` ou `storage_path`.
+
+Vérification : `npm run db:verify` — migrations appliquées sur une base
+jetable, puis tests de schéma et tests de sécurité négatifs.
+
 ---
 
 ## Design System — verrous
@@ -416,7 +430,7 @@ Avant tout commit : `npm run lint && npm run typecheck && npm run build`.
 | --- | -------------------------------------------------- | ------- |
 | 1   | Initialisation technique                           | ✅      |
 | 2   | Fondations visuelles (tokens, polices, primitives) | ✅      |
-| 3   | Modèle de données + Supabase + RLS                 | à faire |
+| 3   | Modèle de données + Supabase + RLS                 | ✅      |
 | 4   | Bibliothèque publique                              | à faire |
 | 5   | Fiche ressource + téléchargement sécurisé          | à faire |
 | 6   | Authentification + espace serviteur                | à faire |
