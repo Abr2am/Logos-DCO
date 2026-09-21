@@ -63,5 +63,7 @@ masquage ne pouvait pas être obtenu par une policy.
 - **Questions et réponses** — étape ultérieure. Les tables `questions` et
   `answers` seront ajoutées par migration, avec leur propre vue de masquage :
   l'e-mail du questionneur ne doit jamais être exposé.
-- **Insensibilité aux accents** dans la recherche — point ouvert `Q`, non
-  tranché. La configuration `french` actuelle ne retire pas les accents.
+  La recherche est **insensible aux accents** (point `Q`, tranché) : la
+  configuration `public.logos_french` enchaîne `unaccent` avant `french_stem`.
+  Toute requête doit employer cette configuration, sinon les lexèmes ne
+  correspondent pas.

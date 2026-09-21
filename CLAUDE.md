@@ -140,6 +140,12 @@ PostgreSQL uniquement.
 
 Deux portées seulement : **globale** et **limitée à une branche**.
 
+**Insensible aux accents** — décision validée (point `Q`, tranché le
+21/09/2026) : « eglise » doit trouver « Église ». Le vecteur et les requêtes
+emploient la configuration `public.logos_french`, qui enchaîne `unaccent` avant
+`french_stem`. **Toujours interroger avec cette configuration** : une requête
+en `french` produirait des lexèmes accentués qui ne correspondraient à rien.
+
 **Interdits :** recherche dans le contenu des fichiers · sémantique · IA ·
 vectoriel · embeddings · Elasticsearch · autocomplétion · recherche avancée.
 
@@ -362,7 +368,6 @@ Ces points **n'ont pas été décidés**. Les signaler plutôt que de choisir.
 | N    | Couverture : déterminisme par identifiant _vs_ contraintes de rythme par rangée                                                                                                                                                                       |
 | O    | Format d'optimisation de la rosace (SVG vectorisé / WebP multi-tailles)                                                                                                                                                                               |
 | P    | Comportement d'URL d'une ressource archivée (404 ou page dédiée)                                                                                                                                                                                      |
-| Q    | Recherche insensible aux accents                                                                                                                                                                                                                      |
 | R    | Anti-spam du formulaire de question anonyme                                                                                                                                                                                                           |
 | S    | Renommage du fichier du Design System (espaces dans le chemin)                                                                                                                                                                                        |
 | T    | **Destination de l'entrée « Mon compte »** une fois connecté — aucune route de compte n'existe dans la liste fermée (le Design System indique seulement que le libellé bascule depuis « Connexion »). `Header` reçoit donc cette entrée en propriété. |
@@ -431,7 +436,7 @@ Avant tout commit : `npm run lint && npm run typecheck && npm run build`.
 | 1   | Initialisation technique                           | ✅      |
 | 2   | Fondations visuelles (tokens, polices, primitives) | ✅      |
 | 3   | Modèle de données + Supabase + RLS                 | ✅      |
-| 4   | Bibliothèque publique                              | à faire |
+| 4   | Bibliothèque publique                              | ✅      |
 | 5   | Fiche ressource + téléchargement sécurisé          | à faire |
 | 6   | Authentification + espace serviteur                | à faire |
 | 7   | Soumission + workflow admin                        | à faire |

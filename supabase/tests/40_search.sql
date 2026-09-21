@@ -1,5 +1,7 @@
 -- Recherche : le vecteur agrège titre, description, catégorie, sous-catégorie
--- et flags.
+-- et flags. Il est construit avec `public.logos_french` — les requêtes
+-- doivent employer la même configuration, sans quoi les lexèmes ne
+-- correspondent pas.
 
 do $$
 declare
@@ -19,26 +21,26 @@ begin
 
   select search_vector into v_vector from public.resources where id = v_res;
 
-  if not (v_vector @@ to_tsquery('french', 'marc')) then
+  if not (v_vector @@ to_tsquery('public.logos_french', 'marc')) then
     raise exception 'Le titre doit être indexé.';
   end if;
-  if not (v_vector @@ to_tsquery('french', 'séances')) then
+  if not (v_vector @@ to_tsquery('public.logos_french', 'séances')) then
     raise exception 'La description doit être indexée.';
   end if;
-  if not (v_vector @@ to_tsquery('french', 'chrétienne')) then
+  if not (v_vector @@ to_tsquery('public.logos_french', 'chrétienne')) then
     raise exception 'La catégorie doit être indexée.';
   end if;
-  if not (v_vector @@ to_tsquery('french', 'jeunesse')) then
+  if not (v_vector @@ to_tsquery('public.logos_french', 'jeunesse')) then
     raise exception 'La sous-catégorie doit être indexée.';
   end if;
-  if not (v_vector @@ to_tsquery('french', 'évangiles')) then
+  if not (v_vector @@ to_tsquery('public.logos_french', 'évangiles')) then
     raise exception 'Les flags doivent être indexés.';
   end if;
 
   -- Le retrait d'un flag met le vecteur à jour.
   delete from public.resource_flags where resource_id = v_res;
   select search_vector into v_vector from public.resources where id = v_res;
-  if v_vector @@ to_tsquery('french', 'évangiles') then
+  if v_vector @@ to_tsquery('public.logos_french', 'évangiles') then
     raise exception 'Le vecteur doit être rafraîchi au retrait d''un flag.';
   end if;
 end;

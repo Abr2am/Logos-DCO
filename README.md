@@ -117,7 +117,7 @@ L'échelle d'espacement est nommée d'après ses valeurs en pixels — `p-22` va
 | 1   | Initialisation technique                           | ✅      |
 | 2   | Fondations visuelles (tokens, polices, primitives) | ✅      |
 | 3   | Modèle de données + Supabase + RLS                 | ✅      |
-| 4   | Bibliothèque publique                              | à faire |
+| 4   | Bibliothèque publique                              | ✅      |
 | 5   | Fiche ressource + téléchargement sécurisé          | à faire |
 | 6   | Authentification + espace serviteur                | à faire |
 | 7   | Soumission + workflow admin                        | à faire |

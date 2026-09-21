@@ -40,7 +40,16 @@ export function Breadcrumb({
               )}
             >
               {index > 0 ? (
-                <span aria-hidden className="text-gold">
+                <span
+                  aria-hidden
+                  className={cn(
+                    'text-gold',
+                    // En mobile, les niveaux intermédiaires sont masqués : le
+                    // premier niveau ENCORE VISIBLE ne doit pas porter de
+                    // séparateur orphelin.
+                    index === hiddenBefore && 'hidden tablet:inline',
+                  )}
+                >
                   ›
                 </span>
               ) : null}

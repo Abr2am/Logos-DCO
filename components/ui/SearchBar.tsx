@@ -19,6 +19,11 @@ type SearchBarProps = {
   branchLabel?: string;
   action?: string;
   defaultValue?: string;
+  /**
+   * Paramètres à conserver lors d'une nouvelle recherche — les filtres actifs,
+   * qui vivent dans l'URL et doivent survivre à la soumission du formulaire.
+   */
+  preserve?: ReadonlyArray<{ name: string; value: string }>;
   className?: string;
 };
 
@@ -27,6 +32,7 @@ export function SearchBar({
   branchLabel,
   action,
   defaultValue,
+  preserve = [],
   className,
 }: SearchBarProps) {
   const branch = scope === 'branch';
@@ -47,6 +53,14 @@ export function SearchBar({
         className,
       )}
     >
+      {preserve.map((field, index) => (
+        <input
+          key={`${field.name}-${index}`}
+          type="hidden"
+          name={field.name}
+          value={field.value}
+        />
+      ))}
       <label htmlFor="q" className="sr-only">
         {branch ? placeholder : 'Rechercher une ressource'}
       </label>

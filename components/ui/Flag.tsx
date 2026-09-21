@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 import { cn } from '@/lib/cn';
@@ -60,6 +61,42 @@ export function FlagFilter({
         </span>
       ) : null}
     </button>
+  );
+}
+
+/**
+ * Même flag de filtre, mais porté par un lien : l'état des filtres vit dans
+ * l'URL, pas dans un état client.
+ */
+export function FlagFilterLink({
+  label,
+  href,
+  selected = false,
+}: {
+  label: string;
+  href: string;
+  selected?: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      aria-pressed={selected}
+      className={cn(
+        BASE,
+        PAD,
+        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy',
+        selected
+          ? 'bg-burgundy font-medium text-on-dark'
+          : 'border border-line bg-surface text-text hover:border-line-secondary hover:bg-cover-plate',
+      )}
+    >
+      {label}
+      {selected ? (
+        <span className="opacity-60" aria-hidden>
+          ✕
+        </span>
+      ) : null}
+    </Link>
   );
 }
 
