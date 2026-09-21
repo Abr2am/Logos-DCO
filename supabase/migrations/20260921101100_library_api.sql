@@ -9,14 +9,14 @@
 -- sous-catégorie · flags. Aucune recherche dans le contenu des fichiers,
 -- aucune recherche sémantique, aucun moteur vectoriel.
 --
--- ⚠️ POINT OUVERT « B » — l'ordre de tri par défaut n'est PAS tranché.
--- En l'absence de requête textuelle, l'ordre appliqué ci-dessous est une
--- valeur d'attente (date de publication décroissante, celle que le Design
--- System suppose sans la confirmer). C'est la SEULE clause à changer le jour
--- où la décision est prise.
+-- Tri — décision validée (point « B », tranché le 21/09/2026) : les ressources
+-- sont présentées par DATE DE PUBLICATION DÉCROISSANTE, de la plus récente à
+-- la plus ancienne. Lorsqu'une requête textuelle est présente, la pertinence
+-- prime et la date départage les résultats de même rang.
 --
--- ⚠️ POINT OUVERT « A » — la pagination n'est PAS tranchée : aucune limite
--- n'est imposée ici, et aucun mécanisme de pagination n'est introduit.
+-- Pagination — décision validée (point « A », tranché le 21/09/2026) : aucune
+-- pagination n'est nécessaire. Aucune limite n'est imposée, et aucun mécanisme
+-- de pagination n'est introduit.
 -- =============================================================================
 
 create function public.search_published_resources(
@@ -90,7 +90,7 @@ as $$
    order by
      case when m.query is null then 0
           else ts_rank(m.search_vector, m.query) end desc,
-     -- ⚠️ Valeur d'attente — point ouvert « B ».
+     -- Tri validé : date de publication décroissante.
      m.published_at desc nulls last,
      m.id;
 $$;

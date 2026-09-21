@@ -116,6 +116,16 @@ catégories. Les autres chemins de découverte passent uniquement par les flags.
 Ordre des blocs de la page Bibliothèque : **recherche → filtres → catégories**.
 Elle n'affiche pas immédiatement toutes les ressources.
 
+**Tri** — décision validée (point `B`, tranché le 21/09/2026) : les ressources
+sont présentées par **date de publication décroissante**, de la plus récente à
+la plus ancienne. Lorsqu'une recherche textuelle est active, la pertinence
+prime et la date départage les résultats de même rang. L'ordre est porté par
+`search_published_resources` : aucun tri côté application.
+
+**Pagination** — décision validée (point `A`, tranché le 21/09/2026) : **aucune
+pagination**. Pas de « Voir plus », pas de pagination numérotée, pas de limite
+de résultats. Ne pas en introduire.
+
 ---
 
 ## Flags
@@ -353,8 +363,6 @@ Ces points **n'ont pas été décidés**. Les signaler plutôt que de choisir.
 
 | Réf. | Point                                                                                                                                                                                                                                                 |
 | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A    | Pagination de la bibliothèque (tout afficher / « Voir plus » / pagination)                                                                                                                                                                            |
-| B    | Ordre de tri par défaut                                                                                                                                                                                                                               |
 | C    | Parcours « mot de passe oublié »                                                                                                                                                                                                                      |
 | D    | Navigation entre les deux écrans d'administration                                                                                                                                                                                                     |
 | E    | Miniature extraite du fichier réel (1ʳᵉ page du PDF)                                                                                                                                                                                                  |

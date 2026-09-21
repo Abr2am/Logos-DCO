@@ -10,9 +10,9 @@ import { ResourceGrid } from './ResourceGrid';
 /**
  * Résultats d'une recherche ou d'une branche, ou état vide.
  *
- * ⚠️ POINT OUVERT « A » — aucune pagination n'est introduite : la totalité des
- * résultats est rendue. Le jour où la décision est prise, c'est ici et dans la
- * fonction SQL que le mécanisme s'ajoutera.
+ * Aucune pagination — décision validée (point « A ») : la totalité des
+ * résultats est rendue. Les ressources arrivent déjà triées par date de
+ * publication décroissante (point « B »).
  */
 export function LibraryResults({
   resources,
