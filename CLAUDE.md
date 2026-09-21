@@ -226,9 +226,19 @@ directement, sans passer par l'interface.
 2. Le public ne voit **que** les ressources `PUBLISHED`. Une ressource
    `PENDING`, `REJECTED` ou `ARCHIVED` est inaccessible **même en connaissant
    son identifiant**.
+   Décision validée (point `P`, tranché le 21/09/2026) : une ressource
+   `ARCHIVED` est **publiquement indistinguable d'une ressource inexistante**
+   et répond **404** — fiche comme téléchargement. Ne jamais introduire de
+   réponse, de message ou de statut qui permettrait de distinguer les deux
+   cas.
 3. **Les fichiers sont protégés au niveau du stockage**, pas masqués dans
    l'interface. Bucket privé, téléchargement par URL signée de courte durée
    délivrée par une route serveur qui vérifie le statut.
+   Mécanisme **arrêté** (validé le 21/09/2026) : il est conservé tel quel. Le
+   chemin de stockage figure dans l'URL signée — c'est inhérent au procédé —
+   mais il n'est ni devinable, ni réutilisable passé le délai, ni exposé dans
+   la page ou dans la surface publique. Ne pas le remplacer par un flux servi
+   depuis le serveur sans nouvelle décision.
 4. **Aucune inscription publique.** Désactivée dans la configuration
    d'authentification, pas seulement absente de l'interface.
 5. Le `role` n'est **jamais** modifiable par le client.
@@ -379,7 +389,6 @@ Ces points **n'ont pas été décidés**. Les signaler plutôt que de choisir.
 | M    | **Service d'envoi des notifications par e-mail** — absent de la stack                                                                                                                                                                                 |
 | N    | Couverture : déterminisme par identifiant _vs_ contraintes de rythme par rangée                                                                                                                                                                       |
 | O    | Format d'optimisation de la rosace (SVG vectorisé / WebP multi-tailles)                                                                                                                                                                               |
-| P    | Comportement d'URL d'une ressource archivée (404 ou page dédiée)                                                                                                                                                                                      |
 | R    | Anti-spam du formulaire de question anonyme                                                                                                                                                                                                           |
 | S    | Renommage du fichier du Design System (espaces dans le chemin)                                                                                                                                                                                        |
 | T    | **Destination de l'entrée « Mon compte »** une fois connecté — aucune route de compte n'existe dans la liste fermée (le Design System indique seulement que le libellé bascule depuis « Connexion »). `Header` reçoit donc cette entrée en propriété. |
