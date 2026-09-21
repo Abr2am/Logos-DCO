@@ -1,4 +1,4 @@
-# LOGOS — Cahier des charges produit V1
+docs/LOGOS_Cahier_des_charges_V1.md
 ## Source de vérité pour le développement
 
 > **Une même foi, pour aujourd’hui et pour demain.**
