@@ -1,0 +1,42 @@
+@import 'tailwindcss';
+@import '../styles/tokens.css';
+
+/* ==========================================================================
+   Base — invariants du Design System uniquement.
+   Aucun style de composant ici : les composants arrivent à l'étape 2.
+   ========================================================================== */
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-ivory);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Accessibilité — le focus est toujours visible, jamais supprimé.
+     Contour 2 px bordeaux, offset 2 px (le Design System impose un offset
+     de 2 à 3 px selon le composant, et un contour doré sur fond noyer).   */
+  :focus-visible {
+    outline: 2px solid var(--color-burgundy);
+    outline-offset: 2px;
+  }
+
+  /* Aucune animation d'entrée, aucune mise à l'échelle : on respecte aussi
+     la préférence système de réduction du mouvement.                       */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

@@ -1,2 +1,123 @@
-# Logos-DCO
-App Bibliothèque catéchisme 
+# Logos — DCO
+
+Bibliothèque numérique de ressources de catéchisme du **Diocèse Copte
+Orthodoxe de Paris**.
+
+> Une même foi, pour aujourd'hui et pour demain.
+
+---
+
+## Documents de référence
+
+| Document                                                                     | Rôle                                                                                    |
+| ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| [`docs/LOGOS_Cahier_des_charges_V1.md`](docs/LOGOS_Cahier_des_charges_V1.md) | Source de vérité **produit**                                                            |
+| `docs/Logos - Design System V2.html`                                         | Référence **visuelle et UI**                                                            |
+| [`CLAUDE.md`](CLAUDE.md)                                                     | Règles permanentes du projet (rôles, routes, sécurité, anti-régression, points ouverts) |
+
+**Lire `CLAUDE.md` avant toute contribution.** Il condense les règles
+opposables des deux documents ci-dessus.
+
+---
+
+## Stack
+
+- **Next.js 16** (App Router) · **React 19** · **TypeScript strict**
+- **Tailwind CSS 4** — configuration restreinte aux tokens du Design System
+- **Supabase** (PostgreSQL · Auth · Storage) — _étape 3, pas encore configuré_
+- Déploiement : Vercel ou équivalent
+
+---
+
+## Démarrage
+
+Prérequis : **Node ≥ 20.9** (la version utilisée est fixée dans `.nvmrc`).
+
+```bash
+npm install
+cp .env.example .env.local   # puis renseigner les valeurs
+npm run dev                  # http://localhost:3000
+```
+
+> `.env.local` n'est jamais versionné. `.env.example` ne doit contenir
+> **aucun secret réel**.
+
+---
+
+## Scripts
+
+| Commande               | Effet                    |
+| ---------------------- | ------------------------ |
+| `npm run dev`          | Serveur de développement |
+| `npm run build`        | Build de production      |
+| `npm run start`        | Serveur de production    |
+| `npm run lint`         | ESLint                   |
+| `npm run lint:fix`     | ESLint avec corrections  |
+| `npm run typecheck`    | `tsc --noEmit`           |
+| `npm run format`       | Prettier (écriture)      |
+| `npm run format:check` | Prettier (vérification)  |
+
+Avant tout commit :
+
+```bash
+npm run lint && npm run typecheck && npm run build
+```
+
+La CI (`.github/workflows/ci.yml`) rejoue ces mêmes vérifications sur chaque
+push et chaque pull request.
+
+---
+
+## Structure
+
+```
+app/              routes (App Router)
+components/
+  ui/             primitives (boutons, champs, flags, statuts…)
+  brand/          marque, bandeau, rosace
+  library/        cartes, couvertures, recherche, filtres
+  layout/         header, menu mobile, breadcrumb, pied
+lib/
+  auth/           couche d'authentification isolée et remplaçable
+  supabase/       clients navigateur / serveur / admin
+  domain/         catégories, publics, types, transitions de statut
+  search/         construction des requêtes de recherche
+  cover/          algorithme de couverture générative
+styles/           tokens.css — tokens du Design System
+supabase/         migrations SQL + seed
+public/brand/     rosace, marqueterie
+docs/             cahier des charges + Design System
+```
+
+---
+
+## Tokens du Design System
+
+Tout le vocabulaire visuel vit dans [`styles/tokens.css`](styles/tokens.css) :
+**8 couleurs, 3 familles typographiques, 1 échelle d'espacement, 3 rayons,
+2 ombres, 2 durées**.
+
+Les palettes, échelles et rayons par défaut de Tailwind y sont **désactivés**.
+Écrire `bg-blue-500`, `rounded-xl` ou `p-7` ne produit donc aucune classe :
+l'anti-régression visuelle est mécanique, pas déclarative.
+
+L'échelle d'espacement est nommée d'après ses valeurs en pixels — `p-22` vaut
+22 px — car le Design System raisonne en pixels.
+
+---
+
+## État d'avancement
+
+| #   | Étape                                              | État    |
+| --- | -------------------------------------------------- | ------- |
+| 1   | Initialisation technique                           | ✅      |
+| 2   | Fondations visuelles (tokens, polices, primitives) | à faire |
+| 3   | Modèle de données + Supabase + RLS                 | à faire |
+| 4   | Bibliothèque publique                              | à faire |
+| 5   | Fiche ressource + téléchargement sécurisé          | à faire |
+| 6   | Authentification + espace serviteur                | à faire |
+| 7   | Soumission + workflow admin                        | à faire |
+| 8   | Questions + durcissement + tests                   | à faire |
+
+`app/page.tsx` est un **marqueur technique**, pas la page d'accueil : il sera
+intégralement remplacé à l'étape 4.
