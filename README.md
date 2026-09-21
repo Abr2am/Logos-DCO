@@ -84,6 +84,8 @@ lib/
   search/         construction des requêtes de recherche
   cover/          algorithme de couverture générative
 styles/           tokens.css — tokens du Design System
+assets/brand/     masters de marque (rosace, marqueterie) — jamais servis
+scripts/          extraction et optimisation des assets de marque
 supabase/         migrations SQL + seed
 public/brand/     rosace, marqueterie
 docs/             cahier des charges + Design System
@@ -111,7 +113,7 @@ L'échelle d'espacement est nommée d'après ses valeurs en pixels — `p-22` va
 | #   | Étape                                              | État    |
 | --- | -------------------------------------------------- | ------- |
 | 1   | Initialisation technique                           | ✅      |
-| 2   | Fondations visuelles (tokens, polices, primitives) | à faire |
+| 2   | Fondations visuelles (tokens, polices, primitives) | ✅      |
 | 3   | Modèle de données + Supabase + RLS                 | à faire |
 | 4   | Bibliothèque publique                              | à faire |
 | 5   | Fiche ressource + téléchargement sécurisé          | à faire |
@@ -121,3 +123,36 @@ L'échelle d'espacement est nommée d'après ses valeurs en pixels — `p-22` va
 
 `app/page.tsx` est un **marqueur technique**, pas la page d'accueil : il sera
 intégralement remplacé à l'étape 4.
+
+---
+
+## Assets de marque
+
+Les **masters font autorité** et vivent dans `assets/brand/` : la rosace
+(PNG 2048 × 2048, 7,4 Mo) et la marqueterie (JPEG 736 × 1336). Ils sont
+conservés tels quels — aucun recadrage, aucune vectorisation, aucune
+transformation en texture répétable.
+
+Ils sont réextractibles bit-à-bit depuis le Design System bundlé :
+
+```bash
+node scripts/extract-brand-masters.mjs
+```
+
+Les versions web servies sont générées dans `public/brand/`, uniquement aux
+tailles réellement employées par le Design System :
+
+```bash
+npm run assets:brand
+```
+
+La rosace n'a que **quatre usages autorisés** — marque, hero, couverture,
+état vide. Le module `components/brand/Rosace.tsx` n'expose que ceux-là.
+
+---
+
+## Planche de vérification
+
+`/design-system` confronte chaque primitive à sa spécification. Cette route
+**n'existe qu'en développement** : elle répond 404 en production, la liste des
+routes publiques reste fermée.

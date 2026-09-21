@@ -175,6 +175,9 @@
   --shadow-cover: 0 8px 20px rgb(46 30 21 / 0.2);
   --shadow-cover-detail: 0 14px 34px rgb(46 30 21 / 0.28);
   --shadow-shelf: 0 6px 16px rgb(46 30 21 / 0.22);
+  /* Survol d'une carte ressource : seule la géométrie change (0 10px 24px),
+     la teinte reste celle de l'ombre `cover`. */
+  --shadow-cover-hover: 0 10px 24px rgb(46 30 21 / 0.2);
 
   /* ── Paliers responsive ───────────────────────────────────────────────── */
   /* Mobile < 640 · Tablette 640-1023 · Desktop ≥ 1024
