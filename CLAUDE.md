@@ -259,9 +259,10 @@ Ce qui reste vrai, et ne doit pas bouger :
   ressources ;
 - une question ne vise qu'une ressource **publiée**.
 
-À reprendre le jour où un service d'e-mail entre dans la pile (point `M`).
-Ce jour-là, la notification remplace l'exposition de l'adresse : ce n'est pas
-une fonctionnalité à ajouter, c'est une dette à rembourser.
+À reprendre le jour où un service d'e-mail sera validé — **hors périmètre
+MVP**, voir la section « Hors périmètre MVP — dette technique assumée ». Ce
+jour-là, la notification remplace l'exposition de l'adresse : ce n'est pas une
+fonctionnalité à ajouter au MVP, c'est une dette à rembourser ensuite.
 
 ---
 
@@ -456,19 +457,41 @@ Ces points **n'ont pas été décidés**. Les signaler plutôt que de choisir.
 | G     | Police de secours pour les caractères coptes / arabes                                                                                                                                                                                                                                                                                  |
 | H     | Favicon et vignette de partage                                                                                                                                                                                                                                                                                                         |
 | J     | Règle de « Tous les publics » combiné à d'autres publics                                                                                                                                                                                                                                                                               |
-| K     | **Écran de modération des questions** — toujours aucun : l'administration lit les questions en base, aucun écran ne les lui présente                                                                                                                                                                                                   |
 | ~~L~~ | ~~Valeurs de `Question.status`~~ — **tranché le 22/09/2026** : `PENDING` et `ANSWERED`, rien d'autre                                                                                                                                                                                                                                   |
-| M     | **Service d'envoi des notifications par e-mail** — toujours absent, et volontairement hors MVP (aucun service externe, aucun coût). C'est lui qui remboursera la dette d'anonymat                                                                                                                                                      |
 | N     | Couverture : déterminisme par identifiant _vs_ contraintes de rythme par rangée                                                                                                                                                                                                                                                        |
 | O     | Format d'optimisation de la rosace (SVG vectorisé / WebP multi-tailles)                                                                                                                                                                                                                                                                |
 | R     | Anti-spam du formulaire de question anonyme                                                                                                                                                                                                                                                                                            |
 | S     | Renommage du fichier du Design System (espaces dans le chemin)                                                                                                                                                                                                                                                                         |
 | T     | **Destination de l'entrée « Mon compte »** une fois connecté — aucune route de compte n'existe dans la liste fermée (le Design System indique seulement que le libellé bascule depuis « Connexion »). En attendant, `Header` accepte `accountAction` : les pages authentifiées y placent la déconnexion, plutôt qu'un lien sans cible. |
 
-> **F est tranché ; K et M restent ouverts.** Le cycle
-> question → notification → réponse du §12 tient désormais debout sans service
-> d'envoi : le serviteur répond depuis sa propre messagerie. Il y manque encore
-> l'écran de modération (`K`) et la notification automatique (`M`).
+> **F et L sont tranchés ; K et M ne sont plus des points ouverts.** Le cycle
+> question → notification → réponse du §12 tient debout sans service d'envoi :
+> le serviteur répond depuis sa propre messagerie. Ce qui manque encore est
+> **hors périmètre**, pas indécis — voir la section ci-dessous.
+
+---
+
+## Hors périmètre MVP — dette technique assumée
+
+Ces points sont **décidés** : ils ne font pas partie du MVP. Ce ne sont ni des
+points ouverts à trancher, ni des fonctionnalités restant à écrire avant la
+livraison. Les rouvrir demande une décision produit, pas une initiative.
+
+**Ne pas les implémenter dans le MVP. Ne pas les reclasser en « à faire ».**
+
+| Réf. | Point                                    | Décision                                                                                                                                                                                                                                                                 |
+| ---- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| K    | **Écran d'administration des questions** | **Hors périmètre MVP.** L'administration a la visibilité en base (policy `questions_select_admin`), mais aucun écran ne la lui présente. Le workflow validé confie la réponse au serviteur, pas à l'administrateur : un écran de modération n'est pas nécessaire au MVP. |
+| M    | **Notifications e-mail automatiques**    | **Hors périmètre MVP.** Aucun service d'envoi n'entre dans la pile — contrainte explicite : aucun service externe, aucun coût. Le serviteur consulte « Mes questions » ; rien ne le prévient. C'est la contrepartie assumée du workflow `mailto:`.                       |
+
+**Dette liée.** `M` porte le remboursement de la dette d'anonymat décrite plus
+haut : le jour où un service d'envoi est validé, la notification remplace
+l'exposition de l'adresse du questionneur au dépositaire. Tant que ce jour
+n'est pas venu, l'adresse reste visible — c'est le prix du MVP, et il est
+documenté, pas subi.
+
+**Reste ouvert sur les questions :** `R` (anti-spam du formulaire anonyme),
+qui n'est ni tranché ni écarté.
 
 ---
 

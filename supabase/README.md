@@ -106,10 +106,13 @@ de table `answers` — la réponse part de la messagerie personnelle du
 dépositaire, hors de Logos.
 
 ⚠️ **Dette technique assumée.** `questioner_email` est visible par le
-dépositaire de la ressource, parce que c'est son seul canal de réponse tant
-qu'aucun service d'envoi n'entre dans la pile (point ouvert `M`). Il reste
-invisible au rôle anonyme et à tout autre serviteur. Voir « Questions » dans
-`CLAUDE.md`.
+dépositaire de la ressource, parce que c'est son seul canal de réponse. Il
+reste invisible au rôle anonyme et à tout autre serviteur.
+
+Deux absences sont **décidées, pas en attente** : aucun écran d'administration
+des questions (`K`) et aucune notification e-mail automatique (`M`) — toutes
+deux **hors périmètre MVP**. Ne pas les implémenter ici. Voir « Questions » et
+« Hors périmètre MVP — dette technique assumée » dans `CLAUDE.md`.
 
 ## Rappel
 
