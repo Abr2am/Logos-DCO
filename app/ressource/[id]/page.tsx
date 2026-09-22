@@ -8,6 +8,7 @@ import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { buttonClassName } from '@/components/ui/Button';
 import { Flag } from '@/components/ui/Flag';
 import { MetadataBlock } from '@/components/ui/Panel';
+import { SectionHeading } from '@/components/ui/SectionHeading';
 import { coverFamilyFromKey } from '@/lib/cover/families';
 import {
   AUDIENCES,
@@ -17,6 +18,8 @@ import {
 import { getPublishedResource } from '@/lib/library/queries';
 import { libraryHref } from '@/lib/library/url';
 
+import { QuestionForm } from './QuestionForm';
+
 /*
  * Fiche ressource.
  *
@@ -25,7 +28,11 @@ import { libraryHref } from '@/lib/library/url';
  * pagination · bouton « Télécharger la ressource ».
  *
  * PAS d'auteur public. Pas de likes, pas de favoris, pas de notes, pas de
- * commentaires. Le bloc Questions appartient à une étape ultérieure.
+ * commentaires.
+ *
+ * Le bloc Questions ne montre QUE le formulaire : les questions reçues ne
+ * s'affichent nulle part publiquement, elles n'existent que pour le
+ * dépositaire et pour l'administration.
  *
  * Une ressource inexistante et une ressource non publiée donnent la même
  * réponse : `notFound()`. Rien ne doit permettre de les distinguer.
@@ -149,6 +156,19 @@ export default async function RessourcePage({ params }: PageProps) {
             ) : null}
           </div>
         </div>
+
+        {/* Poser une question — aucun compte requis, aucune question affichée. */}
+        <section className="mt-56 max-w-reading">
+          <SectionHeading title="Poser une question" />
+          <p className="mt-12 text-body text-text-secondary">
+            Votre question est transmise au dépositaire de cette ressource, qui
+            vous répondra par e-mail. Ce n&apos;est pas un espace de
+            commentaires : rien de ce que vous écrivez ici n&apos;est publié.
+          </p>
+          <div className="mt-22">
+            <QuestionForm resourceId={resource.id} />
+          </div>
+        </section>
       </main>
     </>
   );

@@ -16,7 +16,12 @@ import { createProxyClient } from '@/lib/supabase/server-client';
  * serveur, via `lib/auth`. Retirer ce proxy ne doit ouvrir aucun accès.
  */
 
-const PROTECTED = ['/partager', '/mes-contributions', '/admin'];
+const PROTECTED = [
+  '/partager',
+  '/mes-contributions',
+  '/mes-questions',
+  '/admin',
+];
 
 export async function proxy(request: NextRequest) {
   const response = NextResponse.next({ request });

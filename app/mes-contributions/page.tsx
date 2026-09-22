@@ -56,6 +56,14 @@ export default async function MesContributionsPage() {
         <p className="mt-12 text-body text-text-secondary">
           Le suivi de vos dépôts et de leur validation.
         </p>
+        <p className="mt-12">
+          <Link
+            href="/mes-questions"
+            className="text-[13px] font-semibold text-burgundy underline-offset-4 hover:text-burgundy-light hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy"
+          >
+            Mes questions →
+          </Link>
+        </p>
 
         {contributions.length === 0 ? (
           <div className="mt-34">

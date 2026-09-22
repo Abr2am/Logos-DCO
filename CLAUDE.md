@@ -49,7 +49,9 @@ Environ **80 % contemporain / 20 % héritage copte**.
 | **Publier**                                                    |          ❌          |  **❌ jamais**   |  ✅   |
 | Voir toutes les ressources, tous statuts                       |          ❌          |        ❌        |  ✅   |
 | Voir l'identité et l'e-mail du dépositaire                     |          ❌          |        ❌        |  ✅   |
-| Voir l'identité et l'e-mail du questionneur                    |          ❌          |        ❌        |  ✅   |
+| Voir les questions posées sur **ses** ressources               |          ❌          |        ✅        |  ✅   |
+| Voir l'e-mail du questionneur de ses ressources                |          ❌          |        ✅        |  ✅   |
+| Voir l'identité et l'e-mail de **tout** questionneur           |          ❌          |        ❌        |  ✅   |
 | Modifier / demander corrections / archiver                     |          ❌          |        ❌        |  ✅   |
 | Modérer questions et réponses                                  |          ❌          |        ❌        |  ✅   |
 
@@ -77,11 +79,19 @@ modification par un administrateur.
 
 - `/partager` — Partager un cours
 - `/mes-contributions` — Mes contributions
+- `/mes-questions` — Mes questions
 
 **Administration**
 
 - `/admin` — Dashboard
 - `/admin/ressources/[id]` — Modération d'une ressource
+
+> `/mes-questions` est un **ajout validé** (décision produit du 22/09/2026) :
+> le workflow Q&A du MVP fait du serviteur celui qui répond, et le cahier des
+> charges ne prévoyait aucun écran pour cela. La liste reste fermée — elle
+> compte désormais cette route, et pas une de plus. Elle n'entre pas dans la
+> navigation principale (fermée elle aussi) : on l'atteint depuis
+> « Mes contributions », et réciproquement.
 
 **Interdits :** `/categories` (page d'index indépendante) · `/admin/flags`.
 
@@ -208,14 +218,50 @@ serviteur dans « Mes contributions ».
 Rattachées à une ressource. **Ce n'est pas une messagerie.**
 
 - Le questionneur n'a **pas besoin de compte** : question + adresse e-mail.
-- Son e-mail **n'est jamais communiqué au dépositaire** — y compris dans les
-  en-têtes d'un e-mail de notification.
 - L'identité du dépositaire reste **cachée au questionneur**.
 - L'administration voit tout.
-
-> **Anonymat entre utilisateurs, transparence pour l'administration.**
+- Les questions ne sont **jamais affichées publiquement** : ni sur la fiche
+  ressource, ni ailleurs. La fiche ne porte que le formulaire.
 
 Pas de fil de discussion, pas de réponses multiples, pas de mentions.
+
+### Workflow du MVP — décision validée (22/09/2026)
+
+```
+visiteur (sans compte) → pose une question sur une ressource PUBLIÉE
+serviteur              → la retrouve dans « Mes questions »
+                       → voit l'adresse du visiteur, cliquable en « mailto: »
+                       → répond depuis SA PROPRE messagerie, hors de Logos
+                       → passe la question en « Répondue »
+```
+
+**Deux statuts, et deux seulement** (tranche le point `L`) : `PENDING`
+(« En attente de réponse ») et `ANSWERED` (« Répondue »). Une seule transition
+existe, `PENDING → ANSWERED`, appliquée par déclencheur. **Aucune réponse n'est
+stockée en base** : Logos ne voit jamais le texte de la réponse.
+
+**Ce que le MVP n'a pas, volontairement :** aucun service d'envoi d'e-mail,
+aucune notification automatique, aucune messagerie interne, aucun lien signé,
+aucun écran de modération des questions.
+
+### ⚠️ Dette technique — anonymat partiel
+
+Le cahier des charges (§12) pose « l'e-mail n'est jamais communiqué à
+l'auteur ». **Le MVP déroge à cette règle** : l'adresse du questionneur est
+visible par le dépositaire de la ressource, parce que c'est le seul canal de
+réponse possible sans service d'envoi.
+
+Ce qui reste vrai, et ne doit pas bouger :
+
+- le questionneur n'apprend **rien** du dépositaire ;
+- le public n'a **aucun accès** aux questions — aucune vue, aucun `SELECT` ;
+- un serviteur ne voit **que** les questions posées sur ses propres
+  ressources ;
+- une question ne vise qu'une ressource **publiée**.
+
+À reprendre le jour où un service d'e-mail entre dans la pile (point `M`).
+Ce jour-là, la notification remplace l'exposition de l'adresse : ce n'est pas
+une fonctionnalité à ajouter, c'est une dette à rembourser.
 
 ---
 
@@ -248,9 +294,14 @@ directement, sans passer par l'interface.
 5. Le `role` n'est **jamais** modifiable par le client.
 6. `depositor_id` n'est **jamais** joint à la table des utilisateurs dans une
    requête publique.
-7. `questioner_email` n'est **jamais** exposé. La RLS PostgreSQL est au niveau
-   de la ligne, pas de la colonne : le masquage passe par une **vue** dédiée,
-   pas par une requête prudente côté application.
+7. `questioner_email` n'est **jamais** exposé au rôle anonyme, ni à un
+   serviteur qui n'est pas le dépositaire de la ressource concernée. La table
+   `questions` n'entre dans **aucune vue publique** et n'accorde au rôle
+   anonyme qu'un `INSERT`, borné aux ressources `PUBLISHED` ; la lecture est
+   réservée au dépositaire et à l'administration, par policy RLS.
+   ⚠️ Le MVP expose volontairement cette adresse au dépositaire — voir
+   « Dette technique — anonymat partiel ». La dérogation s'arrête là :
+   l'élargir à qui que ce soit d'autre est une régression.
 8. La clé `service_role` n'est jamais préfixée `NEXT_PUBLIC_` et n'apparaît
    que dans du code serveur.
 9. La séparation SERVANT / ADMIN est vérifiée côté serveur, jamais par un
@@ -396,27 +447,28 @@ dans le cahier des charges.** Si ce n'est pas le cas, ne pas l'ajouter.
 
 Ces points **n'ont pas été décidés**. Les signaler plutôt que de choisir.
 
-| Réf. | Point                                                                                                                                                                                                                                                                                                                                  |
-| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| C    | Parcours « mot de passe oublié »                                                                                                                                                                                                                                                                                                       |
-| D    | Navigation entre les deux écrans d'administration                                                                                                                                                                                                                                                                                      |
-| E    | Miniature extraite du fichier réel (1ʳᵉ page du PDF)                                                                                                                                                                                                                                                                                   |
-| F    | **Canal de réponse du dépositaire aux questions** — aucune route ni écran n'existe                                                                                                                                                                                                                                                     |
-| G    | Police de secours pour les caractères coptes / arabes                                                                                                                                                                                                                                                                                  |
-| H    | Favicon et vignette de partage                                                                                                                                                                                                                                                                                                         |
-| J    | Règle de « Tous les publics » combiné à d'autres publics                                                                                                                                                                                                                                                                               |
-| K    | **Écran de modération des questions** — aucun n'est défini                                                                                                                                                                                                                                                                             |
-| L    | Valeurs de `Question.status`                                                                                                                                                                                                                                                                                                           |
-| M    | **Service d'envoi des notifications par e-mail** — absent de la stack                                                                                                                                                                                                                                                                  |
-| N    | Couverture : déterminisme par identifiant _vs_ contraintes de rythme par rangée                                                                                                                                                                                                                                                        |
-| O    | Format d'optimisation de la rosace (SVG vectorisé / WebP multi-tailles)                                                                                                                                                                                                                                                                |
-| R    | Anti-spam du formulaire de question anonyme                                                                                                                                                                                                                                                                                            |
-| S    | Renommage du fichier du Design System (espaces dans le chemin)                                                                                                                                                                                                                                                                         |
-| T    | **Destination de l'entrée « Mon compte »** une fois connecté — aucune route de compte n'existe dans la liste fermée (le Design System indique seulement que le libellé bascule depuis « Connexion »). En attendant, `Header` accepte `accountAction` : les pages authentifiées y placent la déconnexion, plutôt qu'un lien sans cible. |
+| Réf.  | Point                                                                                                                                                                                                                                                                                                                                  |
+| ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C     | Parcours « mot de passe oublié »                                                                                                                                                                                                                                                                                                       |
+| D     | Navigation entre les deux écrans d'administration                                                                                                                                                                                                                                                                                      |
+| E     | Miniature extraite du fichier réel (1ʳᵉ page du PDF)                                                                                                                                                                                                                                                                                   |
+| ~~F~~ | ~~Canal de réponse du dépositaire aux questions~~ — **tranché le 22/09/2026** : `mailto:` depuis « Mes questions », hors de Logos                                                                                                                                                                                                      |
+| G     | Police de secours pour les caractères coptes / arabes                                                                                                                                                                                                                                                                                  |
+| H     | Favicon et vignette de partage                                                                                                                                                                                                                                                                                                         |
+| J     | Règle de « Tous les publics » combiné à d'autres publics                                                                                                                                                                                                                                                                               |
+| K     | **Écran de modération des questions** — toujours aucun : l'administration lit les questions en base, aucun écran ne les lui présente                                                                                                                                                                                                   |
+| ~~L~~ | ~~Valeurs de `Question.status`~~ — **tranché le 22/09/2026** : `PENDING` et `ANSWERED`, rien d'autre                                                                                                                                                                                                                                   |
+| M     | **Service d'envoi des notifications par e-mail** — toujours absent, et volontairement hors MVP (aucun service externe, aucun coût). C'est lui qui remboursera la dette d'anonymat                                                                                                                                                      |
+| N     | Couverture : déterminisme par identifiant _vs_ contraintes de rythme par rangée                                                                                                                                                                                                                                                        |
+| O     | Format d'optimisation de la rosace (SVG vectorisé / WebP multi-tailles)                                                                                                                                                                                                                                                                |
+| R     | Anti-spam du formulaire de question anonyme                                                                                                                                                                                                                                                                                            |
+| S     | Renommage du fichier du Design System (espaces dans le chemin)                                                                                                                                                                                                                                                                         |
+| T     | **Destination de l'entrée « Mon compte »** une fois connecté — aucune route de compte n'existe dans la liste fermée (le Design System indique seulement que le libellé bascule depuis « Connexion »). En attendant, `Header` accepte `accountAction` : les pages authentifiées y placent la déconnexion, plutôt qu'un lien sans cible. |
 
-> **F, K et M forment un même trou fonctionnel** : le cycle
-> question → notification → réponse décrit au §12 du cahier des charges n'a ni
-> route, ni écran, ni service. À trancher avant l'étape 8.
+> **F est tranché ; K et M restent ouverts.** Le cycle
+> question → notification → réponse du §12 tient désormais debout sans service
+> d'envoi : le serviteur répond depuis sa propre messagerie. Il y manque encore
+> l'écran de modération (`K`) et la notification automatique (`M`).
 
 ---
 
@@ -473,16 +525,16 @@ Avant tout commit : `npm run lint && npm run typecheck && npm run build`.
 
 ## Plan de développement
 
-| #   | Étape                                              | État    |
-| --- | -------------------------------------------------- | ------- |
-| 1   | Initialisation technique                           | ✅      |
-| 2   | Fondations visuelles (tokens, polices, primitives) | ✅      |
-| 3   | Modèle de données + Supabase + RLS                 | ✅      |
-| 4   | Bibliothèque publique                              | ✅      |
-| 5   | Fiche ressource + téléchargement sécurisé          | ✅      |
-| 6   | Authentification + espace serviteur                | ✅      |
-| 7   | Soumission + workflow admin                        | ✅      |
-| 8   | Questions + durcissement + tests                   | à faire |
+| #   | Étape                                              | État                                                           |
+| --- | -------------------------------------------------- | -------------------------------------------------------------- |
+| 1   | Initialisation technique                           | ✅                                                             |
+| 2   | Fondations visuelles (tokens, polices, primitives) | ✅                                                             |
+| 3   | Modèle de données + Supabase + RLS                 | ✅                                                             |
+| 4   | Bibliothèque publique                              | ✅                                                             |
+| 5   | Fiche ressource + téléchargement sécurisé          | ✅                                                             |
+| 6   | Authentification + espace serviteur                | ✅                                                             |
+| 7   | Soumission + workflow admin                        | ✅                                                             |
+| 8   | Questions + durcissement + tests                   | Q&A MVP livré ; durcissement et tests de bout en bout restants |
 
 <!-- BEGIN:nextjs-agent-rules -->
 

@@ -36,13 +36,17 @@ jetable. La CI rejoue cette vérification sur un service PostgreSQL 16.
 
 Les tests couvrent :
 
-| Fichier           | Couverture                                                                                                                                                                            |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `10_schema.sql`   | Neuf catégories exactes, sous-catégories sous « Vie chrétienne » uniquement, énumérations, RLS active partout, absence de policy de suppression ou d'écriture sur la taxonomie, index |
-| `20_workflow.sql` | Matrice de transitions, minimum cinq flags, fichier obligatoire, commentaire obligatoire pour une correction, dépositaire immuable, horodatages                                       |
-| `30_rls.sql`      | Tests **négatifs** : ce que l'anonyme et le serviteur ne doivent jamais pouvoir faire — plus un contrôle positif côté administration                                                  |
-| `40_search.sql`   | Agrégation du vecteur de recherche et rafraîchissement au retrait d'un flag                                                                                                           |
-| `50_storage.sql`  | Bucket privé, cloisonnement par dépositaire, aucun accès anonyme                                                                                                                      |
+| Fichier                  | Couverture                                                                                                                                                                                                                                      |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `10_schema.sql`          | Neuf catégories exactes, sous-catégories sous « Vie chrétienne » uniquement, énumérations, RLS active partout, absence de policy de suppression ou d'écriture sur la taxonomie, index                                                           |
+| `20_workflow.sql`        | Matrice de transitions, minimum cinq flags, fichier obligatoire, commentaire obligatoire pour une correction, dépositaire immuable, horodatages                                                                                                 |
+| `30_rls.sql`             | Tests **négatifs** : ce que l'anonyme et le serviteur ne doivent jamais pouvoir faire — plus un contrôle positif côté administration                                                                                                            |
+| `40_search.sql`          | Agrégation du vecteur de recherche et rafraîchissement au retrait d'un flag                                                                                                                                                                     |
+| `50_storage.sql`         | Bucket privé, cloisonnement par dépositaire, aucun accès anonyme                                                                                                                                                                                |
+| `60_library_api.sql`     | Recherche, filtres par flags (OU), portée de branche, tri par date de publication décroissante                                                                                                                                                  |
+| `70_resource_detail.sql` | Fiche publique, et téléchargement refusé pour toute ressource non publiée                                                                                                                                                                       |
+| `80_contribution.sql`    | Dépôt, correction, resoumission, file de modération, identité du dépositaire réservée à l'administration                                                                                                                                        |
+| `90_questions.sql`       | Insertion anonyme bornée aux ressources publiées, aucune lecture anonyme, cloisonnement de `questioner_email` entre serviteurs, transition unique `PENDING → ANSWERED`, immutabilité du texte et de l'adresse, surface publique toujours fermée |
 
 ## Surface publique
 
@@ -60,6 +64,11 @@ Deux fonctions complètent cette surface pour le rôle anonyme :
 `get_published_file` fait exception : elle renvoie le **chemin de stockage** et
 n'est accordée **qu'à `service_role`**, pour la seule route serveur de
 téléchargement. Ne jamais l'accorder à `anon`.
+
+`ask_question` complète cette surface **en écriture seule** : le rôle anonyme
+peut déposer une question sur une ressource publiée, sans jamais pouvoir en
+relire aucune. La table `questions` n'entre dans **aucune vue publique** ;
+`90_questions.sql` vérifie que la liste ci-dessus n'a pas grandi.
 
 N'y figurent ni `depositor_id`, ni `admin_comment`, ni `status`, ni
 `storage_path`, ni `filename`, ni aucune colonne de `users`. La RLS de
@@ -89,12 +98,22 @@ update public.users set role = 'ADMIN' where email = '…';
 Aucune policy ne permet à un client de le faire, et un déclencheur refuse tout
 changement de rôle émanant d'un utilisateur authentifié non administrateur.
 
-## Ce qui n'est pas encore là
+## Questions
 
-- **Questions et réponses** — étape ultérieure. Les tables `questions` et
-  `answers` seront ajoutées par migration, avec leur propre vue de masquage :
-  l'e-mail du questionneur ne doit jamais être exposé.
-  La recherche est **insensible aux accents** (point `Q`, tranché) : la
-  configuration `public.logos_french` enchaîne `unaccent` avant `french_stem`.
-  Toute requête doit employer cette configuration, sinon les lexèmes ne
-  correspondent pas.
+La table `questions` porte le workflow du MVP : deux statuts (`PENDING`,
+`ANSWERED`), une seule transition, aucune réponse stockée. Il n'existe **pas**
+de table `answers` — la réponse part de la messagerie personnelle du
+dépositaire, hors de Logos.
+
+⚠️ **Dette technique assumée.** `questioner_email` est visible par le
+dépositaire de la ressource, parce que c'est son seul canal de réponse tant
+qu'aucun service d'envoi n'entre dans la pile (point ouvert `M`). Il reste
+invisible au rôle anonyme et à tout autre serviteur. Voir « Questions » dans
+`CLAUDE.md`.
+
+## Rappel
+
+La recherche est **insensible aux accents** (point `Q`, tranché) : la
+configuration `public.logos_french` enchaîne `unaccent` avant `french_stem`.
+Toute requête doit employer cette configuration, sinon les lexèmes ne
+correspondent pas.
