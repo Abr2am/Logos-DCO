@@ -198,3 +198,5 @@ DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres npm run db:ver
 
 La base indiquée est recréée dans l'état attendu : **n'utiliser qu'une base
 jetable**.
+
+Deployment configuration verified.
