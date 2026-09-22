@@ -73,48 +73,83 @@ export default async function AdminPage() {
             <EmptyState title="Aucune ressource déposée" />
           </div>
         ) : (
-          <table className="mt-34 w-full">
-            <thead>
-              <tr>
-                {['Titre', 'Dépositaire', 'Statut', 'Soumise le'].map((h) => (
-                  <th
-                    key={h}
-                    className="border-b border-line pb-12 pr-[14px] text-left font-mono text-mono font-medium uppercase tracking-[0.13em] text-help"
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {queue.map((item) => (
-                <tr key={item.id}>
-                  <td className="border-b border-line-hairline py-[14px] pr-[14px]">
-                    <Link
-                      href={`/admin/ressources/${item.id}`}
-                      className="font-medium underline-offset-4 hover:text-burgundy hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy"
+          <>
+            {/* Desktop : tableau de quatre colonnes.
+                Sous 1024 px, l'adresse du dépositaire déborderait ; la file
+                bascule alors en cartes empilées, comme « Mes contributions ». */}
+            <table className="mt-34 hidden w-full desktop:table">
+              <thead>
+                <tr>
+                  {['Titre', 'Dépositaire', 'Statut', 'Soumise le'].map((h) => (
+                    <th
+                      key={h}
+                      className="border-b border-line pb-12 pr-[14px] text-left font-mono text-mono font-medium uppercase tracking-[0.13em] text-help"
                     >
-                      {item.title}
-                    </Link>
-                    <span className="block text-small text-help">
-                      {item.categoryName}
-                    </span>
-                  </td>
-                  <td className="border-b border-line-hairline py-[14px] pr-[14px] text-[13px]">
-                    {item.depositorEmail}
-                  </td>
-                  <td className="border-b border-line-hairline py-[14px] pr-[14px]">
-                    <Status status={item.status} />
-                  </td>
-                  <td className="border-b border-line-hairline py-[14px] text-[13px] text-help">
-                    {new Date(
-                      item.submittedAt ?? item.createdAt,
-                    ).toLocaleDateString('fr-FR')}
-                  </td>
+                      {h}
+                    </th>
+                  ))}
                 </tr>
+              </thead>
+              <tbody>
+                {queue.map((item) => (
+                  <tr key={item.id}>
+                    <td className="border-b border-line-hairline py-[14px] pr-[14px]">
+                      <Link
+                        href={`/admin/ressources/${item.id}`}
+                        className="font-medium underline-offset-4 hover:text-burgundy hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy"
+                      >
+                        {item.title}
+                      </Link>
+                      <span className="block text-small text-help">
+                        {item.categoryName}
+                      </span>
+                    </td>
+                    <td className="border-b border-line-hairline py-[14px] pr-[14px] text-[13px]">
+                      {item.depositorEmail}
+                    </td>
+                    <td className="border-b border-line-hairline py-[14px] pr-[14px]">
+                      <Status status={item.status} />
+                    </td>
+                    <td className="border-b border-line-hairline py-[14px] text-[13px] text-help">
+                      {new Date(
+                        item.submittedAt ?? item.createdAt,
+                      ).toLocaleDateString('fr-FR')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <ul className="mt-26 grid gap-12 desktop:hidden">
+              {queue.map((item) => (
+                <li
+                  key={item.id}
+                  className="rounded-panel border border-line bg-surface p-16"
+                >
+                  <Link
+                    href={`/admin/ressources/${item.id}`}
+                    className="font-medium underline-offset-4 hover:text-burgundy hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy"
+                  >
+                    {item.title}
+                  </Link>
+                  <p className="mt-[3px] text-small text-help">
+                    {item.categoryName}
+                  </p>
+                  <p className="mt-12 break-all text-small text-help">
+                    {item.depositorEmail}
+                  </p>
+                  <div className="mt-12 flex items-center justify-between gap-12">
+                    <Status status={item.status} />
+                    <span className="text-small text-help">
+                      {new Date(
+                        item.submittedAt ?? item.createdAt,
+                      ).toLocaleDateString('fr-FR')}
+                    </span>
+                  </div>
+                </li>
               ))}
-            </tbody>
-          </table>
+            </ul>
+          </>
         )}
       </main>
     </>

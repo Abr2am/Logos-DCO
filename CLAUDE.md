@@ -534,6 +534,7 @@ lib/              auth · supabase · domain · library · cover · files ·
                   contributions · questions
 styles/           tokens du Design System
 supabase/         migrations SQL + tests (aucun seed de contenu)
+scripts/          assets de marque, vérification du schéma, crochets de test
 public/brand/     rosace, marqueterie
 docs/             cahier des charges + Design System
 ```
@@ -544,27 +545,50 @@ docs/             cahier des charges + Design System
 npm run dev           # serveur de développement
 npm run lint          # ESLint
 npm run typecheck     # tsc --noEmit
+npm run test          # tests de logique pure (lanceur natif de Node)
 npm run build         # build de production
 npm run format:check  # Prettier (vérification)
+npm run db:verify     # migrations + tests SQL sur une base jetable
 ```
 
-Avant tout commit : `npm run lint && npm run typecheck && npm run build`.
+Avant tout commit :
+`npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build`.
+
+### Tests
+
+Deux harnais, deux périmètres, aucun framework :
+
+- **`npm run db:verify`** — la sécurité. Migrations appliquées sur une base
+  jetable, puis tests de schéma et tests **négatifs** exécutés sous les vrais
+  rôles PostgreSQL. C'est là que vivent les preuves de RLS.
+- **`npm run test`** — la logique pure. Lanceur natif `node:test`, aucune
+  dépendance ajoutée ; `scripts/test-hooks.mjs` ne fait que résoudre l'alias
+  `@/` et neutraliser les modules réservés au serveur.
+
+Sont couverts : validation des téléversements, détection de pagination,
+libellés du cahier des charges, URL de bibliothèque, `safeReturnPath` et le
+lien `mailto:` de réponse.
+
+**Ne sont PAS couverts, volontairement :** les composants React, le rendu, et
+tout ce qui exige un navigateur. Pas de Playwright, pas de tests de
+composants, pas de nouveau framework — décision du 23/09/2026.
 
 ---
 
 ## Plan de développement
 
-| #   | Étape                                              | État                                                           |
-| --- | -------------------------------------------------- | -------------------------------------------------------------- |
-| 1   | Initialisation technique                           | ✅                                                             |
-| 2   | Fondations visuelles (tokens, polices, primitives) | ✅                                                             |
-| 3   | Modèle de données + Supabase + RLS                 | ✅                                                             |
-| 4   | Bibliothèque publique                              | ✅                                                             |
-| 5   | Fiche ressource + téléchargement sécurisé          | ✅                                                             |
-| 6   | Authentification + espace serviteur                | ✅                                                             |
-| 7   | Soumission + workflow admin                        | ✅                                                             |
-| 8   | Questions + durcissement + tests                   | Q&A MVP livré ; durcissement et tests de bout en bout restants |
-| 9   | Accueil éditorial + pied de page                   | ✅                                                             |
+| #   | Étape                                              | État |
+| --- | -------------------------------------------------- | ---- |
+| 1   | Initialisation technique                           | ✅   |
+| 2   | Fondations visuelles (tokens, polices, primitives) | ✅   |
+| 3   | Modèle de données + Supabase + RLS                 | ✅   |
+| 4   | Bibliothèque publique                              | ✅   |
+| 5   | Fiche ressource + téléchargement sécurisé          | ✅   |
+| 6   | Authentification + espace serviteur                | ✅   |
+| 7   | Soumission + workflow admin                        | ✅   |
+| 8   | Questions + durcissement + tests                   | ✅   |
+| 9   | Accueil éditorial + pied de page                   | ✅   |
+| 10  | Durcissement : états d'erreur et harnais de test   | ✅   |
 
 <!-- BEGIN:nextjs-agent-rules -->
 

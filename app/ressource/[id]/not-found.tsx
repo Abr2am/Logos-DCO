@@ -19,9 +19,9 @@ export default function RessourceIntrouvable() {
 
       <main className="mx-auto max-w-content px-22 py-44 tablet:px-26 desktop:px-44">
         <Panel accent="burgundy" className="max-w-reading">
-          <span className="font-display text-[20px] leading-[1.2]">
+          <h1 className="font-display text-[20px] leading-[1.2] tablet:text-[24px]">
             Cette ressource n&apos;est pas disponible
-          </span>
+          </h1>
           <p className="mt-12 text-body text-text-secondary">
             Elle a peut-être été archivée. Vous pouvez revenir à la
             bibliothèque.

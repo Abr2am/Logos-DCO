@@ -7,6 +7,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { Panel } from '@/components/ui/Panel';
 import { requireMember } from '@/lib/auth/session';
 import { markQuestionAnswered } from '@/lib/questions/actions';
+import { answerMailto } from '@/lib/questions/mailto';
 import { getMyQuestions } from '@/lib/questions/queries';
 import type { MyQuestion } from '@/lib/questions/types';
 
@@ -88,21 +89,9 @@ export default async function MesQuestionsPage() {
 function QuestionCard({ question }: { question: MyQuestion }) {
   const answered = question.status === 'ANSWERED';
 
-  /* L'adresse est encodée avant d'entrer dans l'URL : un « ? » ou un « # »
-     dans la partie locale — que la contrainte de la table accepte — couperait
-     sinon le destinataire au premier de ces caractères, et le courrier
-     partirait silencieusement à la mauvaise adresse. Le « @ » reste littéral,
-     comme l'attendent les clients de messagerie.
-
-     Objet pré-rempli : le visiteur ne sait pas de quelle ressource il s'agit
+  /* Objet pré-rempli : le visiteur ne sait pas de quelle ressource il s'agit
      une fois la réponse reçue hors de Logos. */
-  const address = encodeURIComponent(question.questionerEmail).replace(
-    /%40/g,
-    '@',
-  );
-  const mailto =
-    `mailto:${address}` +
-    `?subject=${encodeURIComponent(`Logos — ${question.resourceTitle}`)}`;
+  const mailto = answerMailto(question.questionerEmail, question.resourceTitle);
 
   return (
     <Panel accent={answered ? 'gold' : 'neutral'}>

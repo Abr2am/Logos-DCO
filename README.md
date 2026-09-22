@@ -54,6 +54,7 @@ npm run dev                  # http://localhost:3000
 | `npm run lint`         | ESLint                   |
 | `npm run lint:fix`     | ESLint avec corrections  |
 | `npm run typecheck`    | `tsc --noEmit`           |
+| `npm run test`         | Tests de logique pure    |
 | `npm run format`       | Prettier (écriture)      |
 | `npm run format:check` | Prettier (vérification)  |
 | `npm run assets:brand` | Régénère `public/brand/` |
@@ -62,11 +63,27 @@ npm run dev                  # http://localhost:3000
 Avant tout commit :
 
 ```bash
-npm run lint && npm run typecheck && npm run build
+npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build
 ```
 
 La CI (`.github/workflows/ci.yml`) rejoue ces mêmes vérifications sur chaque
-push et chaque pull request.
+push et chaque pull request, ainsi que `npm run db:verify` sur un service
+PostgreSQL 16.
+
+### Tests
+
+Deux harnais, aucun framework, aucune dépendance de test :
+
+- `npm run db:verify` — la **sécurité**. Migrations sur une base jetable, puis
+  tests de schéma et tests négatifs sous les vrais rôles PostgreSQL.
+- `npm run test` — la **logique pure**, avec le lanceur natif `node:test`.
+  Node 22 exécute TypeScript directement ; `scripts/test-hooks.mjs` se borne à
+  résoudre l'alias `@/` et à neutraliser les modules réservés au serveur.
+
+Couverts : validation des téléversements, détection de pagination, libellés du
+cahier des charges, URL de bibliothèque, `safeReturnPath`, lien `mailto:`.
+
+Volontairement hors périmètre : composants React, rendu, navigateur.
 
 ---
 
@@ -113,17 +130,22 @@ L'échelle d'espacement est nommée d'après ses valeurs en pixels — `p-22` va
 
 ## État d'avancement
 
-| #   | Étape                                              | État                                                           |
-| --- | -------------------------------------------------- | -------------------------------------------------------------- |
-| 1   | Initialisation technique                           | ✅                                                             |
-| 2   | Fondations visuelles (tokens, polices, primitives) | ✅                                                             |
-| 3   | Modèle de données + Supabase + RLS                 | ✅                                                             |
-| 4   | Bibliothèque publique                              | ✅                                                             |
-| 5   | Fiche ressource + téléchargement sécurisé          | ✅                                                             |
-| 6   | Authentification + espace serviteur                | ✅                                                             |
-| 7   | Soumission + workflow admin                        | ✅                                                             |
-| 8   | Questions + durcissement + tests                   | Q&A MVP livré ; durcissement et tests de bout en bout restants |
-| 9   | Accueil éditorial + pied de page                   | ✅                                                             |
+| #   | Étape                                              | État |
+| --- | -------------------------------------------------- | ---- |
+| 1   | Initialisation technique                           | ✅   |
+| 2   | Fondations visuelles (tokens, polices, primitives) | ✅   |
+| 3   | Modèle de données + Supabase + RLS                 | ✅   |
+| 4   | Bibliothèque publique                              | ✅   |
+| 5   | Fiche ressource + téléchargement sécurisé          | ✅   |
+| 6   | Authentification + espace serviteur                | ✅   |
+| 7   | Soumission + workflow admin                        | ✅   |
+| 8   | Questions + durcissement + tests                   | ✅   |
+| 9   | Accueil éditorial + pied de page                   | ✅   |
+| 10  | Durcissement : états d'erreur et harnais de test   | ✅   |
+
+`app/not-found.tsx` et `app/error.tsx` couvrent les deux pannes visibles : une
+URL inconnue et une exception non rattrapée. Aucun détail technique n'est
+exposé au visiteur.
 
 `app/page.tsx` porte l'accueil éditorial du §20 du cahier des charges : hero,
 raison d'être, recherche, les neuf thèmes, « À découvrir », bande de
