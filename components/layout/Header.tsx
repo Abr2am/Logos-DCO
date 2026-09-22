@@ -2,43 +2,34 @@ import Link from 'next/link';
 
 import { BrandMark } from '@/components/brand/BrandMark';
 import { TopBanner } from '@/components/brand/TopBanner';
+import { currentUser } from '@/lib/auth/session';
 import { cn } from '@/lib/cn';
 
 import { MobileMenu } from './MobileMenu';
-import { DEFAULT_ACCOUNT_ITEM, NAV_ITEMS, type NavItem } from './nav-items';
+import { SignOutButton } from './SignOutButton';
+import { ACCOUNT_ITEM, ACCOUNT_LABEL_SIGNED_IN, NAV_ITEMS } from './nav-items';
 
 /*
  * Header : bandeau noyer + filet doré, puis barre de 76 px (60 px mobile).
  * Fond `--surface`, bordure basse `.12`. PAS de header collant.
  * Bascule vers le hamburger sous 900 px.
+ *
+ * Le header lit LUI-MÊME la session : aucune page n'a plus à lui dire si son
+ * visiteur est connecté, et le libellé de compte ne peut donc plus mentir sur
+ * une page publique. La lecture passe par `currentUser`, seul point d'entrée
+ * de `lib/auth` — le rôle est relu en base, jamais dans un jeton.
+ *
+ * ⚠️ Le point ouvert « T » reste entier : « Mon compte » n'est pas un lien,
+ * faute de destination tranchée. Voir `nav-items.ts`.
  */
-export function Header({
-  currentPath,
-  account = DEFAULT_ACCOUNT_ITEM,
-  accountAction,
-}: {
-  currentPath?: string;
-  /** Entrée de compte ; « Connexion » tant que l'utilisateur n'est pas connecté. */
-  account?: NavItem;
-  /**
-   * Remplace le lien de compte lorsqu'il est fourni — la déconnexion, pour un
-   * utilisateur authentifié.
-   *
-   * ⚠️ Conséquence du point ouvert « T » : le Design System indique que le
-   * libellé bascule sur « Mon compte » une fois connecté, mais aucune route de
-   * compte n'existe dans la liste fermée. Tant que la destination n'est pas
-   * tranchée, afficher un lien sans cible serait pire qu'une action utile.
-   */
-  accountAction?: React.ReactNode;
-}) {
-  const items: ReadonlyArray<NavItem> = accountAction
-    ? NAV_ITEMS
-    : [...NAV_ITEMS, account];
+export async function Header({ currentPath }: { currentPath?: string }) {
+  const user = await currentUser();
+  const signedIn = user !== null;
 
   return (
     <header className="border-b border-line bg-surface">
       <TopBanner />
-      <div className="mx-auto flex h-[60px] max-w-content items-center justify-between px-20 tablet:h-[76px] tablet:px-26 desktop:px-44">
+      <div className="mx-auto flex h-[60px] max-w-content items-center justify-between px-22 tablet:h-[76px] tablet:px-26 desktop:px-44">
         <Link
           href="/"
           aria-label="Logos — accueil"
@@ -78,20 +69,27 @@ export function Header({
               </Link>
             );
           })}
-          {accountAction ?? (
+
+          {signedIn ? (
+            <>
+              <span className="text-help">{ACCOUNT_LABEL_SIGNED_IN}</span>
+              <SignOutButton />
+            </>
+          ) : (
             <Link
-              href={account.href}
+              href={ACCOUNT_ITEM.href}
               className="rounded-control border border-line-field px-16 py-[8px] transition-colors duration-[150ms] ease-logos hover:bg-cover-plate focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-burgundy"
             >
-              {account.label}
+              {ACCOUNT_ITEM.label}
             </Link>
           )}
         </nav>
 
         <MobileMenu
-          items={items}
+          items={signedIn ? NAV_ITEMS : [...NAV_ITEMS, ACCOUNT_ITEM]}
           currentPath={currentPath}
-          action={accountAction}
+          accountLabel={signedIn ? ACCOUNT_LABEL_SIGNED_IN : undefined}
+          action={signedIn ? <SignOutButton /> : undefined}
         />
       </div>
     </header>

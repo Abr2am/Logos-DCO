@@ -448,21 +448,21 @@ dans le cahier des charges.** Si ce n'est pas le cas, ne pas l'ajouter.
 
 Ces points **n'ont pas été décidés**. Les signaler plutôt que de choisir.
 
-| Réf.  | Point                                                                                                                                                                                                                                                                                                                                  |
-| ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| C     | Parcours « mot de passe oublié »                                                                                                                                                                                                                                                                                                       |
-| D     | Navigation entre les deux écrans d'administration                                                                                                                                                                                                                                                                                      |
-| E     | Miniature extraite du fichier réel (1ʳᵉ page du PDF)                                                                                                                                                                                                                                                                                   |
-| ~~F~~ | ~~Canal de réponse du dépositaire aux questions~~ — **tranché le 22/09/2026** : `mailto:` depuis « Mes questions », hors de Logos                                                                                                                                                                                                      |
-| G     | Police de secours pour les caractères coptes / arabes                                                                                                                                                                                                                                                                                  |
-| H     | Favicon et vignette de partage                                                                                                                                                                                                                                                                                                         |
-| J     | Règle de « Tous les publics » combiné à d'autres publics                                                                                                                                                                                                                                                                               |
-| ~~L~~ | ~~Valeurs de `Question.status`~~ — **tranché le 22/09/2026** : `PENDING` et `ANSWERED`, rien d'autre                                                                                                                                                                                                                                   |
-| N     | Couverture : déterminisme par identifiant _vs_ contraintes de rythme par rangée                                                                                                                                                                                                                                                        |
-| O     | Format d'optimisation de la rosace (SVG vectorisé / WebP multi-tailles)                                                                                                                                                                                                                                                                |
-| R     | Anti-spam du formulaire de question anonyme                                                                                                                                                                                                                                                                                            |
-| S     | Renommage du fichier du Design System (espaces dans le chemin)                                                                                                                                                                                                                                                                         |
-| T     | **Destination de l'entrée « Mon compte »** une fois connecté — aucune route de compte n'existe dans la liste fermée (le Design System indique seulement que le libellé bascule depuis « Connexion »). En attendant, `Header` accepte `accountAction` : les pages authentifiées y placent la déconnexion, plutôt qu'un lien sans cible. |
+| Réf.  | Point                                                                                                                                                                                                                                                                                                                                                                                      |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| C     | Parcours « mot de passe oublié »                                                                                                                                                                                                                                                                                                                                                           |
+| D     | Navigation entre les deux écrans d'administration                                                                                                                                                                                                                                                                                                                                          |
+| E     | Miniature extraite du fichier réel (1ʳᵉ page du PDF)                                                                                                                                                                                                                                                                                                                                       |
+| ~~F~~ | ~~Canal de réponse du dépositaire aux questions~~ — **tranché le 22/09/2026** : `mailto:` depuis « Mes questions », hors de Logos                                                                                                                                                                                                                                                          |
+| G     | Police de secours pour les caractères coptes / arabes                                                                                                                                                                                                                                                                                                                                      |
+| H     | Favicon et vignette de partage                                                                                                                                                                                                                                                                                                                                                             |
+| J     | Règle de « Tous les publics » combiné à d'autres publics                                                                                                                                                                                                                                                                                                                                   |
+| ~~L~~ | ~~Valeurs de `Question.status`~~ — **tranché le 22/09/2026** : `PENDING` et `ANSWERED`, rien d'autre                                                                                                                                                                                                                                                                                       |
+| N     | Couverture : déterminisme par identifiant _vs_ contraintes de rythme par rangée                                                                                                                                                                                                                                                                                                            |
+| O     | Format d'optimisation de la rosace (SVG vectorisé / WebP multi-tailles)                                                                                                                                                                                                                                                                                                                    |
+| R     | Anti-spam du formulaire de question anonyme                                                                                                                                                                                                                                                                                                                                                |
+| S     | Renommage du fichier du Design System (espaces dans le chemin)                                                                                                                                                                                                                                                                                                                             |
+| T     | **Destination de l'entrée « Mon compte »** une fois connecté — aucune route de compte n'existe dans la liste fermée. Le libellé, lui, est tranché (22/09/2026) : `Header` lit la session et bascule « Connexion » → « Mon compte ». Ce libellé **n'est pas un lien**, faute de destination ; l'action utile — la déconnexion — l'accompagne. Ce qui reste ouvert est la seule destination. |
 
 > **F et L sont tranchés ; K et M ne sont plus des points ouverts.** Le cycle
 > question → notification → réponse du §12 tient debout sans service d'envoi :
@@ -508,6 +508,11 @@ Supabase (PostgreSQL + Auth + Storage) · Vercel.**
   aucune classe : l'anti-régression visuelle est mécanique.
 - L'échelle d'espacement est nommée d'après ses valeurs en pixels
   (`p-22` = 22 px), car le Design System raisonne en pixels.
+  ⚠️ Elle est **fermée** : 4 · 8 · 12 · 16 · 22 · 26 · 34 · 44 · 56 · 78 · 96.
+  Une valeur hors échelle ne produit **aucune classe et aucune erreur** —
+  `px-20` ne posait aucune gouttière, et la faute n'est apparue qu'à l'audit
+  visuel à 360 px. Toujours vérifier qu'un pas existe dans `tokens.css` avant
+  de l'employer ; ne jamais en ajouter un pour dépanner.
 - **Pas de gestionnaire d'état, pas de data-fetching client** : l'URL porte
   l'état (les filtres et la recherche sont des `searchParams`).
 - Le rendu est serveur par défaut ; `'use client'` seulement quand
@@ -525,9 +530,10 @@ Supabase (PostgreSQL + Auth + Storage) · Vercel.**
 ```
 app/              routes (App Router)
 components/       ui · brand · library · layout · contribution
-lib/              auth · supabase · domain · search · cover
+lib/              auth · supabase · domain · library · cover · files ·
+                  contributions · questions
 styles/           tokens du Design System
-supabase/         migrations SQL + seed
+supabase/         migrations SQL + tests (aucun seed de contenu)
 public/brand/     rosace, marqueterie
 docs/             cahier des charges + Design System
 ```
@@ -558,6 +564,7 @@ Avant tout commit : `npm run lint && npm run typecheck && npm run build`.
 | 6   | Authentification + espace serviteur                | ✅                                                             |
 | 7   | Soumission + workflow admin                        | ✅                                                             |
 | 8   | Questions + durcissement + tests                   | Q&A MVP livré ; durcissement et tests de bout en bout restants |
+| 9   | Accueil éditorial + pied de page                   | ✅                                                             |
 
 <!-- BEGIN:nextjs-agent-rules -->
 

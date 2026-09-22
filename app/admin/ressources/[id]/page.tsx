@@ -4,7 +4,6 @@ import { notFound } from 'next/navigation';
 
 import { ResourceForm } from '@/components/contribution/ResourceForm';
 import { Header } from '@/components/layout/Header';
-import { SignOutButton } from '@/components/layout/SignOutButton';
 import { ResourceCover } from '@/components/library/ResourceCover';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Button, buttonClassName } from '@/components/ui/Button';
@@ -67,9 +66,9 @@ export default async function ModerationPage({ params }: PageProps) {
 
   return (
     <>
-      <Header accountAction={<SignOutButton />} />
+      <Header />
 
-      <main className="mx-auto max-w-content px-20 py-34 tablet:px-26 tablet:py-44 desktop:px-44">
+      <main className="mx-auto max-w-content px-22 py-34 tablet:px-26 tablet:py-44 desktop:px-44">
         <Breadcrumb
           items={[
             { label: 'Administration', href: '/admin' },

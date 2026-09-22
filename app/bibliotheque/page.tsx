@@ -50,7 +50,7 @@ export default async function BibliothequePage({
     <>
       <Header currentPath="/bibliotheque" />
 
-      <main className="mx-auto max-w-content px-20 py-34 tablet:px-26 tablet:py-44 desktop:px-44">
+      <main className="mx-auto max-w-content px-22 py-34 tablet:px-26 tablet:py-44 desktop:px-44">
         <Breadcrumb
           items={[{ label: 'Accueil', href: '/' }, { label: 'Bibliothèque' }]}
         />

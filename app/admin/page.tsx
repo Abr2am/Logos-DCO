@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { Header } from '@/components/layout/Header';
-import { SignOutButton } from '@/components/layout/SignOutButton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Status } from '@/components/ui/Status';
 import { requireAdmin } from '@/lib/auth/session';
@@ -41,9 +40,9 @@ export default async function AdminPage() {
 
   return (
     <>
-      <Header accountAction={<SignOutButton />} />
+      <Header />
 
-      <main className="mx-auto max-w-content px-20 py-34 tablet:px-26 tablet:py-44 desktop:px-44">
+      <main className="mx-auto max-w-content px-22 py-34 tablet:px-26 tablet:py-44 desktop:px-44">
         <div className="flex items-baseline gap-16">
           <h1 className="font-display text-h1-mobile tablet:text-h1">
             Ressources

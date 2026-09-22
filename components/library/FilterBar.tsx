@@ -80,7 +80,7 @@ export function FilterBar({
 
   return (
     <div ref={rootRef} className="relative">
-      <div className="-mx-20 flex gap-[9px] overflow-x-auto px-20 tablet:mx-0 tablet:flex-wrap tablet:overflow-visible tablet:px-0">
+      <div className="-mx-22 flex gap-[9px] overflow-x-auto px-22 tablet:mx-0 tablet:flex-wrap tablet:overflow-visible tablet:px-0">
         <Trigger
           name="categorie"
           label="Catégorie"

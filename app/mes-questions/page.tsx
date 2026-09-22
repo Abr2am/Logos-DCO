@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { Header } from '@/components/layout/Header';
-import { SignOutButton } from '@/components/layout/SignOutButton';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Panel } from '@/components/ui/Panel';
@@ -44,9 +43,9 @@ export default async function MesQuestionsPage() {
 
   return (
     <>
-      <Header currentPath="/mes-questions" accountAction={<SignOutButton />} />
+      <Header currentPath="/mes-questions" />
 
-      <main className="mx-auto max-w-content px-20 py-34 tablet:px-26 tablet:py-44 desktop:px-44">
+      <main className="mx-auto max-w-content px-22 py-34 tablet:px-26 tablet:py-44 desktop:px-44">
         <h1 className="font-display text-h1-mobile tablet:text-h1">
           Mes questions
         </h1>

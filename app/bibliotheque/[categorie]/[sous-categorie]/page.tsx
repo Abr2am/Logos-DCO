@@ -85,7 +85,7 @@ export default async function SousCategoriePage({
         searchPreserve={flags.map((flag) => ({ name: 'flags', value: flag }))}
       />
 
-      <main className="mx-auto max-w-content px-20 py-34 tablet:px-26 tablet:py-44 desktop:px-44">
+      <main className="mx-auto max-w-content px-22 py-34 tablet:px-26 tablet:py-44 desktop:px-44">
         <FilterBar
           categories={categories}
           categorySlug={category.slug}

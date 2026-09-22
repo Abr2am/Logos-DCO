@@ -77,7 +77,7 @@ export default function DesignSystemPage() {
     <div className="min-h-screen bg-ivory">
       <Header currentPath="/bibliotheque" />
 
-      <main className="mx-auto max-w-content space-y-34 px-20 py-44 tablet:px-26 desktop:px-44">
+      <main className="mx-auto max-w-content space-y-34 px-22 py-44 tablet:px-26 desktop:px-44">
         <div>
           <h1 className="font-display text-h1-mobile tablet:text-h1">
             Fondations visuelles

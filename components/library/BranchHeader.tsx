@@ -24,7 +24,7 @@ export function BranchHeader({
   searchPreserve?: ReadonlyArray<{ name: string; value: string }>;
 }) {
   return (
-    <section className="relative isolate overflow-hidden rounded-none bg-walnut-900 px-20 py-34 tablet:px-26 tablet:py-44 desktop:px-44">
+    <section className="relative isolate overflow-hidden rounded-none bg-walnut-900 px-22 py-34 tablet:px-26 tablet:py-44 desktop:px-44">
       <Image
         src="/brand/marqueterie-736.webp"
         alt=""

@@ -43,7 +43,7 @@ export default async function ConnexionPage({
     <>
       <header className="border-b border-line bg-surface">
         <TopBanner />
-        <div className="mx-auto flex h-[60px] max-w-content items-center px-20 tablet:h-[76px] tablet:px-26 desktop:px-44">
+        <div className="mx-auto flex h-[60px] max-w-content items-center px-22 tablet:h-[76px] tablet:px-26 desktop:px-44">
           <Link
             href="/"
             aria-label="Logos — accueil"
@@ -59,7 +59,7 @@ export default async function ConnexionPage({
         </div>
       </header>
 
-      <main className="flex min-h-[calc(100vh-76px)] items-start justify-center px-20 py-44 tablet:px-26 tablet:py-56">
+      <main className="flex min-h-[calc(100vh-76px)] items-start justify-center px-22 py-44 tablet:px-26 tablet:py-56">
         {/* Panneau centré de 420 px — surface encadrée, sans accent latéral. */}
         <div className="w-full max-w-login rounded-panel border border-line bg-surface px-[26px] py-[28px]">
           <h1 className="font-display text-h2-mobile tablet:text-h2">

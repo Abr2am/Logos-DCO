@@ -20,10 +20,17 @@ import type { NavItem } from './nav-items';
 export function MobileMenu({
   items,
   currentPath,
+  accountLabel,
   action,
 }: {
   items: ReadonlyArray<NavItem>;
   currentPath?: string;
+  /**
+   * Libellé de compte d'un utilisateur connecté — « Mon compte ». Rendu en
+   * texte, jamais en lien : aucune route de compte n'est tranchée (point
+   * ouvert « T »). L'action utile est portée par `action`.
+   */
+  accountLabel?: string;
   /** Action de compte, lorsqu'elle remplace le lien (ex. : déconnexion). */
   action?: React.ReactNode;
 }) {
@@ -93,7 +100,7 @@ export function MobileMenu({
           ref={panelRef}
           className="fixed inset-0 z-50 flex flex-col bg-surface nav:hidden"
         >
-          <div className="flex h-[60px] shrink-0 items-center justify-between border-b border-[rgb(36_24_16/0.1)] px-20">
+          <div className="flex h-[60px] shrink-0 items-center justify-between border-b border-[rgb(36_24_16/0.1)] px-22">
             <BrandMark size="sm" />
             <button
               type="button"
@@ -108,7 +115,7 @@ export function MobileMenu({
             </button>
           </div>
 
-          <nav aria-label="Navigation principale" className="px-20 pt-[8px]">
+          <nav aria-label="Navigation principale" className="px-22 pt-[8px]">
             <ul>
               {items.map((item, index) => {
                 const active = currentPath === item.href;
@@ -132,6 +139,11 @@ export function MobileMenu({
                 );
               })}
             </ul>
+            {accountLabel ? (
+              <p className="flex min-h-[52px] items-center border-t border-[rgb(36_24_16/0.08)] py-[17px] text-[16px] font-medium text-help">
+                {accountLabel}
+              </p>
+            ) : null}
             {action ? <div className="pt-16">{action}</div> : null}
             <div
               aria-hidden

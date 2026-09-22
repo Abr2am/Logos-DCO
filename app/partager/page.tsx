@@ -3,7 +3,6 @@ import Link from 'next/link';
 
 import { ResourceForm } from '@/components/contribution/ResourceForm';
 import { Header } from '@/components/layout/Header';
-import { SignOutButton } from '@/components/layout/SignOutButton';
 import { buttonClassName } from '@/components/ui/Button';
 import { Panel } from '@/components/ui/Panel';
 import { requireMember } from '@/lib/auth/session';
@@ -52,9 +51,9 @@ export default async function PartagerPage({
 
   return (
     <>
-      <Header currentPath="/partager" accountAction={<SignOutButton />} />
+      <Header currentPath="/partager" />
 
-      <main className="mx-auto max-w-form px-20 py-34 tablet:px-26 tablet:py-44">
+      <main className="mx-auto max-w-form px-22 py-34 tablet:px-26 tablet:py-44">
         <h1 className="font-display text-h1-mobile tablet:text-h1">
           {correcting ? 'Corriger la ressource' : 'Partager un cours'}
         </h1>

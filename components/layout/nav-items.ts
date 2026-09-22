@@ -10,15 +10,20 @@ export const NAV_ITEMS = [
 
 export type NavItem = { label: string; href: string };
 
-/**
- * Entrée de compte par défaut : visiteur non authentifié.
- *
- * ⚠️ POINT OUVERT — le Design System indique que le libellé bascule sur
- * « Mon compte » une fois connecté, mais aucune route de compte n'est définie
- * par le cahier des charges. La destination authentifiée est donc fournie par
- * l'appelant ; elle n'est pas décidée ici.
- */
-export const DEFAULT_ACCOUNT_ITEM: NavItem = {
+/** Entrée de compte d'un visiteur : un lien vers la connexion. */
+export const ACCOUNT_ITEM: NavItem = {
   label: 'Connexion',
   href: '/connexion',
 };
+
+/**
+ * Libellé de l'entrée de compte une fois connecté.
+ *
+ * ⚠️ POINT OUVERT « T » — INTACT. Le Design System indique que le libellé
+ * bascule de « Connexion » à « Mon compte » ; il ne dit pas où mène cette
+ * entrée, et aucune route de compte ne figure dans la liste fermée. Ce
+ * libellé n'est donc PAS un lien : il énonce l'état de la session, et
+ * l'action utile — la déconnexion — l'accompagne. Choisir une destination
+ * reviendrait à trancher « T ».
+ */
+export const ACCOUNT_LABEL_SIGNED_IN = 'Mon compte';

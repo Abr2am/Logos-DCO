@@ -113,19 +113,22 @@ L'échelle d'espacement est nommée d'après ses valeurs en pixels — `p-22` va
 
 ## État d'avancement
 
-| #   | Étape                                              | État    |
-| --- | -------------------------------------------------- | ------- |
-| 1   | Initialisation technique                           | ✅      |
-| 2   | Fondations visuelles (tokens, polices, primitives) | ✅      |
-| 3   | Modèle de données + Supabase + RLS                 | ✅      |
-| 4   | Bibliothèque publique                              | ✅      |
-| 5   | Fiche ressource + téléchargement sécurisé          | ✅      |
-| 6   | Authentification + espace serviteur                | ✅      |
-| 7   | Soumission + workflow admin                        | ✅      |
-| 8   | Questions + durcissement + tests                   | à faire |
+| #   | Étape                                              | État                                                           |
+| --- | -------------------------------------------------- | -------------------------------------------------------------- |
+| 1   | Initialisation technique                           | ✅                                                             |
+| 2   | Fondations visuelles (tokens, polices, primitives) | ✅                                                             |
+| 3   | Modèle de données + Supabase + RLS                 | ✅                                                             |
+| 4   | Bibliothèque publique                              | ✅                                                             |
+| 5   | Fiche ressource + téléchargement sécurisé          | ✅                                                             |
+| 6   | Authentification + espace serviteur                | ✅                                                             |
+| 7   | Soumission + workflow admin                        | ✅                                                             |
+| 8   | Questions + durcissement + tests                   | Q&A MVP livré ; durcissement et tests de bout en bout restants |
+| 9   | Accueil éditorial + pied de page                   | ✅                                                             |
 
-`app/page.tsx` est un **marqueur technique**, pas la page d'accueil : il sera
-intégralement remplacé à l'étape 4.
+`app/page.tsx` porte l'accueil éditorial du §20 du cahier des charges : hero,
+raison d'être, recherche, les neuf thèmes, « À découvrir », bande de
+contribution. Le pied de page est monté globalement dans `app/layout.tsx` et
+clôt toutes les pages.
 
 ---
 

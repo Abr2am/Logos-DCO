@@ -17,7 +17,7 @@ export default function RessourceIntrouvable() {
     <>
       <Header currentPath="/bibliotheque" />
 
-      <main className="mx-auto max-w-content px-20 py-44 tablet:px-26 desktop:px-44">
+      <main className="mx-auto max-w-content px-22 py-44 tablet:px-26 desktop:px-44">
         <Panel accent="burgundy" className="max-w-reading">
           <span className="font-display text-[20px] leading-[1.2]">
             Cette ressource n&apos;est pas disponible
