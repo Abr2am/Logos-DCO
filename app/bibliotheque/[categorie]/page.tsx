@@ -5,7 +5,7 @@ import { Header } from '@/components/layout/Header';
 import { BranchHeader } from '@/components/library/BranchHeader';
 import { FilterBar } from '@/components/library/FilterBar';
 import { LibraryResults } from '@/components/library/LibraryResults';
-import { ThemeCard } from '@/components/library/ThemeCard';
+import { ThemeShelf } from '@/components/library/ThemeShelf';
 import {
   getCategories,
   getFlagFacets,
@@ -90,19 +90,18 @@ export default async function CategoriePage({
         />
 
         {category.subcategories.length > 0 ? (
-          <ul className="mt-26 grid gap-[9px] tablet:grid-cols-3 tablet:gap-12">
-            {category.subcategories.map((subcategory) => (
-              <li key={subcategory.slug}>
-                <ThemeCard
-                  name={subcategory.name}
-                  href={libraryHref({
-                    ...branch,
-                    subcategorySlug: subcategory.slug,
-                  })}
-                />
-              </li>
-            ))}
-          </ul>
+          <ThemeShelf
+            className="mt-26"
+            layout="subthemes"
+            items={category.subcategories.map((subcategory) => ({
+              key: subcategory.slug,
+              name: subcategory.name,
+              href: libraryHref({
+                ...branch,
+                subcategorySlug: subcategory.slug,
+              }),
+            }))}
+          />
         ) : null}
 
         <div className="mt-34">

@@ -59,7 +59,7 @@ export default async function MesQuestionsPage() {
         <p className="mt-12">
           <Link
             href="/mes-contributions"
-            className="text-[13px] font-semibold text-burgundy underline-offset-4 hover:text-burgundy-light hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy"
+            className="text-[13px] font-semibold text-walnut-900 underline-offset-4 hover:text-walnut-700 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900"
           >
             Mes contributions →
           </Link>
@@ -98,7 +98,7 @@ function QuestionCard({ question }: { question: MyQuestion }) {
       <p className="font-mono text-mono font-medium uppercase tracking-[0.13em] text-help">
         <Link
           href={`/ressource/${question.resourceId}`}
-          className="underline-offset-4 hover:text-burgundy hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy"
+          className="underline-offset-4 hover:text-walnut-900 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900"
         >
           {question.resourceTitle}
         </Link>
@@ -114,7 +114,7 @@ function QuestionCard({ question }: { question: MyQuestion }) {
           <dd>
             <a
               href={mailto}
-              className="font-medium text-burgundy underline underline-offset-4 hover:text-burgundy-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy"
+              className="font-medium text-walnut-900 underline underline-offset-4 hover:text-walnut-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900"
             >
               {question.questionerEmail}
             </a>
@@ -135,7 +135,7 @@ function QuestionCard({ question }: { question: MyQuestion }) {
         <div className="mt-16 flex flex-wrap items-center gap-12">
           <a
             href={mailto}
-            className="text-[13px] font-semibold text-burgundy underline underline-offset-4 hover:text-burgundy-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy"
+            className="text-[13px] font-semibold text-walnut-900 underline underline-offset-4 hover:text-walnut-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900"
           >
             Répondre par e-mail
           </a>

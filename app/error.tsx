@@ -19,7 +19,7 @@ import { Panel } from '@/components/ui/Panel';
  * policies. Le paramètre `error` est reçu parce que Next l'impose, et il
  * n'est pas lu.
  *
- * Le traitement est celui du Design System : panneau à accent bordeaux, « ! »
+ * Le traitement est celui du Design System : panneau à accent noyer, « ! »
  * textuel s'il en faut un. Aucun rouge, aucune couleur d'état.
  */
 
@@ -29,7 +29,7 @@ export default function ErreurApplication({ reset }: { reset: () => void }) {
       <MinimalHeader />
 
       <main className="mx-auto max-w-content px-22 py-44 tablet:px-26 tablet:py-56 desktop:px-44">
-        <Panel accent="burgundy" className="max-w-reading">
+        <Panel accent="walnut" className="max-w-reading">
           <h1 className="font-display text-[20px] leading-[1.2] tablet:text-[24px]">
             Une erreur est survenue
           </h1>
@@ -44,7 +44,7 @@ export default function ErreurApplication({ reset }: { reset: () => void }) {
             </Button>
             <Link
               href="/"
-              className="text-[13.5px] font-semibold text-burgundy underline underline-offset-4 hover:text-burgundy-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy"
+              className="text-[13.5px] font-semibold text-walnut-900 underline underline-offset-4 hover:text-walnut-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900"
             >
               Revenir à l&apos;accueil
             </Link>

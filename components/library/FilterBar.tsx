@@ -222,10 +222,10 @@ function Trigger({
         'inline-flex shrink-0 items-center gap-[8px] rounded-control border',
         'min-h-[44px] px-16 py-[11px] text-[13px] font-medium',
         'transition-colors duration-[150ms] ease-logos',
-        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy',
+        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900',
         'disabled:cursor-not-allowed disabled:border-line disabled:text-disabled-text',
         value
-          ? 'border-burgundy bg-surface text-burgundy'
+          ? 'border-walnut-900 bg-surface text-walnut-900'
           : 'border-line-field bg-surface text-text hover:bg-cover-plate',
       )}
     >
@@ -258,14 +258,14 @@ function Panel({
       )}
     >
       <div className="flex items-center justify-between border-b border-line-hairline px-16 py-12">
-        <span className="font-mono text-mono font-medium uppercase tracking-[0.13em] text-burgundy">
+        <span className="font-mono text-mono font-medium uppercase tracking-[0.13em] text-walnut-900">
           {title}
         </span>
         <button
           type="button"
           onClick={onClose}
           aria-label="Fermer"
-          className="grid size-[44px] place-items-center text-[16px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy tablet:size-[24px]"
+          className="grid size-[44px] place-items-center text-[16px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900 tablet:size-[24px]"
         >
           <span aria-hidden>✕</span>
         </button>
@@ -291,9 +291,9 @@ function OptionLink({
       className={cn(
         'flex min-h-[52px] items-center border-b border-line-hairline px-16 py-12',
         'text-[14px] transition-colors duration-[150ms] ease-logos',
-        'focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-burgundy',
+        'focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-walnut-900',
         'last:border-b-0 hover:bg-cover-plate',
-        selected && 'font-semibold text-burgundy',
+        selected && 'font-semibold text-walnut-900',
       )}
     >
       {label}

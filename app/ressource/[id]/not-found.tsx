@@ -18,7 +18,7 @@ export default function RessourceIntrouvable() {
       <Header currentPath="/bibliotheque" />
 
       <main className="mx-auto max-w-content px-22 py-44 tablet:px-26 desktop:px-44">
-        <Panel accent="burgundy" className="max-w-reading">
+        <Panel accent="walnut" className="max-w-reading">
           <h1 className="font-display text-[20px] leading-[1.2] tablet:text-[24px]">
             Cette ressource n&apos;est pas disponible
           </h1>
@@ -28,7 +28,7 @@ export default function RessourceIntrouvable() {
           </p>
           <Link
             href="/bibliotheque"
-            className="mt-16 inline-block text-[13.5px] font-semibold text-burgundy underline underline-offset-4 hover:text-burgundy-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy"
+            className="mt-16 inline-block text-[13.5px] font-semibold text-walnut-900 underline underline-offset-4 hover:text-walnut-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900"
           >
             Revenir à la bibliothèque
           </Link>

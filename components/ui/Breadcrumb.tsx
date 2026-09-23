@@ -66,7 +66,7 @@ export function Breadcrumb({
               ) : (
                 <Link
                   href={item.href}
-                  className="hover:text-burgundy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy"
+                  className="hover:text-walnut-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900"
                 >
                   {item.label}
                 </Link>

@@ -4,7 +4,7 @@ import { BrandMark } from '@/components/brand/BrandMark';
 import { RosaceHero } from '@/components/brand/Rosace';
 import { Header } from '@/components/layout/Header';
 import { ResourceGrid } from '@/components/library/ResourceGrid';
-import { ThemeCard } from '@/components/library/ThemeCard';
+import { ThemeShelf } from '@/components/library/ThemeShelf';
 import { buttonClassName } from '@/components/ui/Button';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { SectionHeading } from '@/components/ui/SectionHeading';
@@ -22,9 +22,10 @@ import { libraryHref } from '@/lib/library/url';
  * Design System. Aucun compteur, aucune statistique, aucun statut, aucun
  * auteur — la page ne montre rien que la bibliothèque ne montre déjà.
  *
- * Zones noyer de cet écran : la bande de contribution et le pied, contigus
- * et séparés d'un filet doré. Le Design System les compose comme un seul
- * bloc ; le plafond de deux zones par écran est donc tenu.
+ * Direction NOYER (23/09/2026) : le hero est COURT — il annonce, il n'occupe
+ * pas l'écran. La rosace y est entière, discrète, jamais coupée par un bord.
+ * « Explorer par thème » est un rayonnage de niches, « À découvrir » une
+ * véritable étagère d'ouvrages.
  */
 
 export const dynamic = 'force-dynamic';
@@ -48,35 +49,46 @@ export default async function AccueilPage() {
       <Header currentPath="/" />
 
       <main>
-        {/* 1 · Hero — l'unique occurrence de la rosace en grand format. */}
-        <section className="relative overflow-hidden border-b border-line-hairline">
-          <RosaceHero
-            variant="desktop"
-            className="absolute -right-[420px] -top-[470px] tablet:-right-[340px] tablet:-top-[420px]"
-          />
+        {/* 1 · Hero — court. L'unique occurrence de la rosace, ENTIÈRE et
+            discrète : elle accompagne le titre, elle ne le domine pas. */}
+        <section className="relative border-b border-line-hairline">
+          <div className="relative mx-auto flex max-w-content flex-col gap-26 px-22 py-34 tablet:flex-row tablet:items-center tablet:justify-between tablet:px-26 tablet:py-44 desktop:px-44">
+            <div className="relative max-w-reading">
+              <BrandMark size="hero" />
 
-          <div className="relative mx-auto max-w-content px-22 py-56 tablet:px-26 tablet:py-78 desktop:px-44 desktop:py-96">
-            <BrandMark size="hero" />
+              <p className="mt-22 font-mono text-mono font-medium uppercase tracking-[0.13em] text-walnut-700">
+                Diocèse Copte Orthodoxe de Paris
+              </p>
 
-            <p className="mt-34 font-mono text-mono font-medium uppercase tracking-[0.13em] text-burgundy">
-              Diocèse Copte Orthodoxe de Paris
-            </p>
+              <h1 className="mt-[6px] font-display text-hero-mobile tablet:text-hero">
+                Les ressources de catéchisme
+              </h1>
 
-            <h1 className="mt-12 max-w-reading font-display text-hero-mobile tablet:text-hero">
-              Les ressources de catéchisme
-            </h1>
+              <p className="mt-12 font-display italic text-signature-mobile text-text-secondary tablet:text-signature">
+                Une même foi, pour aujourd&apos;hui et pour demain.
+              </p>
 
-            <p className="mt-16 font-display italic text-signature-mobile text-text-secondary tablet:text-signature">
-              Une même foi, pour aujourd&apos;hui et pour demain.
-            </p>
+              <div className="mt-26 flex flex-wrap gap-12">
+                <Link
+                  href="/bibliotheque"
+                  className={buttonClassName('primary')}
+                >
+                  Explorer la bibliothèque
+                </Link>
+                <Link href="/partager" className={buttonClassName('secondary')}>
+                  Partager un cours
+                </Link>
+              </div>
+            </div>
 
-            <div className="mt-34 flex flex-wrap gap-12">
-              <Link href="/bibliotheque" className={buttonClassName('primary')}>
-                Explorer la bibliothèque
-              </Link>
-              <Link href="/partager" className={buttonClassName('secondary')}>
-                Partager un cours
-              </Link>
+            {/* Rosace entière, à droite du titre. Masquée sous 640 px : à cette
+                largeur elle ne tiendrait pas sans être rognée. */}
+            <div
+              aria-hidden
+              className="hidden shrink-0 tablet:block desktop:pr-[26px]"
+            >
+              <RosaceHero size={240} className="desktop:hidden" />
+              <RosaceHero size={320} className="hidden desktop:block" />
             </div>
           </div>
         </section>
@@ -100,29 +112,28 @@ export default async function AccueilPage() {
           <SearchBar action="/bibliotheque" className="max-w-search" />
         </section>
 
-        {/* 4 · Explorer par thème — les neuf, jamais un compteur. */}
+        {/* 4 · Explorer par thème — les neuf en rayonnage de niches.
+            Jamais un compteur. Pas de lien tertiaire à droite du titre : sa
+            cible tactile tomberait sous 44 px, et les neuf niches mènent déjà
+            à la bibliothèque. */}
         <section className="mx-auto max-w-content px-22 pb-44 tablet:px-26 tablet:pb-56 desktop:px-44">
-          {/* Pas de lien tertiaire à droite du titre : sa cible tactile
-              tomberait sous 44 px, et les neuf thèmes mènent déjà à la
-              bibliothèque. */}
           <SectionHeading title="Explorer par thème" />
-          <ul className="mt-22 grid gap-[9px] tablet:grid-cols-2 tablet:gap-12 desktop:grid-cols-3 desktop:gap-[14px]">
-            {categories.map((category) => (
-              <li key={category.slug}>
-                <ThemeCard
-                  name={category.name}
-                  href={libraryHref({ categorySlug: category.slug })}
-                  subthemes={category.subcategories.map((sub) => sub.name)}
-                />
-              </li>
-            ))}
-          </ul>
+          <ThemeShelf
+            className="mt-22"
+            items={categories.map((category) => ({
+              key: category.slug,
+              name: category.name,
+              href: libraryHref({ categorySlug: category.slug }),
+              subthemes: category.subcategories.map((sub) => sub.name),
+            }))}
+          />
         </section>
 
         {/* 5 · À découvrir — quatre ressources publiées récentes.
-            Tant qu'il n'y en a aucune, le bloc disparaît : l'accueil n'est pas
-            l'endroit d'un état vide, et une tablette sans couvertures au-dessus
-            d'elle n'a pas de sens. */}
+            Une véritable étagère : les ouvrages sont posés sur la tablette.
+            Tant qu'il n'y en a aucun, le bloc disparaît — l'accueil n'est pas
+            l'endroit d'un état vide, et une tablette sans couvertures
+            au-dessus d'elle n'a pas de sens. */}
         {discover.length > 0 ? (
           <section className="mx-auto max-w-content px-22 pb-44 tablet:px-26 tablet:pb-56 desktop:px-44">
             <SectionHeading title="À découvrir" />

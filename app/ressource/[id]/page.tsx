@@ -144,7 +144,7 @@ export default async function RessourcePage({ params }: PageProps) {
 
             {resource.flags.length > 0 ? (
               <div className="mt-26">
-                <p className="font-mono text-mono font-medium uppercase tracking-[0.13em] text-burgundy">
+                <p className="font-mono text-mono font-medium uppercase tracking-[0.13em] text-walnut-900">
                   Flags
                 </p>
                 <div className="mt-12 flex flex-wrap gap-[7px]">

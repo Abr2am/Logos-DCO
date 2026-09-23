@@ -31,7 +31,7 @@ export function Flag({ children }: { children: ReactNode }) {
   );
 }
 
-/** Flag utilisé en filtre : l'état sélectionné passe en bordeaux plein. */
+/** Flag utilisé en filtre : l'état sélectionné passe en noyer plein. */
 export function FlagFilter({
   label,
   selected = false,
@@ -47,9 +47,9 @@ export function FlagFilter({
       className={cn(
         BASE,
         PAD,
-        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy',
+        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900',
         selected
-          ? 'bg-burgundy font-medium text-on-dark'
+          ? 'bg-walnut-900 font-medium text-on-dark'
           : 'border border-line bg-surface text-text hover:border-line-secondary hover:bg-cover-plate',
       )}
       {...props}
@@ -84,9 +84,9 @@ export function FlagFilterLink({
       className={cn(
         BASE,
         PAD,
-        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy',
+        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900',
         selected
-          ? 'bg-burgundy font-medium text-on-dark'
+          ? 'bg-walnut-900 font-medium text-on-dark'
           : 'border border-line bg-surface text-text hover:border-line-secondary hover:bg-cover-plate',
       )}
     >
@@ -121,7 +121,7 @@ export function FlagRemovable({
         type="button"
         onClick={onRemove}
         aria-label={`Retirer le mot-clé ${label}`}
-        className="text-burgundy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy"
+        className="text-walnut-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900"
       >
         ✕
       </button>
@@ -137,8 +137,8 @@ export function FlagAdd(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
       className={cn(
         BASE,
         PAD_FORM,
-        'border border-dashed border-[rgb(110_27_42/0.4)] text-burgundy',
-        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy',
+        'border border-dashed border-[rgb(46_30_21/0.4)] text-walnut-900',
+        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900',
       )}
       {...props}
     >

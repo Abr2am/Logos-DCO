@@ -55,7 +55,7 @@ export default async function MesContributionsPage() {
         <p className="mt-12">
           <Link
             href="/mes-questions"
-            className="text-[13px] font-semibold text-burgundy underline-offset-4 hover:text-burgundy-light hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy"
+            className="text-[13px] font-semibold text-walnut-900 underline-offset-4 hover:text-walnut-700 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900"
           >
             Mes questions →
           </Link>
@@ -163,7 +163,7 @@ function Correction({ contribution }: { contribution: Contribution }) {
 
   return (
     <div className="mt-12">
-      <Panel accent="burgundy" label="Commentaire de l'administrateur">
+      <Panel accent="walnut" label="Commentaire de l'administrateur">
         {contribution.adminComment ?? '—'}
       </Panel>
       <div className="mt-12 flex flex-wrap gap-12">

@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { Header } from '@/components/layout/Header';
 import { FilterBar } from '@/components/library/FilterBar';
 import { LibraryResults } from '@/components/library/LibraryResults';
-import { ThemeCard } from '@/components/library/ThemeCard';
+import { ThemeShelf } from '@/components/library/ThemeShelf';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { SearchBar } from '@/components/ui/SearchBar';
 import {
@@ -84,17 +84,14 @@ export default async function BibliothequePage({
           {hasCriteria ? (
             <LibraryResults resources={resources} resetHref={libraryHref({})} />
           ) : (
-            <ul className="grid gap-[9px] tablet:grid-cols-2 tablet:gap-12 desktop:grid-cols-3 desktop:gap-[14px]">
-              {categories.map((category) => (
-                <li key={category.slug}>
-                  <ThemeCard
-                    name={category.name}
-                    href={libraryHref({ categorySlug: category.slug })}
-                    subthemes={category.subcategories.map((sub) => sub.name)}
-                  />
-                </li>
-              ))}
-            </ul>
+            <ThemeShelf
+              items={categories.map((category) => ({
+                key: category.slug,
+                name: category.name,
+                href: libraryHref({ categorySlug: category.slug }),
+                subthemes: category.subcategories.map((sub) => sub.name),
+              }))}
+            />
           )}
         </div>
       </main>

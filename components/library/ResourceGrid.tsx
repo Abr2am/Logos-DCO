@@ -1,14 +1,12 @@
-import { coverFamilyFromKey } from '@/lib/cover/families';
-import { resourceMetaLine } from '@/lib/domain/resource';
 import type { ResourceSummary } from '@/lib/library/types';
 
-import { ResourceCard } from './ResourceCard';
-import { Shelf } from './Shelf';
+import { Bookshelf } from './Bookshelf';
 
 /*
- * Grille de couvertures, close par une tablette.
+ * Les ressources d'une branche ou d'une recherche, présentées en rayonnage.
  *
- * 2 par rangée en mobile · 3 en tablette · 4 en desktop.
+ * 2 ouvrages par rangée en mobile · 3 en tablette · 4 en desktop — le
+ * responsive du cahier des charges, tenu par le seul CSS (voir `Bookshelf`).
  *
  * La famille de couverture est dérivée de l'identifiant de la ressource
  * (déterminisme stable). Le point ouvert « N » — arbitrage entre ce
@@ -19,21 +17,5 @@ export function ResourceGrid({
 }: {
   resources: ReadonlyArray<ResourceSummary>;
 }) {
-  return (
-    <div>
-      <div className="grid grid-cols-2 gap-16 tablet:grid-cols-3 tablet:gap-26 desktop:grid-cols-4">
-        {resources.map((resource) => (
-          <ResourceCard
-            key={resource.id}
-            href={`/ressource/${resource.id}`}
-            title={resource.title}
-            category={resource.subcategoryName ?? resource.categoryName}
-            family={coverFamilyFromKey(resource.id)}
-            meta={resourceMetaLine(resource)}
-          />
-        ))}
-      </div>
-      <Shelf className="mt-[18px]" />
-    </div>
-  );
+  return <Bookshelf resources={resources} />;
 }

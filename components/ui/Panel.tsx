@@ -4,17 +4,17 @@ import { cn } from '@/lib/cn';
 
 /*
  * Panneau d'information — accent gauche de 3 px :
- *   bordeaux pour une demande de correction,
+ *   noyer pour une demande de correction,
  *   doré   pour une confirmation,
  *   neutre pour une information sans qualification.
  *
  * Aucun panneau ne porte d'ombre : il a une bordure.
  */
 
-type PanelAccent = 'burgundy' | 'gold' | 'neutral';
+type PanelAccent = 'walnut' | 'gold' | 'neutral';
 
 const ACCENTS: Record<PanelAccent, string> = {
-  burgundy: 'border-l-[3px] border-l-burgundy',
+  walnut: 'border-l-[3px] border-l-walnut-900',
   gold: 'border-l-[3px] border-l-gold',
   neutral: 'border-l-[3px] border-l-[rgb(36_24_16/0.2)]',
 };
@@ -40,7 +40,7 @@ export function Panel({
       )}
     >
       {label ? (
-        <div className="font-mono text-mono font-medium uppercase tracking-[0.13em] text-burgundy">
+        <div className="font-mono text-mono font-medium uppercase tracking-[0.13em] text-walnut-900">
           {label}
         </div>
       ) : null}
@@ -59,7 +59,7 @@ export function MetadataBlock({
     <dl className="grid grid-cols-2 gap-x-[32px] gap-y-16 rounded-panel border border-line bg-surface px-[26px] py-[24px]">
       {items.map((item) => (
         <div key={item.label}>
-          <dt className="font-mono text-mono font-medium uppercase tracking-[0.13em] text-burgundy">
+          <dt className="font-mono text-mono font-medium uppercase tracking-[0.13em] text-walnut-900">
             {item.label}
           </dt>
           <dd className="mt-[6px] text-[14.5px]">{item.value}</dd>

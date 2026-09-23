@@ -20,10 +20,10 @@
   }
 
   /* Accessibilité — le focus est toujours visible, jamais supprimé.
-     Contour 2 px bordeaux, offset 2 px (le Design System impose un offset
+     Contour 2 px noyer, offset 2 px (le Design System impose un offset
      de 2 à 3 px selon le composant, et un contour doré sur fond noyer).   */
   :focus-visible {
-    outline: 2px solid var(--color-burgundy);
+    outline: 2px solid var(--color-walnut-900);
     outline-offset: 2px;
   }
 

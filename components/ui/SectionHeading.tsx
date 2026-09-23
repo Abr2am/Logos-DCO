@@ -17,7 +17,7 @@ export function SectionHeading({
       {action ? (
         <Link
           href={action.href}
-          className="shrink-0 text-[13px] font-semibold text-burgundy underline-offset-4 hover:text-burgundy-light hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy"
+          className="shrink-0 text-[13px] font-semibold text-walnut-900 underline-offset-4 hover:text-walnut-700 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900"
         >
           {action.label} →
         </Link>

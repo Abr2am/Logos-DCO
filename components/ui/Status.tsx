@@ -2,7 +2,7 @@ import { cn } from '@/lib/cn';
 
 /*
  * Quatre statuts, différenciés par la MATIÈRE et non par une palette de
- * dashboard : doré plein, bordeaux plein, contour bordeaux, contour neutre.
+ * dashboard : doré plein, noyer plein, contour noyer, contour neutre.
  *
  * « Ils n'apparaissent que dans Mes contributions et l'administration,
  *   jamais dans la bibliothèque publique. »
@@ -19,11 +19,12 @@ const STATUS: Record<DisplayedStatus, { label: string; className: string }> = {
   },
   PUBLISHED: {
     label: 'Publiée',
-    className: 'bg-burgundy text-on-dark px-[10px] py-[5px]',
+    className: 'bg-walnut-900 text-on-dark px-[10px] py-[5px]',
   },
   REJECTED: {
     label: 'À corriger',
-    className: 'border-[1.5px] border-burgundy text-burgundy px-[9px] py-[4px]',
+    className:
+      'border-[1.5px] border-walnut-900 text-walnut-900 px-[9px] py-[4px]',
   },
   ARCHIVED: {
     label: 'Archivée',

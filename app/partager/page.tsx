@@ -92,7 +92,7 @@ export default async function PartagerPage({
 
             {resource?.adminComment ? (
               <Panel
-                accent="burgundy"
+                accent="walnut"
                 label="Commentaire de l'administrateur"
                 className="mt-26"
               >

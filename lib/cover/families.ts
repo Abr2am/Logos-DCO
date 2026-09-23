@@ -9,9 +9,9 @@
  * la catégorie n'est exprimée que par le texte (surtitre et métadonnées).
  */
 export const COVER_FAMILIES = [
-  'burgundy',
+  'plate',
   'ivory',
-  'walnut',
+  'marquetry',
   'motif',
   'minimal',
 ] as const;
@@ -24,7 +24,7 @@ export type CoverFamily = (typeof COVER_FAMILIES)[number];
  *
  * ⚠️ POINT OUVERT « N » — non tranché.
  * Le Design System impose à la fois ce déterminisme par identifiant ET des
- * contraintes de rythme par rangée de 4 (au plus 2 noyer, au plus 1 à motif,
+ * contraintes de rythme par rangée de 4 (au plus 2 sombres, au plus 1 à motif,
  * jamais deux minimales côte à côte, au plus 1 rosace sur 5). Les deux règles
  * ne sont pas conciliables en général : deux ressources voisines dans une
  * grille filtrée peuvent violer le rythme.

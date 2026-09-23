@@ -15,7 +15,7 @@ import { Panel } from '@/components/ui/Panel';
  * rattacher au produit, et un seul chemin en sort — l'accueil.
  *
  * Le traitement est celui du Design System pour une erreur de page : un
- * panneau à accent bordeaux, sans rosace. La pastille dorée est réservée aux
+ * panneau à accent noyer, sans rosace. La pastille dorée est réservée aux
  * états vides.
  */
 
@@ -30,7 +30,7 @@ export default function PageIntrouvable() {
       <MinimalHeader />
 
       <main className="mx-auto max-w-content px-22 py-44 tablet:px-26 tablet:py-56 desktop:px-44">
-        <Panel accent="burgundy" className="max-w-reading">
+        <Panel accent="walnut" className="max-w-reading">
           <h1 className="font-display text-[20px] leading-[1.2] tablet:text-[24px]">
             Cette page n&apos;existe pas
           </h1>
@@ -39,7 +39,7 @@ export default function PageIntrouvable() {
           </p>
           <Link
             href="/"
-            className="mt-16 inline-block text-[13.5px] font-semibold text-burgundy underline underline-offset-4 hover:text-burgundy-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy"
+            className="mt-16 inline-block text-[13.5px] font-semibold text-walnut-900 underline underline-offset-4 hover:text-walnut-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900"
           >
             Revenir à l&apos;accueil
           </Link>

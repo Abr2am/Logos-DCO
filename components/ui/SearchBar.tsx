@@ -46,7 +46,7 @@ export function SearchBar({
       role="search"
       className={cn(
         'flex items-stretch rounded-control',
-        'focus-within:outline-2 focus-within:outline-offset-[3px] focus-within:outline-burgundy',
+        'focus-within:outline-2 focus-within:outline-offset-[3px] focus-within:outline-walnut-900',
         branch
           ? 'border border-[rgb(195_154_84/0.6)] bg-ivory'
           : 'border border-[rgb(36_24_16/0.25)] bg-surface',
@@ -68,7 +68,7 @@ export function SearchBar({
         {/* Marque de recherche : cercle géométrique, conforme au gabarit. */}
         <span
           aria-hidden
-          className="size-[12px] shrink-0 rounded-full border-[1.5px] border-burgundy tablet:size-[15px]"
+          className="size-[12px] shrink-0 rounded-full border-[1.5px] border-walnut-900 tablet:size-[15px]"
         />
         <input
           id="q"
@@ -82,8 +82,8 @@ export function SearchBar({
       <button
         type="submit"
         className={cn(
-          'shrink-0 bg-burgundy font-semibold text-on-dark',
-          'transition-colors duration-[150ms] ease-logos hover:bg-burgundy-hover',
+          'shrink-0 bg-walnut-900 font-semibold text-on-dark',
+          'transition-colors duration-[150ms] ease-logos hover:bg-walnut-700',
           'px-[16px] text-[12.5px] tablet:px-[34px] tablet:text-ui',
         )}
       >

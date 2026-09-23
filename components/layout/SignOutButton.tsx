@@ -11,7 +11,7 @@ export function SignOutButton() {
     <form action={signOut}>
       <button
         type="submit"
-        className="rounded-control border border-line-field px-16 py-[8px] text-[13.5px] font-medium transition-colors duration-[150ms] ease-logos hover:bg-cover-plate focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-burgundy"
+        className="rounded-control border border-line-field px-16 py-[8px] text-[13.5px] font-medium transition-colors duration-[150ms] ease-logos hover:bg-cover-plate focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-walnut-900"
       >
         Se déconnecter
       </button>

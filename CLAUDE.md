@@ -357,17 +357,33 @@ jetable, puis tests de schéma et tests de sécurité négatifs.
 **8 tokens de couleur · 3 familles typographiques · 1 échelle d'espacement ·
 3 rayons · 2 ombres · 2 durées.** Tout est dans `styles/tokens.css`.
 
-**Répartition de surface imposée :** ivoire ≈ 82 % · bordeaux ≤ 12 % ·
-noyer ≤ 6 % · doré en filet uniquement.
+### Direction NOYER — validée le 23/09/2026
+
+**Le bordeaux `#6E1B2A` est RETIRÉ de la direction visuelle.** Il ne subsiste
+dans aucun token, aucune classe, aucune famille de couverture.
+
+| Rôle                             | Couleur                            |
+| -------------------------------- | ---------------------------------- |
+| Identité **et** action           | **Noyer `#2E1E15`** (`walnut-900`) |
+| Nuance architecturale secondaire | Noyer `#4A3123` (`walnut-700`)     |
+| Accent discret, filets           | Doré `#C39A54`                     |
+| Fond principal                   | Ivoire `#F7F3EA`                   |
+
+- Les **boutons principaux sont noyer**, jamais bordeaux.
+- **Sur fond noyer, le bouton est doré à texte noyer** — le seul cas où le
+  doré porte une action.
+- **Aucune couleur nouvelle.** Un survol ou un appui emprunte la même famille
+  (`walnut-700`, `walnut-active`) ; rien d'autre n'est permis.
 
 - **Aucune couleur d'état** : pas de rouge d'erreur, pas de vert de succès,
-  pas d'orange. Erreur = bordeaux + « ! » textuel ; succès = bordeaux + filet
-  doré ; attente = doré.
+  pas d'orange. Erreur = noyer + « ! » textuel + bordure renforcée ;
+  succès = noyer + filet doré ; attente = doré.
 - **Aucune couleur par catégorie.** Les neuf thèmes partagent exactement le
   même traitement.
 - **Aucun bleu, aucun vert.**
-- **Ombres réservées aux couvertures.** Cartes, panneaux, champs et boutons
-  ont une bordure, jamais une ombre.
+- **Ombres réservées aux couvertures**, et **très légères** : un ouvrage est
+  posé sur sa tablette, il n'y flotte pas. Panneaux, champs et boutons ont
+  une bordure, jamais une ombre.
 - **Rayons :** 3 px contrôles · 4 px panneaux · **0 couvertures, bandeaux et
   tablettes** (un livre a des angles vifs). Jamais d'arrondi complet, sauf la
   pastille de rosace.
@@ -382,29 +398,62 @@ noyer ≤ 6 % · doré en filet uniquement.
 - **Statuts** (En attente / Publiée / À corriger / Archivée) n'apparaissent
   **que** dans « Mes contributions » et l'administration, jamais dans la
   bibliothèque publique.
-- **Carte ressource :** couverture, titre, et une seule ligne
+- **Ouvrage (carte ressource) :** couverture 3:4, titre, et une seule ligne
   `type · format · pagination`. Rien d'autre — ni auteur, ni date, ni public,
-  ni flags, ni bouton.
-- **Carte thème :** aucun compteur de ressources.
+  ni flags, ni bouton. **AUCUNE carte blanche autour de la couverture** : le
+  livre est posé directement sur la tablette.
+- **Niche de thème :** aucun compteur de ressources.
 - **Couvertures génératives**, calculées depuis catégorie + titre + index
   stable. Aucune image téléversée. **Une famille de couverture ne représente
   jamais une catégorie** : aucune correspondance couleur ↔ thème.
 
 ### Rosace — 4 usages seulement
 
-Marque (pastille 22-40 px) · Hero (une occurrence, ≥ 200 px) · Couverture
-(filigrane ≤ 26 %, au plus 1 sur 5) · État vide (pastille dorée 34 px).
+Marque (pastille 22-40 px) · Hero (une occurrence, **entière, discrète, en
+multiplication à 9 %** — jamais coupée par un bord, jamais dominante) ·
+Couverture (filigrane ≤ 26 %, au plus 1 sur 5) · État vide (pastille dorée
+34 px).
+
+⚠️ **Recentrage.** Le centre de masse du motif d'origine n'est pas son centre
+géométrique : il est décalé de +0,82 % en x et de −1,38 % en y. `Rosace.tsx`
+corrige ce décalage. Ne pas le retirer — sans lui, la rosace paraît haute et
+à droite dans sa pastille.
 
 **Interdits :** déformation, recadrage en fragment, redessin, motif répété,
 usage comme icône fonctionnelle, rotation, contour tracé, version mono-trait.
 
-### Bois / noyer — liste fermée
+### Architecture de bibliothèque — le langage central
 
-Bandeau · en-tête de catégorie · panneau de hero (mobile) · tablette · plat de
-couverture famille 03 · bande de contribution et pied.
+L'interface doit se lire comme une **bibliothèque contemporaine**, par
+l'architecture et les proportions : étagères, tablettes noyer, niches et
+travées, montants ponctuels, couvertures présentées comme de vrais ouvrages,
+filets dorés très fins.
 
-**Interdits :** texture sous un paragraphe, fond de page, motif répété, bois
-derrière un champ, **plus de deux zones noyer par écran**, dégradé bois.
+**Les étagères sont une STRUCTURE GRAPHIQUE, pas une bibliothèque réaliste.**
+Ni musée, ni brocante, ni bibliothèque ancienne, ni décor chargé.
+
+- Une **tablette** ferme chaque rangée : 7 px en mobile, 9 px au-delà, aplat
+  `walnut-700`, filet doré, ombre légère.
+- La tablette est portée par **chaque travée**, jamais par la grille entière :
+  les travées d'une rangée sont jointives, leurs tablettes se rejoignent en
+  une ligne continue. C'est ce qui rend le rayonnage exact à tous les paliers
+  **sans une seule règle conditionnelle**.
+- **Montants** : un filet d'un pixel de part et d'autre, en desktop seulement.
+- **Ouvrages par rangée :** 2 en mobile · 3 en tablette · 4 en desktop.
+- L'étagère reste **discrète** et ne domine jamais les couvertures.
+
+Où le langage s'applique : accueil (« Explorer par thème » en niches,
+« À découvrir » en étagère), Bibliothèque et pages de catégorie — c'est là
+qu'il est le plus visible.
+
+Où il ne s'applique PAS : **la fiche ressource** (l'ouvrage est extrait du
+rayon — couverture, petit socle, informations, téléchargement, sans grande
+étagère décorative) et **« Partager un cours »** (interface éditoriale sobre,
+aucune étagère derrière le formulaire).
+
+**Interdits :** texture de bois répétitive, motif répété, fond de page en
+bois, bois derrière un champ de formulaire, dégradé bois, accumulation de
+symboles religieux.
 
 > Le patrimoine passe d'abord par la **géométrie** : symétrie, cadres en
 > retrait, filets, rythme des panneaux, tranches de couvertures. Aucune croix,
@@ -413,7 +462,7 @@ derrière un champ, **plus de deux zones noyer par écran**, dégradé bois.
 
 ### Accessibilité
 
-Focus toujours visible, jamais supprimé (contour 2 px bordeaux, doré sur
+Focus toujours visible, jamais supprimé (contour 2 px noyer, doré sur
 noyer). Cibles tactiles 44 × 44 minimum, boutons 48 px en mobile. Chaque champ
 a un `<label>` lié. Les erreurs sont annoncées par `aria-describedby` et ne
 reposent jamais sur la seule couleur. Contraste du texte courant ≥ 7:1.
@@ -589,6 +638,7 @@ composants, pas de nouveau framework — décision du 23/09/2026.
 | 8   | Questions + durcissement + tests                   | ✅   |
 | 9   | Accueil éditorial + pied de page                   | ✅   |
 | 10  | Durcissement : états d'erreur et harnais de test   | ✅   |
+| 11  | Refonte visuelle — direction Noyer                 | ✅   |
 
 <!-- BEGIN:nextjs-agent-rules -->
 

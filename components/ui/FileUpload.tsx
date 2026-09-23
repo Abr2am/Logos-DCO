@@ -50,7 +50,7 @@ export function FileUpload({
       <div
         className={cn(
           'mt-[7px] rounded-control border bg-surface px-16 py-[14px]',
-          error ? 'border-[1.5px] border-burgundy' : 'border-line-field',
+          error ? 'border-[1.5px] border-walnut-900' : 'border-line-field',
         )}
       >
         {/* Le bouton natif d'un champ de fichier porte un libellé imposé par
@@ -76,7 +76,7 @@ export function FileUpload({
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="rounded-control border border-line-secondary px-16 py-[11px] text-[13.5px] font-medium transition-colors duration-[150ms] ease-logos hover:border-line-secondary-hover hover:text-burgundy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy"
+          className="rounded-control border border-line-secondary px-16 py-[11px] text-[13.5px] font-medium transition-colors duration-[150ms] ease-logos hover:border-line-secondary-hover hover:text-walnut-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900"
         >
           {shown ? 'Remplacer le fichier' : 'Déposer un fichier ou parcourir'}
         </button>

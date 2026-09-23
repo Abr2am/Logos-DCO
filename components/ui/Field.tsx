@@ -6,10 +6,10 @@ import { cn } from '@/lib/cn';
  * Règles de champ du Design System :
  *   - le libellé est TOUJOURS au-dessus du champ ; jamais de placeholder en
  *     guise de libellé ;
- *   - astérisque bordeaux si requis ; les champs optionnels ne portent
+ *   - astérisque noyer si requis ; les champs optionnels ne portent
  *     aucune mention ;
  *   - l'aide est factuelle et tient sur une ligne ;
- *   - l'erreur est bordeaux, précédée d'un « ! » monospace — aucune couleur
+ *   - l'erreur est noyer, précédée d'un « ! » monospace — aucune couleur
  *     rouge, aucune icône graphique, jamais la couleur seule pour informer ;
  *   - validation au `blur` et à la soumission, jamais à la frappe.
  */
@@ -27,7 +27,7 @@ export function FieldLabel({
     <label htmlFor={htmlFor} className="block text-label font-semibold">
       {children}
       {required ? (
-        <span className="text-burgundy" aria-hidden>
+        <span className="text-walnut-900" aria-hidden>
           &nbsp;*
         </span>
       ) : null}
@@ -59,7 +59,7 @@ export function FieldError({
   return (
     <p
       id={id}
-      className="mt-[6px] flex gap-[6px] text-[11.5px] leading-[1.5] text-burgundy"
+      className="mt-[6px] flex gap-[6px] text-[11.5px] leading-[1.5] text-walnut-900"
     >
       <span className="font-mono" aria-hidden>
         !
@@ -104,11 +104,11 @@ export function controlClassName(hasError = false, className?: string): string {
     'text-[14.5px] leading-[1.4] text-text min-h-[48px]',
     'border transition-colors duration-[150ms] ease-logos',
     'placeholder:text-placeholder',
-    hasError ? 'border-[1.5px] border-burgundy' : 'border-line-field',
+    hasError ? 'border-[1.5px] border-walnut-900' : 'border-line-field',
     'hover:border-line-field-hover',
-    // Focus de champ : bordure bordeaux + halo 2 px (spécification du DS).
-    'focus-visible:border-burgundy focus-visible:outline-none',
-    'focus-visible:ring-2 focus-visible:ring-[rgb(110_27_42/0.28)]',
+    // Focus de champ : bordure noyer + halo 2 px (spécification du DS).
+    'focus-visible:border-walnut-900 focus-visible:outline-none',
+    'focus-visible:ring-2 focus-visible:ring-[rgb(46_30_21/0.28)]',
     'disabled:border-line disabled:bg-disabled-surface disabled:text-disabled-text',
     className,
   );

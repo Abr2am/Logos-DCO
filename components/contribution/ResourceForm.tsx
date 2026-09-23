@@ -57,7 +57,7 @@ export function ResourceForm({
     <form action={formAction} className="grid gap-22">
       {resource ? <input type="hidden" name="id" value={resource.id} /> : null}
 
-      {state.error ? <Panel accent="burgundy">{state.error}</Panel> : null}
+      {state.error ? <Panel accent="walnut">{state.error}</Panel> : null}
 
       <Input
         id="title"

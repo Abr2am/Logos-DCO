@@ -67,9 +67,9 @@ export function ChipGroup({
               className={cn(
                 'inline-flex items-center rounded-control px-[13px] py-[9px]',
                 'text-small transition-colors duration-[150ms] ease-logos',
-                'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy',
+                'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900',
                 isSelected
-                  ? 'bg-burgundy font-medium text-on-dark'
+                  ? 'bg-walnut-900 font-medium text-on-dark'
                   : 'border border-line bg-surface text-text hover:border-line-secondary hover:bg-cover-plate',
               )}
             >

@@ -59,7 +59,7 @@ export function BrandMark({
     <span className={cn('inline-flex items-center', spec.gap, className)}>
       <RosacePastille
         size={spec.pastille}
-        tone={tone === 'light' ? 'burgundy' : 'gold'}
+        tone={tone === 'light' ? 'walnut' : 'gold'}
       />
       <span
         className={cn(

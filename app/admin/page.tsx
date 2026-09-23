@@ -58,7 +58,7 @@ export default async function AdminPage() {
               key={tile.label}
               className="rounded-panel border border-line bg-surface px-[20px] py-16"
             >
-              <dt className="font-mono text-mono font-medium uppercase tracking-[0.13em] text-burgundy">
+              <dt className="font-mono text-mono font-medium uppercase tracking-[0.13em] text-walnut-900">
                 {tile.label}
               </dt>
               <dd className="mt-[6px] font-display text-[34px] leading-none">
@@ -96,7 +96,7 @@ export default async function AdminPage() {
                     <td className="border-b border-line-hairline py-[14px] pr-[14px]">
                       <Link
                         href={`/admin/ressources/${item.id}`}
-                        className="font-medium underline-offset-4 hover:text-burgundy hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy"
+                        className="font-medium underline-offset-4 hover:text-walnut-900 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900"
                       >
                         {item.title}
                       </Link>
@@ -128,7 +128,7 @@ export default async function AdminPage() {
                 >
                   <Link
                     href={`/admin/ressources/${item.id}`}
-                    className="font-medium underline-offset-4 hover:text-burgundy hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy"
+                    className="font-medium underline-offset-4 hover:text-walnut-900 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900"
                   >
                     {item.title}
                   </Link>

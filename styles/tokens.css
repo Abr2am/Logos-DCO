@@ -1,5 +1,5 @@
 /* ==========================================================================
-   LOGOS — Tokens du Design System V1.1 (direction Noyer V2.2)
+   LOGOS — Tokens du Design System V2 (direction Noyer)
    --------------------------------------------------------------------------
    Source unique de vérité visuelle. Toute valeur ci-dessous provient
    littéralement de `docs/Logos - Design System V2.html`. Rien n'est extrapolé.
@@ -18,22 +18,20 @@
   /* ── Couleur — 8 tokens, aucun ajout ──────────────────────────────────── */
   --color-*: initial;
 
-  --color-ivory: #f7f3ea; /* Fond de page — ~82 % de la surface */
-  --color-surface: #fdfaf3; /* Surface élevée : cartes, champs, header */
-  --color-burgundy: #6e1b2a; /* Action & état actif — plafond ~12 % */
-  --color-gold: #c39a54; /* Détail & filet — jamais en aplat large */
-  --color-walnut-900: #2e1e15; /* Structure — plafond 6 % */
-  --color-walnut-700: #4a3123; /* Tablette & accent */
+  --color-ivory: #f7f3ea; /* Fond de page — la surface dominante */
+  --color-surface: #fdfaf3; /* Surface élevée : champs, panneaux, header */
+  --color-walnut-900: #2e1e15; /* COULEUR IDENTITAIRE : structure ET action */
+  --color-walnut-700: #4a3123; /* Nuance architecturale secondaire */
+  --color-gold: #c39a54; /* Accent discret — filets, jamais en aplat large */
   --color-text: #241810; /* Texte principal — jamais #000 */
   --color-text-secondary: #4c3b30; /* Texte secondaire — jamais sous 12,5 px */
 
-  /* Dérivés autorisés par le Design System — aucun autre n'est permis. */
-  --color-burgundy-hover: #5c1623;
-  --color-burgundy-active: #4e1220;
-  --color-burgundy-light: #8c2938; /* lien / tertiaire au survol */
+  /* Dérivés autorisés — aucune teinte nouvelle, uniquement des valeurs de la
+     même famille. Le survol d'une action noyer emprunte `walnut-700`. */
+  --color-walnut-active: #1f140d; /* appui d'une action noyer */
   --color-gold-hover: #b48c48;
   --color-gold-overline: #dcb979; /* surtitre doré sur fond noyer */
-  --color-cover-spine: #571421; /* tranche de couverture bordeaux */
+  --color-cover-spine: #1f140d; /* tranche de couverture noyer */
   --color-cover-plate: #f1eadc; /* plat de couverture ivoire / état actif */
   --color-cover-edge: #ede3cf; /* tranche de couverture ivoire */
   --color-theme-hover: #f5efe3; /* survol de carte de thème */
@@ -41,7 +39,7 @@
   --color-disabled-text: #a3927f;
   --color-placeholder: #8a7866;
   --color-help: #7a6656;
-  --color-on-dark: #f9f4ea; /* texte sur bordeaux / noyer */
+  --color-on-dark: #f9f4ea; /* texte sur noyer */
 
   /* Bordures & séparateurs — uniquement des alphas de --color-text. */
   --color-line-hairline: rgb(36 24 16 / 0.07);
@@ -52,11 +50,15 @@
   --color-line-secondary-hover: rgb(36 24 16 / 0.45);
   --color-line-on-dark: rgb(249 244 234 / 0.4);
 
-  /* AUCUNE couleur d'état : pas de rouge d'erreur, pas de vert de succès,
-     pas d'orange d'avertissement. Erreur = bordeaux + « ! » textuel,
-     succès = bordeaux + filet doré, attente = doré.
+  /* Direction NOYER (validée le 23/09/2026) : le bordeaux est retiré de la
+     direction visuelle. Le noyer porte l'identité ET l'action ; le doré reste
+     un accent de filet ; l'ivoire reste le fond.
+
+     AUCUNE couleur d'état : pas de rouge d'erreur, pas de vert de succès,
+     pas d'orange. Erreur = noyer + « ! » textuel et bordure renforcée,
+     succès = noyer + filet doré, attente = doré.
      AUCUNE couleur par catégorie : les neuf thèmes partagent le même
-     traitement. AUCUN bleu, AUCUN vert.                                    */
+     traitement. AUCUN bleu, AUCUN vert, AUCUN bordeaux.                    */
 
   /* ── Typographie — 3 familles, 10 rôles ───────────────────────────────── */
   --font-*: initial;
@@ -172,12 +174,15 @@
      bordure.                                                               */
   --shadow-*: initial;
 
-  --shadow-cover: 0 8px 20px rgb(46 30 21 / 0.2);
-  --shadow-cover-detail: 0 14px 34px rgb(46 30 21 / 0.28);
-  --shadow-shelf: 0 6px 16px rgb(46 30 21 / 0.22);
-  /* Survol d'une carte ressource : seule la géométrie change (0 10px 24px),
-     la teinte reste celle de l'ombre `cover`. */
-  --shadow-cover-hover: 0 10px 24px rgb(46 30 21 / 0.2);
+  /* Direction NOYER : l'ombre est TRÈS LÉGÈRE. Un ouvrage est posé sur la
+     tablette, il n'y flotte pas. L'étagère ne doit jamais dominer la
+     couverture. */
+  --shadow-cover: 0 6px 14px rgb(46 30 21 / 0.14);
+  --shadow-cover-light: 0 4px 10px rgb(46 30 21 / 0.1); /* plats clairs */
+  --shadow-cover-detail: 0 12px 26px rgb(46 30 21 / 0.2);
+  --shadow-shelf: 0 4px 10px rgb(46 30 21 / 0.16);
+  /* Survol : seule la géométrie s'ouvre, la teinte reste celle de `cover`. */
+  --shadow-cover-hover: 0 8px 18px rgb(46 30 21 / 0.14);
 
   /* ── Paliers responsive ───────────────────────────────────────────────── */
   /* Mobile < 640 · Tablette 640-1023 · Desktop ≥ 1024

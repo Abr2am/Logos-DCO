@@ -79,7 +79,7 @@ export function MobileMenu({
         aria-controls="menu-principal"
         aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
         onClick={() => setOpen((value) => !value)}
-        className="-mr-[10px] grid size-[44px] place-items-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy nav:hidden"
+        className="-mr-[10px] grid size-[44px] place-items-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900 nav:hidden"
       >
         {open ? (
           <span aria-hidden className="text-[18px] leading-none">
@@ -109,7 +109,7 @@ export function MobileMenu({
                 setOpen(false);
                 triggerRef.current?.focus();
               }}
-              className="-mr-[10px] grid size-[44px] place-items-center text-[18px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy"
+              className="-mr-[10px] grid size-[44px] place-items-center text-[18px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900"
             >
               <span aria-hidden>✕</span>
             </button>
@@ -127,10 +127,10 @@ export function MobileMenu({
                       aria-current={active ? 'page' : undefined}
                       className={cn(
                         'flex min-h-[52px] items-center py-[17px] text-[16px] font-medium',
-                        'active:bg-cover-plate focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy',
+                        'active:bg-cover-plate focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900',
                         index < items.length - 1 &&
                           'border-b border-[rgb(36_24_16/0.08)]',
-                        active && 'text-burgundy',
+                        active && 'text-walnut-900',
                       )}
                     >
                       {item.label}

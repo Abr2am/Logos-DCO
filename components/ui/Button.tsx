@@ -27,10 +27,10 @@ const BASE =
 /** Couleurs et bordures — aucune métrique. */
 const TONES: Record<ButtonVariant, string> = {
   primary: cn(
-    'bg-burgundy text-on-dark font-semibold',
-    'hover:bg-burgundy-hover active:bg-burgundy-active',
-    'focus-visible:outline-burgundy',
-    'disabled:opacity-[.38] disabled:hover:bg-burgundy',
+    'bg-walnut-900 text-on-dark font-semibold',
+    'hover:bg-walnut-700 active:bg-walnut-active',
+    'focus-visible:outline-walnut-900',
+    'disabled:opacity-[.38] disabled:hover:bg-walnut-900',
   ),
   primaryOnWalnut: cn(
     'bg-gold text-walnut-900 font-semibold',
@@ -40,9 +40,9 @@ const TONES: Record<ButtonVariant, string> = {
   ),
   secondary: cn(
     'border border-line-secondary bg-transparent text-text font-medium',
-    'hover:border-line-secondary-hover hover:text-burgundy',
+    'hover:border-line-secondary-hover hover:text-walnut-900',
     'active:bg-cover-plate',
-    'focus-visible:outline-burgundy',
+    'focus-visible:outline-walnut-900',
     'disabled:border-line disabled:text-disabled-text',
   ),
   secondaryOnWalnut: cn(
@@ -52,9 +52,9 @@ const TONES: Record<ButtonVariant, string> = {
     'disabled:opacity-[.38]',
   ),
   tertiary: cn(
-    'font-semibold text-burgundy underline underline-offset-4',
-    'hover:text-burgundy-light',
-    'focus-visible:outline-burgundy focus-visible:outline-offset-2',
+    'font-semibold text-walnut-900 underline underline-offset-4',
+    'hover:text-walnut-700',
+    'focus-visible:outline-walnut-900 focus-visible:outline-offset-2',
   ),
 };
 

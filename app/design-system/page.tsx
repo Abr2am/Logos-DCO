@@ -7,7 +7,7 @@ import { Header } from '@/components/layout/Header';
 import { ResourceCard } from '@/components/library/ResourceCard';
 import { ResourceCover } from '@/components/library/ResourceCover';
 import { Shelf } from '@/components/library/Shelf';
-import { ThemeCard } from '@/components/library/ThemeCard';
+import { ThemeShelf } from '@/components/library/ThemeShelf';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -53,7 +53,7 @@ function Sheet({
 
 function Label({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mb-12 mt-22 font-mono text-mono first:mt-0 font-medium uppercase tracking-[0.13em] text-burgundy">
+    <p className="mb-12 mt-22 font-mono text-mono first:mt-0 font-medium uppercase tracking-[0.13em] text-walnut-900">
       {children}
     </p>
   );
@@ -118,20 +118,15 @@ export default function DesignSystemPage() {
           </div>
 
           <Label>
-            Hero — filigrane desktop (multiply 11 %) · mobile (luminosity 30 %)
+            Hero — rosace ENTIÈRE, en multiplication à 9 %. Jamais coupée par un
+            bord, jamais dominante.
           </Label>
           <div className="grid gap-16 tablet:grid-cols-2">
-            <div className="relative h-[220px] overflow-hidden rounded-panel border border-line bg-ivory">
-              <RosaceHero
-                variant="desktop"
-                className="absolute left-1/2 top-[30%] w-[560px] -translate-x-1/2"
-              />
+            <div className="grid h-[260px] place-items-center rounded-panel border border-line bg-ivory">
+              <RosaceHero size={200} />
             </div>
-            <div className="relative h-[220px] overflow-hidden rounded-panel bg-walnut-900">
-              <RosaceHero
-                variant="mobile"
-                className="absolute left-1/2 top-[-60px] w-[300px] -translate-x-1/2"
-              />
+            <div className="grid h-[260px] place-items-center rounded-panel border border-line bg-ivory">
+              <RosaceHero size={120} />
             </div>
           </div>
         </Sheet>
@@ -277,7 +272,7 @@ export default function DesignSystemPage() {
           <Label>Couverture de fiche — 330 px, tranche 9 px</Label>
           <ResourceCover
             variant="detail"
-            family="burgundy"
+            family="plate"
             category="Saints"
             title="Saint Marc, apôtre de l'Égypte"
             className="w-[330px]"
@@ -291,7 +286,7 @@ export default function DesignSystemPage() {
               <ResourceCard
                 key={sample.title}
                 href="/design-system"
-                family={COVER_FAMILIES[index] ?? 'burgundy'}
+                family={COVER_FAMILIES[index] ?? 'plate'}
                 category={sample.category}
                 title={sample.title}
                 meta="Cours · PDF · 32 pages"
@@ -300,16 +295,24 @@ export default function DesignSystemPage() {
           </div>
           <Shelf className="mt-[18px]" />
 
-          <Label>Cartes de thème — aucun compteur</Label>
-          <div className="grid gap-[10px] tablet:grid-cols-2">
-            <ThemeCard name="Bible" href="/bibliotheque/bible" />
-            <ThemeCard name="Saints" href="/bibliotheque/saints" selected />
-            <ThemeCard
-              name="Vie chrétienne"
-              href="/bibliotheque/vie-chretienne"
-              subthemes={['Petite enfance', 'Jeunesse', 'Famille']}
-            />
-          </div>
+          <Label>Niches de thème — aucun compteur, tablette en pied</Label>
+          <ThemeShelf
+            items={[
+              { key: 'bible', name: 'Bible', href: '/bibliotheque/bible' },
+              {
+                key: 'saints',
+                name: 'Saints',
+                href: '/bibliotheque/saints',
+                selected: true,
+              },
+              {
+                key: 'vie-chretienne',
+                name: 'Vie chrétienne',
+                href: '/bibliotheque/vie-chretienne',
+                subthemes: ['Petite enfance', 'Jeunesse', 'Famille'],
+              },
+            ]}
+          />
         </Sheet>
 
         <Sheet title="Panneaux · métadonnées · états vides">
@@ -323,7 +326,7 @@ export default function DesignSystemPage() {
             ]}
           />
           <div className="mt-16 grid gap-12 tablet:grid-cols-2">
-            <Panel accent="burgundy" label="Commentaire de l'administrateur">
+            <Panel accent="walnut" label="Commentaire de l'administrateur">
               Il manque la tranche d&apos;âge visée dans la description.
             </Panel>
             <Panel accent="gold" label="Ressource soumise">
@@ -337,7 +340,7 @@ export default function DesignSystemPage() {
               description="Essayez un autre mot, ou retirez un filtre."
               action={<Button variant="secondary">Retirer les filtres</Button>}
             />
-            <Panel accent="burgundy">
+            <Panel accent="walnut">
               <span className="font-display text-[20px]">
                 Cette ressource n&apos;est pas disponible
               </span>

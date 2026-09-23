@@ -24,7 +24,7 @@ export function MinimalHeader() {
         <Link
           href="/"
           aria-label="Logos — accueil"
-          className="focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-burgundy"
+          className="focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-walnut-900"
         >
           <span className="tablet:hidden">
             <BrandMark size="sm" />

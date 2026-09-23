@@ -33,7 +33,7 @@ export async function Header({ currentPath }: { currentPath?: string }) {
         <Link
           href="/"
           aria-label="Logos — accueil"
-          className="focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-burgundy"
+          className="focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-walnut-900"
         >
           {/* Les deux tailles sont portées par des enveloppes : `BrandMark`
               pose déjà `inline-flex`, et une classe `hidden` posée sur le
@@ -59,10 +59,10 @@ export async function Header({ currentPath }: { currentPath?: string }) {
                 aria-current={active ? 'page' : undefined}
                 className={cn(
                   'transition-colors duration-[150ms] ease-logos',
-                  'focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-burgundy',
+                  'focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-walnut-900',
                   active
-                    ? 'border-b-2 border-burgundy pb-[3px] text-burgundy'
-                    : 'hover:text-burgundy',
+                    ? 'border-b-2 border-walnut-900 pb-[3px] text-walnut-900'
+                    : 'hover:text-walnut-900',
                 )}
               >
                 {item.label}
@@ -78,7 +78,7 @@ export async function Header({ currentPath }: { currentPath?: string }) {
           ) : (
             <Link
               href={ACCOUNT_ITEM.href}
-              className="rounded-control border border-line-field px-16 py-[8px] transition-colors duration-[150ms] ease-logos hover:bg-cover-plate focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-burgundy"
+              className="rounded-control border border-line-field px-16 py-[8px] transition-colors duration-[150ms] ease-logos hover:bg-cover-plate focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-walnut-900"
             >
               {ACCOUNT_ITEM.label}
             </Link>

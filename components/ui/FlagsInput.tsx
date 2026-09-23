@@ -87,15 +87,15 @@ export function FlagsInput({
             'min-h-[48px] flex-1 rounded-control bg-surface px-16 py-[14px]',
             'text-[14.5px] text-text placeholder:text-placeholder',
             'border transition-colors duration-[150ms] ease-logos',
-            error ? 'border-[1.5px] border-burgundy' : 'border-line-field',
-            'focus-visible:border-burgundy focus-visible:outline-none',
-            'focus-visible:ring-2 focus-visible:ring-[rgb(110_27_42/0.28)]',
+            error ? 'border-[1.5px] border-walnut-900' : 'border-line-field',
+            'focus-visible:border-walnut-900 focus-visible:outline-none',
+            'focus-visible:ring-2 focus-visible:ring-[rgb(46_30_21/0.28)]',
           )}
         />
         <button
           type="button"
           onClick={add}
-          className="shrink-0 rounded-control border border-line-secondary px-16 text-[13.5px] font-medium transition-colors duration-[150ms] ease-logos hover:border-line-secondary-hover hover:text-burgundy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy"
+          className="shrink-0 rounded-control border border-line-secondary px-16 text-[13.5px] font-medium transition-colors duration-[150ms] ease-logos hover:border-line-secondary-hover hover:text-walnut-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900"
         >
           Ajouter
         </button>

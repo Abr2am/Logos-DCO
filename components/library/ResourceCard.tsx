@@ -6,14 +6,17 @@ import type { CoverFamily } from '@/lib/cover/families';
 import { ResourceCover } from './ResourceCover';
 
 /*
- * Carte ressource : couverture 3:4, titre, puis UNE SEULE ligne de
- * métadonnées `type · format · pagination`.
+ * Un ouvrage posé sur la tablette.
+ *
+ * Direction NOYER (23/09/2026) : AUCUNE carte blanche autour de la
+ * couverture. Le lien n'a ni fond, ni bordure, ni rayon — la couverture 3:4
+ * est l'objet, le titre et la ligne de métadonnées la légendent.
  *
  * « Rien d'autre : ni auteur, ni date, ni public, ni flags, ni bouton —
- *   la carte entière est la zone cliquable. »
+ *   la zone cliquable est l'ouvrage entier. »
  *
- * Hover : la couverture monte de 2 px et l'ombre s'ouvre.
- * Pas d'ombre sur la carte elle-même.
+ * Survol : l'ouvrage se soulève de 2 px, l'ombre — déjà très légère —
+ * s'ouvre à peine.
  */
 
 export type ResourceCardProps = {
@@ -38,7 +41,7 @@ export function ResourceCard({
     <Link
       href={href}
       className={cn(
-        'group block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy',
+        'group block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-walnut-900',
         className,
       )}
     >
@@ -51,10 +54,10 @@ export function ResourceCard({
           'group-hover:-translate-y-[2px] group-hover:shadow-cover-hover',
         )}
       />
-      <p className="mt-12 text-[13.5px] font-medium tablet:text-[14px]">
+      <p className="mt-16 text-[13.5px] font-medium leading-[1.35] tablet:text-[14.5px]">
         {title}
       </p>
-      <p className="mt-[3px] text-[12px] text-help">{meta}</p>
+      <p className="mt-[5px] text-[12px] text-help">{meta}</p>
     </Link>
   );
 }

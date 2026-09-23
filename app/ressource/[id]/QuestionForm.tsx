@@ -17,7 +17,7 @@ import { EMPTY_ASK_STATE, QUESTION_MAX_LENGTH } from '@/lib/questions/types';
  * n'est jamais nommé au questionneur.
  *
  * Ce n'est pas une messagerie : un seul envoi, pas de fil, pas d'historique
- * côté visiteur. La confirmation remplace le formulaire — succès = bordeaux
+ * côté visiteur. La confirmation remplace le formulaire — succès = noyer
  * et filet doré, jamais de vert, jamais de toast.
  */
 export function QuestionForm({ resourceId }: { resourceId: string }) {
@@ -69,7 +69,7 @@ export function QuestionForm({ resourceId }: { resourceId: string }) {
       </div>
 
       {state.error ? (
-        <p className="flex gap-[6px] text-[11.5px] leading-[1.5] text-burgundy">
+        <p className="flex gap-[6px] text-[11.5px] leading-[1.5] text-walnut-900">
           <span className="font-mono" aria-hidden>
             !
           </span>

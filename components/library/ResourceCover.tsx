@@ -30,50 +30,53 @@ type FamilySpec = {
 };
 
 const FAMILIES: Record<CoverFamily, FamilySpec> = {
-  burgundy: {
-    plate: 'bg-burgundy',
+  /* Cinq traitements, une seule famille de teintes : le noyer porte
+     l'identité, l'ivoire allège, le doré ne sert qu'au filet. Aucune famille
+     ne représente une catégorie. */
+  plate: {
+    plate: 'bg-walnut-900',
     spine: 'border-l-cover-spine',
-    shadow: 'shadow-[0_8px_20px_rgb(46_30_21/0.2)]',
+    shadow: 'shadow-cover',
     overline: 'text-gold-overline',
     title: 'text-on-dark',
-    frame: 'border-[rgb(195_154_84/0.6)]',
+    frame: 'border-[rgb(195_154_84/0.55)]',
     rule: 'bg-[rgb(195_154_84/0.75)]',
   },
   ivory: {
     plate: 'bg-surface border border-[rgb(36_24_16/0.18)]',
     spine: 'border-l-cover-edge',
-    shadow: 'shadow-[0_8px_20px_rgb(46_30_21/0.14)]',
-    overline: 'text-burgundy',
+    shadow: 'shadow-cover-light',
+    overline: 'text-walnut-700',
     title: 'text-text',
-    frame: 'border-[rgb(110_27_42/0.35)]',
-    rule: 'bg-[rgb(110_27_42/0.45)]',
+    frame: 'border-[rgb(46_30_21/0.3)]',
+    rule: 'bg-[rgb(46_30_21/0.4)]',
   },
-  walnut: {
+  marquetry: {
     plate: 'bg-walnut-900',
-    spine: 'border-l-[#241710]',
-    shadow: 'shadow-[0_8px_20px_rgb(46_30_21/0.28)]',
+    spine: 'border-l-walnut-active',
+    shadow: 'shadow-cover',
     overline: 'text-gold-overline',
     title: 'text-on-dark',
     frame:
-      'border-[rgb(195_154_84/0.5)] bg-[linear-gradient(rgb(46_30_21/0.55),rgb(46_30_21/0.8))]',
+      'border-[rgb(195_154_84/0.45)] bg-[linear-gradient(rgb(46_30_21/0.55),rgb(46_30_21/0.82))]',
     rule: 'bg-[rgb(195_154_84/0.7)]',
   },
   motif: {
-    plate: 'bg-burgundy',
+    plate: 'bg-walnut-700',
     spine: 'border-l-cover-spine',
-    shadow: 'shadow-[0_8px_20px_rgb(46_30_21/0.2)]',
+    shadow: 'shadow-cover',
     overline: 'text-gold-overline',
     title: 'text-on-dark',
-    frame: 'border-[rgb(195_154_84/0.6)]',
-    rule: 'bg-[rgb(195_154_84/0.75)]',
+    frame: 'border-[rgb(195_154_84/0.5)]',
+    rule: 'bg-[rgb(195_154_84/0.7)]',
   },
   minimal: {
     plate: 'bg-cover-plate border border-[rgb(36_24_16/0.14)]',
     spine: 'border-l-walnut-700',
-    shadow: 'shadow-[0_8px_20px_rgb(46_30_21/0.12)]',
-    overline: 'text-burgundy',
+    shadow: 'shadow-cover-light',
+    overline: 'text-walnut-700',
     title: 'text-text',
-    rule: 'bg-[rgb(36_24_16/0.25)]',
+    rule: 'bg-[rgb(46_30_21/0.28)]',
   },
 };
 
@@ -134,7 +137,7 @@ export function ResourceCover({
         className,
       )}
     >
-      {family === 'walnut' ? (
+      {family === 'marquetry' ? (
         <Image
           src="/brand/marqueterie-368.webp"
           alt=""

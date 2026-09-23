@@ -146,7 +146,7 @@ export default async function ModerationPage({ params }: PageProps) {
 
             {resource.flags.length > 0 ? (
               <div className="mt-26">
-                <p className="font-mono text-mono font-medium uppercase tracking-[0.13em] text-burgundy">
+                <p className="font-mono text-mono font-medium uppercase tracking-[0.13em] text-walnut-900">
                   Flags
                 </p>
                 <div className="mt-12 flex flex-wrap gap-[7px]">
@@ -159,7 +159,7 @@ export default async function ModerationPage({ params }: PageProps) {
 
             {resource.adminComment ? (
               <Panel
-                accent="burgundy"
+                accent="walnut"
                 label="Commentaire de l'administrateur"
                 className="mt-26"
               >
@@ -171,7 +171,7 @@ export default async function ModerationPage({ params }: PageProps) {
 
         {/* ── Actions ─────────────────────────────────────────────────── */}
         <section className="mt-56 border-t border-line pt-34">
-          <h2 className="font-mono text-mono font-medium uppercase tracking-[0.13em] text-burgundy">
+          <h2 className="font-mono text-mono font-medium uppercase tracking-[0.13em] text-walnut-900">
             Actions
           </h2>
 
@@ -210,7 +210,7 @@ export default async function ModerationPage({ params }: PageProps) {
 
         {/* ── Modification ────────────────────────────────────────────── */}
         <section className="mt-56 border-t border-line pt-34">
-          <h2 className="font-mono text-mono font-medium uppercase tracking-[0.13em] text-burgundy">
+          <h2 className="font-mono text-mono font-medium uppercase tracking-[0.13em] text-walnut-900">
             Modifier
           </h2>
           <p className="mt-12 max-w-reading text-small text-help">
