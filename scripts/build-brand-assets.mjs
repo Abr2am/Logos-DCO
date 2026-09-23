@@ -9,6 +9,9 @@
  *     réencodage uniquement, aucun redessin, aucun recadrage, aucune
  *     vectorisation ;
  *   - la marqueterie n'est ni recadrée ni transformée en texture répétable ;
+ *   - l'emblème officiel n'est NI redessiné, NI déformé, NI recoloré : le
+ *     master fait foi. Deux opérations seulement lui sont appliquées, et
+ *     elles ne touchent pas au dessin (voir `buildEmbleme`) ;
  *   - seules les tailles réellement utilisées par le Design System sont
  *     produites.
  *
@@ -77,6 +80,115 @@ for (const target of TARGETS) {
         `${String(Math.round(size / 1024)).padStart(5)} Kio   ${usage}`,
     );
   }
+}
+
+await buildEmbleme();
+
+/*
+ * Emblème officiel — `assets/brand/embleme.png` fait foi.
+ *
+ * Le master est fourni en PNG OPAQUE, sur fond blanc, et son dessin n'est pas
+ * centré dans son cadre (marges 196 / 173 / 164 / 107 px). Deux opérations,
+ * et deux seulement, sont appliquées — aucune ne touche au dessin :
+ *
+ *   1. le fond blanc EXTÉRIEUR devient transparent, par remplissage depuis les
+ *      bords. Les blancs INTÉRIEURS fermés — les cannelures de la hampe — sont
+ *      préservés : ils font partie du dessin ;
+ *   2. le cadre est rogné sur la boîte englobante de l'encre. Rien du logo
+ *      n'est coupé : seules les marges vides disparaissent. C'est ce qui rend
+ *      le centrage exact dans ses conteneurs, SANS aucune translation
+ *      arbitraire.
+ *
+ * Ni redimensionnement de forme, ni recolorisation, ni filtre, ni ombre. Le
+ * rapport d'aspect du dessin est conservé tel quel.
+ */
+async function buildEmbleme() {
+  const source = join(MASTERS, 'embleme.png');
+  const { data, info } = await sharp(source)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+
+  const { width, height, channels } = info;
+  const at = (x, y) => (y * width + x) * channels;
+  /* Le master a traversé une compression avec pertes : le « blanc » y vaut
+     253-255 selon les pixels. Le seuil est donc tolérant. */
+  const WHITE = 236;
+  const isWhite = (i) =>
+    data[i] >= WHITE && data[i + 1] >= WHITE && data[i + 2] >= WHITE;
+
+  /* 1 · Remplissage depuis les bords — seul le fond extérieur est atteint. */
+  const outside = new Uint8Array(width * height);
+  const queue = [];
+  const push = (x, y) => {
+    const p = y * width + x;
+    if (outside[p] || !isWhite(at(x, y))) return;
+    outside[p] = 1;
+    queue.push(p);
+  };
+  for (let x = 0; x < width; x += 1) {
+    push(x, 0);
+    push(x, height - 1);
+  }
+  for (let y = 0; y < height; y += 1) {
+    push(0, y);
+    push(width - 1, y);
+  }
+  while (queue.length > 0) {
+    const p = queue.pop();
+    const x = p % width;
+    const y = (p - x) / width;
+    if (x > 0) push(x - 1, y);
+    if (x < width - 1) push(x + 1, y);
+    if (y > 0) push(x, y - 1);
+    if (y < height - 1) push(x, y + 1);
+  }
+  for (let p = 0; p < outside.length; p += 1) {
+    if (outside[p]) data[p * channels + 3] = 0;
+  }
+
+  /* 2 · Boîte englobante de l'encre restante. */
+  let minX = width;
+  let maxX = -1;
+  let minY = height;
+  let maxY = -1;
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      if (data[at(x, y) + 3] === 0) continue;
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
+    }
+  }
+  const box = {
+    left: minX,
+    top: minY,
+    width: maxX - minX + 1,
+    height: maxY - minY + 1,
+  };
+
+  const trimmed = sharp(data, { raw: { width, height, channels } }).extract(
+    box,
+  );
+
+  /* Une seule taille servie : l'emblème n'est employé qu'entre 26 et 58 px.
+     256 px de large couvre le hero à plus de quatre fois sa taille. */
+  const out = join(OUT, 'embleme-256.webp');
+  await trimmed
+    .resize({ width: 256, fit: 'inside', withoutEnlargement: true })
+    .webp({ quality: 92, effort: 6, alphaQuality: 100 })
+    .toFile(out);
+
+  const { size } = await stat(out);
+  console.log(
+    `${'embleme-256.webp'.padEnd(24)} ${`256×${Math.round((box.height / box.width) * 256)}`.padEnd(11)} ` +
+      `${String(Math.round(size / 1024)).padStart(5)} Kio   marque (26-58 px)`,
+  );
+  console.log(
+    `   dessin ${box.width}×${box.height} px, rapport ${(box.width / box.height).toFixed(4)} ` +
+      `— rogné de (${box.left}, ${box.top}) dans un master de ${width}×${height}`,
+  );
 }
 
 /* Manifeste lisible : ce qui est publié et pourquoi. */

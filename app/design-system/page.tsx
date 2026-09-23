@@ -92,7 +92,7 @@ export default function DesignSystemPage() {
         <Sheet title="Marque · bandeau · rosace">
           <div className="grid gap-34 tablet:grid-cols-2">
             <div>
-              <Label>Brand mark — fond clair</Label>
+              <Label>Brand mark — emblème officiel, fond clair</Label>
               <div className="flex flex-wrap items-end gap-[30px] rounded-panel border border-line bg-surface p-22">
                 <BrandMark size="sm" />
                 <BrandMark size="md" />
@@ -108,7 +108,10 @@ export default function DesignSystemPage() {
                 <TopBanner />
                 <div className="h-[44px] bg-surface" />
               </div>
-              <Label>Pastilles — 22 · 26 · 34 (état vide)</Label>
+              <Label>
+                Pastille de rosace — 22 · 26 · 34 (état vide). Elle ne porte
+                plus la marque depuis l&apos;emblème officiel.
+              </Label>
               <div className="flex items-center gap-16 rounded-panel border border-line bg-surface p-22">
                 <RosacePastille size={22} />
                 <RosacePastille size={26} />
@@ -118,8 +121,9 @@ export default function DesignSystemPage() {
           </div>
 
           <Label>
-            Hero — rosace ENTIÈRE, en multiplication à 9 %. Jamais coupée par un
-            bord, jamais dominante.
+            Hero — rosace très agrandie, décalée à droite, opacité très faible.
+            Dimensionnée par la hauteur de sa section : le motif étant un disque
+            tangent à son cadre, aucune extrémité n&apos;est coupée.
           </Label>
           <div className="grid gap-16 tablet:grid-cols-2">
             <div className="grid h-[260px] place-items-center rounded-panel border border-line bg-ivory">

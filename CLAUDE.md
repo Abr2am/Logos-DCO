@@ -416,10 +416,48 @@ dans aucun token, aucune classe, aucune famille de couverture.
   stable. Aucune image téléversée. **Une famille de couverture ne représente
   jamais une catégorie** : aucune correspondance couleur ↔ thème.
 
-### Rosace — 4 usages seulement
+### Emblème officiel — la marque, depuis le 23/09/2026
 
-Marque (pastille 22-40 px) · Hero (une occurrence par écran, **élément
-architectural d'arrière-plan**) · Couverture (filigrane ≤ 26 %, au plus 1 sur 5) · État vide (pastille dorée 34 px).
+Le logo du diocèse est un **fichier fourni et validé**. Il fait foi, et il est
+servi tel quel : `assets/brand/embleme.png` (master, jamais servi) →
+`public/brand/embleme-256.webp` (`npm run assets:brand`).
+
+**Interdits :** le redessiner, le revectoriser, le recréer en CSS, changer ses
+formes, ses couleurs ou ses proportions, lui appliquer un filtre, une ombre,
+une rotation ou une déformation, le recadrer sur une partie de son dessin.
+
+Deux opérations, et deux seulement, sont appliquées par le script — aucune ne
+touche au dessin :
+
+1. le fond blanc **extérieur** devient transparent, par remplissage depuis les
+   bords (le master est un PNG opaque). Les blancs fermés à l'intérieur du
+   dessin sont préservés ;
+2. le cadre est rogné sur la **boîte englobante de l'encre** — le master a des
+   marges inégales (196 / 173 / 164 / 107 px). Rien du logo n'est coupé.
+
+C'est ce rognage qui rend le centrage **purement géométrique** dans chaque
+conteneur : `BrandMark` n'applique aucune translation de compensation, et il
+ne faut pas en introduire. Sa largeur est **calculée** depuis le rapport du
+dessin (964 / 907), jamais saisie à la main.
+
+Tailles : **26 px** en mobile · **32 px** en desktop · **58 px** en hero,
+toujours accompagnées du mot-marque « LOGOS », que l'emblème ne contient pas.
+
+⚠️ **L'emblème porte une croix, et c'est la seule de l'interface.** La règle
+« aucune croix, icône, bougie, plante ou objet liturgique » vise la
+décoration : elle reste entière partout ailleurs. Un logo validé n'est pas une
+décoration, et il ne s'en déduit aucune permission d'en ajouter.
+
+Sur aplat noyer, l'emblème est servi sans changement : le doré porte le
+dessin, les bruns se fondent dans le fond. Aucune variante recolorée.
+
+### Rosace — 3 usages depuis l'emblème officiel
+
+~~Marque (pastille 22-40 px)~~ — **remplacée par l'emblème officiel le
+23/09/2026.** Restent : Hero (une occurrence par écran, **élément
+architectural d'arrière-plan**) · Couverture (filigrane ≤ 26 %, au plus 1 sur 5) · État vide (pastille dorée 34 px). La grande rosace décorative du hero est
+un élément **distinct du logo** : ne jamais employer l'emblème comme motif de
+fond, ni la rosace comme marque.
 
 **Le hero de l'accueil est un ANGLE DE SALLE** (décision du 23/09/2026) :
 le texte à gauche, la rosace au fond comme une pierre sculptée, et le **meuble
@@ -557,6 +595,10 @@ symboles religieux.
 > retrait, filets, rythme des panneaux, tranches de couvertures. Aucune croix,
 > icône, bougie, plante ou objet liturgique n'entre dans l'interface —
 > l'identité doit rester reconnaissable une fois tout symbole retiré.
+>
+> Seule exception, et elle n'en est pas vraiment une : **l'emblème officiel**,
+> qui porte une croix. C'est le logo validé du diocèse, pas de la décoration —
+> voir « Emblème officiel ». Rien d'autre ne s'en déduit.
 
 ### Accessibilité
 
@@ -682,7 +724,7 @@ lib/              auth · supabase · domain · library · cover · files ·
 styles/           tokens du Design System
 supabase/         migrations SQL + tests (aucun seed de contenu)
 scripts/          assets de marque, vérification du schéma, crochets de test
-public/brand/     rosace, marqueterie
+public/brand/     emblème officiel, rosace, marqueterie
 docs/             cahier des charges + Design System
 ```
 
