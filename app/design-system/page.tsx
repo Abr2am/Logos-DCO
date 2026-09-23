@@ -7,7 +7,7 @@ import { Header } from '@/components/layout/Header';
 import { ResourceCard } from '@/components/library/ResourceCard';
 import { ResourceCover } from '@/components/library/ResourceCover';
 import { Shelf } from '@/components/library/Shelf';
-import { ThemeShelf } from '@/components/library/ThemeShelf';
+import { Bookcase } from '@/components/library/Bookcase';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -296,7 +296,8 @@ export default function DesignSystemPage() {
           <Shelf className="mt-[18px]" />
 
           <Label>Niches de thème — aucun compteur, tablette en pied</Label>
-          <ThemeShelf
+          <Bookcase
+            friezeId="ds"
             items={[
               { key: 'bible', name: 'Bible', href: '/bibliotheque/bible' },
               {

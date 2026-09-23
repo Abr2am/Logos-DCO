@@ -41,8 +41,12 @@ export function RosacePastille({
   tone = 'walnut',
   className,
 }: RosacePastilleProps) {
-  // Le Design System cadre la rosace à 138-140 % du diamètre de la pastille.
-  const inner = Math.round(size * 1.4);
+  /* Le Design System cadre la rosace à 138-140 % du diamètre de la pastille.
+     La taille intérieure est forcée à un nombre PAIR : avec une pastille de
+     diamètre pair, le décalage de centrage `(size - inner) / 2` tombe alors
+     sur un entier. Un demi-pixel suffit à faire paraître le motif décentré
+     dans un cercle de 22 px. */
+  const inner = Math.round((size * 1.4) / 2) * 2;
 
   return (
     <span
@@ -53,10 +57,14 @@ export function RosacePastille({
       )}
       style={{ width: size, height: size }}
     >
-      {/* ⚠️ RECENTRAGE. Le centre de masse du motif d'origine n'est pas son
-          centre géométrique : il est décalé de +0,82 % en x et de −1,38 % en y
-          (mesuré sur `rosace-512.webp`). Sans cette correction, la rosace
-          paraît légèrement haute et à droite dans sa pastille. */}
+      {/* ⚠️ AUCUNE correction de position — et c'est délibéré.
+          Mesure du fichier source (`rosace-512.webp`, canal alpha) :
+          barycentre à 254,47 / 253,91 pour un cadre de 512, soit −0,30 % et
+          −0,41 %. Le motif EST centré dans son cadre. Le seul décentrage
+          visible venait d'un `translate` posé le 23/09/2026 à partir d'une
+          mesure faite sur la luminance SANS le canal alpha : elle pesait la
+          densité d'encre, pas la géométrie. Le retirer recentre réellement le
+          logo. Ne pas le réintroduire sans remesurer sur l'alpha. */}
       <Image
         src={SRC_SMALL}
         alt=""
@@ -64,52 +72,82 @@ export function RosacePastille({
         width={inner}
         height={inner}
         className="max-w-none mix-blend-luminosity"
-        style={{
-          opacity: tone === 'walnut' ? 0.85 : 0.9,
-          transform: `translate(${-0.82 * inner * 0.01}px, ${1.38 * inner * 0.01}px)`,
-        }}
+        style={{ opacity: tone === 'walnut' ? 0.85 : 0.9 }}
       />
     </span>
   );
 }
 
 type RosaceHeroProps = {
-  /** Diamètre en pixels. Le hero de l'accueil l'emploie autour de 300-420 px. */
+  /**
+   * Diamètre en pixels. **Omis**, la taille est portée par `className` — le
+   * cas de l'accueil : la rosace y prend la HAUTEUR de sa section
+   * (`h-full w-auto`), si bien que ses extrémités haute et basse ne sont
+   * jamais coupées, quelle que soit la longueur du contenu.
+   */
   size?: number;
+  /** Opacité du filigrane. Très faible par principe. */
+  opacity?: number;
+  /**
+   * Mode de fusion. `multiply` sur fond clair — le motif y creuse l'ivoire ;
+   * `screen` sur aplat noyer — sans lui, un motif sombre sur un fond sombre
+   * ne se voit pas.
+   *
+   * ⚠️ Le mode est porté par CE composant et par lui seul : deux classes
+   * `mix-blend-*` sur un même élément ne s'ordonnent pas de façon fiable.
+   */
+  blend?: 'multiply' | 'screen';
   className?: string;
+};
+
+const BLEND: Record<'multiply' | 'screen', string> = {
+  multiply: 'mix-blend-multiply',
+  screen: 'mix-blend-screen',
 };
 
 /**
  * Usage 2 (hero) : une seule occurrence par écran.
  *
- * Direction NOYER (23/09/2026) : la rosace est DISCRÈTE et ne domine plus
- * l'écran. Elle est rendue ENTIÈRE — jamais recadrée, jamais coupée par un
- * bord —, en multiplication à 9 % sur l'ivoire. C'est un élément architectural
- * ponctuel, pas un décor de fond.
+ * Élément ARCHITECTURAL d'arrière-plan : très agrandi, centre nettement
+ * décalé vers la droite, opacité très faible. Il donne la géométrie copte de
+ * la page sans jamais concurrencer le texte.
+ *
+ * Le motif est un disque TANGENT à son cadre (mesuré sur le canal alpha :
+ * l'alpha couvre exactement 78 % du carré, soit π/4). Dimensionner la rosace
+ * par sa hauteur suffit donc à garantir qu'aucune extrémité n'est coupée : le
+ * débordement ne peut avoir lieu que sur les côtés.
+ *
+ * Le motif est centré dans son cadre : aucune correction de position n'est
+ * appliquée.
  *
  * « L'utilisateur doit la ressentir avant de l'identifier. »
  */
-export function RosaceHero({ size = 360, className }: RosaceHeroProps) {
+export function RosaceHero({
+  size,
+  opacity = 0.07,
+  blend = 'multiply',
+  className,
+}: RosaceHeroProps) {
   return (
     <Image
       src={SRC_MEDIUM}
       alt=""
       aria-hidden
-      width={size}
-      height={size}
+      /* Dimensions intrinsèques : elles ne fixent que le rapport d'aspect
+         lorsque la taille vient de `className`. */
+      width={size ?? 512}
+      height={size ?? 512}
       priority
       className={cn(
-        'pointer-events-none max-w-none select-none mix-blend-multiply',
+        'pointer-events-none max-w-none select-none',
+        BLEND[blend],
         className,
       )}
-      style={{
-        width: size,
-        height: size,
-        opacity: 0.09,
-        /* Même recentrage que la pastille : le motif n'est pas centré dans
-           son cadre d'origine. */
-        transform: `translate(${-0.82 * size * 0.01}px, ${1.38 * size * 0.01}px)`,
-      }}
+      style={
+        size === undefined
+          ? { opacity }
+          : { width: size, height: size, opacity }
+      }
     />
   );
 }

@@ -4,7 +4,7 @@ import { BrandMark } from '@/components/brand/BrandMark';
 import { RosaceHero } from '@/components/brand/Rosace';
 import { Header } from '@/components/layout/Header';
 import { ResourceGrid } from '@/components/library/ResourceGrid';
-import { ThemeShelf } from '@/components/library/ThemeShelf';
+import { Bookcase } from '@/components/library/Bookcase';
 import { buttonClassName } from '@/components/ui/Button';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { SectionHeading } from '@/components/ui/SectionHeading';
@@ -22,10 +22,10 @@ import { libraryHref } from '@/lib/library/url';
  * Design System. Aucun compteur, aucune statistique, aucun statut, aucun
  * auteur — la page ne montre rien que la bibliothèque ne montre déjà.
  *
- * Direction NOYER (23/09/2026) : le hero est COURT — il annonce, il n'occupe
- * pas l'écran. La rosace y est entière, discrète, jamais coupée par un bord.
- * « Explorer par thème » est un rayonnage de niches, « À découvrir » une
- * véritable étagère d'ouvrages.
+ * Direction BIBLIOTHÈQUE ARCHITECTURALE (23/09/2026) : le hero est compact,
+ * le contenu à gauche, la rosace très agrandie en arrière-plan à droite.
+ * « Explorer par thème » est une FAÇADE DE BIBLIOTHÈQUE — neuf niches
+ * voûtées dans un meuble de noyer —, « À découvrir » un rayonnage d'ouvrages.
  */
 
 export const dynamic = 'force-dynamic';
@@ -49,10 +49,33 @@ export default async function AccueilPage() {
       <Header currentPath="/" />
 
       <main>
-        {/* 1 · Hero — court. L'unique occurrence de la rosace, ENTIÈRE et
-            discrète : elle accompagne le titre, elle ne le domine pas. */}
-        <section className="relative border-b border-line-hairline">
-          <div className="relative mx-auto flex max-w-content flex-col gap-26 px-22 py-34 tablet:flex-row tablet:items-center tablet:justify-between tablet:px-26 tablet:py-44 desktop:px-44">
+        {/* 1 · Hero — compact, contenu à gauche, rosace architecturale à
+            droite.
+
+            La rosace est TRÈS agrandie, son centre nettement décalé vers la
+            droite : elle sort de l'écran par le côté droit et son arête
+            visible vient au niveau du bloc titre.
+
+            UNE SEULE RÈGLE la dimensionne, à tous les paliers : elle prend la
+            HAUTEUR de la section (`inset-y-0 h-full w-auto`). Le motif étant
+            un disque tangent à son cadre, ses extrémités haute et basse
+            effleurent exactement les bords de la section — aucune n'est
+            coupée. Seul le débordement LATÉRAL est rogné, par
+            `overflow-hidden` : jamais par le document, qui ne défile pas
+            horizontalement.
+
+            En mobile la composition ne la masque pas : la même rosace passe
+            derrière le texte, un peu plus sortie et un peu plus pâle. */}
+        <section className="relative min-h-[440px] overflow-hidden border-b border-line-hairline tablet:min-h-[480px] desktop:min-h-[560px]">
+          {/* ⚠️ L'opacité est portée par la PROP, pas par une classe : le
+              composant l'écrit en style inline, qui primerait sur
+              `tablet:opacity-*`. Une seule valeur, donc, à tous les paliers. */}
+          <RosaceHero
+            opacity={0.06}
+            className="absolute inset-y-0 -right-[150px] h-full w-auto tablet:-right-[110px] desktop:-right-[70px]"
+          />
+
+          <div className="relative mx-auto max-w-content px-22 py-34 tablet:px-26 tablet:py-44 desktop:px-44 desktop:py-56">
             <div className="relative max-w-reading">
               <BrandMark size="hero" />
 
@@ -79,16 +102,6 @@ export default async function AccueilPage() {
                   Partager un cours
                 </Link>
               </div>
-            </div>
-
-            {/* Rosace entière, à droite du titre. Masquée sous 640 px : à cette
-                largeur elle ne tiendrait pas sans être rognée. */}
-            <div
-              aria-hidden
-              className="hidden shrink-0 tablet:block desktop:pr-[26px]"
-            >
-              <RosaceHero size={240} className="desktop:hidden" />
-              <RosaceHero size={320} className="hidden desktop:block" />
             </div>
           </div>
         </section>
@@ -118,7 +131,8 @@ export default async function AccueilPage() {
             à la bibliothèque. */}
         <section className="mx-auto max-w-content px-22 pb-44 tablet:px-26 tablet:pb-56 desktop:px-44">
           <SectionHeading title="Explorer par thème" />
-          <ThemeShelf
+          <Bookcase
+            friezeId="accueil"
             className="mt-22"
             items={categories.map((category) => ({
               key: category.slug,
@@ -143,10 +157,20 @@ export default async function AccueilPage() {
           </section>
         ) : null}
 
-        {/* 6 · Bande de contribution — aplat noyer, titre Bodoni ivoire,
-            CTA doré : le seul cas où le doré porte une action. */}
-        <section className="bg-walnut-900 text-on-dark">
-          <div className="mx-auto max-w-content px-22 py-44 tablet:px-26 tablet:py-56 desktop:px-44">
+        {/* 6 · Panneau de contribution — aplat noyer, titre Bodoni ivoire,
+            CTA doré. La rosace y revient en filigrane architectural, très
+            discrète et absorbée par `overflow-hidden`. */}
+        <section className="relative overflow-hidden bg-walnut-900 text-on-dark">
+          {/* Filigrane architectural : le disque prend la hauteur du panneau,
+              donc aucune extrémité coupée ; il sort par la droite. Fusion
+              `screen` — un motif sombre sur un aplat noyer ne se verrait
+              pas. */}
+          <RosaceHero
+            opacity={0.1}
+            blend="screen"
+            className="absolute inset-y-0 -right-[120px] h-full w-auto"
+          />
+          <div className="relative mx-auto max-w-content px-22 py-44 tablet:px-26 tablet:py-56 desktop:px-44">
             <p className="font-mono text-mono font-medium uppercase tracking-[0.13em] text-gold-overline">
               Contribuer
             </p>

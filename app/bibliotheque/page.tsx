@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { Header } from '@/components/layout/Header';
 import { FilterBar } from '@/components/library/FilterBar';
 import { LibraryResults } from '@/components/library/LibraryResults';
-import { ThemeShelf } from '@/components/library/ThemeShelf';
+import { Bookcase } from '@/components/library/Bookcase';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { SearchBar } from '@/components/ui/SearchBar';
 import {
@@ -84,7 +84,8 @@ export default async function BibliothequePage({
           {hasCriteria ? (
             <LibraryResults resources={resources} resetHref={libraryHref({})} />
           ) : (
-            <ThemeShelf
+            <Bookcase
+              friezeId="bibliotheque"
               items={categories.map((category) => ({
                 key: category.slug,
                 name: category.name,

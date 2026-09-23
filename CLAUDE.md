@@ -369,11 +369,14 @@ dans aucun token, aucune classe, aucune famille de couverture.
 | Accent discret, filets           | Doré `#C39A54`                     |
 | Fond principal                   | Ivoire `#F7F3EA`                   |
 
-- Les **boutons principaux sont noyer**, jamais bordeaux.
-- **Sur fond noyer, le bouton est doré à texte noyer** — le seul cas où le
-  doré porte une action.
+- **L'action principale est DORÉE à texte noyer**, sur ivoire comme sur
+  noyer — décision du 23/09/2026 : le doré a un rôle visuel réel, il n'est pas
+  qu'un filet. Contraste noyer sur doré : 7,4:1.
+- **L'action secondaire est transparente à bordure noyer** (bordure ivoire sur
+  aplat noyer). Jamais deux aplats dorés côte à côte : un seul bouton
+  principal par zone de décision.
 - **Aucune couleur nouvelle.** Un survol ou un appui emprunte la même famille
-  (`walnut-700`, `walnut-active`) ; rien d'autre n'est permis.
+  (`gold-hover`, `walnut-700`, `walnut-active`) ; rien d'autre n'est permis.
 
 - **Aucune couleur d'état** : pas de rouge d'erreur, pas de vert de succès,
   pas d'orange. Erreur = noyer + « ! » textuel + bordure renforcée ;
@@ -409,15 +412,36 @@ dans aucun token, aucune classe, aucune famille de couverture.
 
 ### Rosace — 4 usages seulement
 
-Marque (pastille 22-40 px) · Hero (une occurrence, **entière, discrète, en
-multiplication à 9 %** — jamais coupée par un bord, jamais dominante) ·
-Couverture (filigrane ≤ 26 %, au plus 1 sur 5) · État vide (pastille dorée
-34 px).
+Marque (pastille 22-40 px) · Hero (une occurrence par écran, **élément
+architectural d'arrière-plan**) · Couverture (filigrane ≤ 26 %, au plus 1 sur 5) · État vide (pastille dorée 34 px).
 
-⚠️ **Recentrage.** Le centre de masse du motif d'origine n'est pas son centre
-géométrique : il est décalé de +0,82 % en x et de −1,38 % en y. `Rosace.tsx`
-corrige ce décalage. Ne pas le retirer — sans lui, la rosace paraît haute et
-à droite dans sa pastille.
+**Le hero — arbitrage du 23/09/2026.** La rosace y est **très agrandie**, son
+centre nettement **décalé vers la droite**, son opacité **très faible**
+(6 %). Elle **sort de l'écran par le côté**, jamais par le haut ni par le bas :
+sa taille est portée par la HAUTEUR de sa section (`inset-y-0 h-full w-auto`),
+et le motif étant un **disque tangent à son cadre** (mesuré : l'alpha couvre
+78 % du carré, soit π/4), ses extrémités haute et basse effleurent exactement
+les bords de la section. **Aucune extrémité n'est donc coupée**, quelle que
+soit la longueur du contenu, et le débordement latéral est absorbé par
+`overflow-hidden` — jamais par le document, qui ne défile jamais
+horizontalement. En mobile, la composition **ne la masque pas** : la même
+rosace passe derrière le texte.
+
+Fusion : `multiply` sur fond clair, `screen` sur aplat noyer — un motif sombre
+sur fond sombre ne se verrait pas. Le mode est porté par une **prop** de
+`Rosace.tsx`, jamais par une classe ajoutée : deux `mix-blend-*` sur un même
+élément ne s'ordonnent pas de façon fiable. L'opacité, elle, est écrite en
+style inline par le composant et primerait sur une classe `tablet:opacity-*` :
+une seule valeur, à tous les paliers.
+
+⚠️ **Centrage — ne pas « corriger » à nouveau.** Le motif **est centré dans son
+cadre** : barycentre du canal alpha à 254,47 / 253,91 pour un cadre de 512
+(−0,30 % / −0,41 %). `Rosace.tsx` n'applique **aucune translation**, et la
+taille intérieure de la pastille est forcée à un nombre pair pour que le
+décalage de centrage tombe sur un entier. Un `translate` posé le 23/09/2026 à
+partir d'une mesure faite sur la luminance **sans le canal alpha** — elle
+pesait la densité d'encre, pas la géométrie — décentrait activement le logo ;
+il a été retiré. Ne pas le réintroduire sans remesurer sur l'alpha.
 
 **Interdits :** déformation, recadrage en fragment, redessin, motif répété,
 usage comme icône fonctionnelle, rotation, contour tracé, version mono-trait.
@@ -432,8 +456,32 @@ filets dorés très fins.
 **Les étagères sont une STRUCTURE GRAPHIQUE, pas une bibliothèque réaliste.**
 Ni musée, ni brocante, ni bibliothèque ancienne, ni décor chargé.
 
+**Le meuble (`Bookcase`) — « Explorer par thème ».** Les neuf thèmes sont neuf
+**niches d'une même façade**, pas neuf cartes :
+
+- la **carcasse** est le fond de la grille, en `walnut-700` ; les **niches**
+  sont des cellules `walnut-900`, plus sombres — c'est ce contraste de
+  matière, et non une ombre, qui creuse le renfoncement ;
+- les **montants** sont les gouttières verticales de la grille : la carcasse y
+  transparaît, exactement entre deux niches, à tous les paliers et **sans une
+  seule règle conditionnelle** ;
+- chaque niche est couronnée d'un **arc surbaissé** (l'écoinçon est plein,
+  l'ouverture se découpe en négatif), bordée de deux **piédroits** dorés très
+  pâles, et fermée en pied par une **tablette** ;
+- une **frise de losanges** court en corniche et en socle ;
+- une rangée incomplète laisse voir la carcasse : une travée fermée, en bois
+  plein. C'est un meuble, pas une grille trouée.
+
+**La menuiserie (`Arabesque.tsx`)** — arcs, frises, montants — dérive de la
+géométrie de la rosace : losanges entrelacés, arcs, étoiles. Chaque tracé est
+une **pièce d'architecture** étirée sur la pièce qu'elle habille. **Jamais une
+texture de fond**, jamais un motif répété sous une page.
+
+**Le rayonnage (`Bookshelf`) — « À découvrir » et la bibliothèque :**
+
 - Une **tablette** ferme chaque rangée : 7 px en mobile, 9 px au-delà, aplat
-  `walnut-700`, filet doré, ombre légère.
+  `walnut-700`, filet doré en arête, tasseau `walnut-900` en dessous — trois
+  aplats, aucune ombre portée, aucun dégradé de bois.
 - La tablette est portée par **chaque travée**, jamais par la grille entière :
   les travées d'une rangée sont jointives, leurs tablettes se rejoignent en
   une ligne continue. C'est ce qui rend le rayonnage exact à tous les paliers
@@ -639,6 +687,7 @@ composants, pas de nouveau framework — décision du 23/09/2026.
 | 9   | Accueil éditorial + pied de page                   | ✅   |
 | 10  | Durcissement : états d'erreur et harnais de test   | ✅   |
 | 11  | Refonte visuelle — direction Noyer                 | ✅   |
+| 12  | Bibliothèque architecturale copte (meuble, arcs)   | ✅   |
 
 <!-- BEGIN:nextjs-agent-rules -->
 

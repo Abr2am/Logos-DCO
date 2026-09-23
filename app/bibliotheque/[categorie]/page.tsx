@@ -5,7 +5,7 @@ import { Header } from '@/components/layout/Header';
 import { BranchHeader } from '@/components/library/BranchHeader';
 import { FilterBar } from '@/components/library/FilterBar';
 import { LibraryResults } from '@/components/library/LibraryResults';
-import { ThemeShelf } from '@/components/library/ThemeShelf';
+import { Bookcase } from '@/components/library/Bookcase';
 import {
   getCategories,
   getFlagFacets,
@@ -90,7 +90,8 @@ export default async function CategoriePage({
         />
 
         {category.subcategories.length > 0 ? (
-          <ThemeShelf
+          <Bookcase
+            friezeId="branche"
             className="mt-26"
             layout="subthemes"
             items={category.subcategories.map((subcategory) => ({

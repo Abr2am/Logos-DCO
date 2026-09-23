@@ -5,7 +5,9 @@ import { cn } from '@/lib/cn';
 /*
  * Un seul bouton primaire par zone de décision.
  * Aucune ombre : les boutons ont une bordure ou un aplat, jamais d'ombre.
- * Le doré ne porte une action que dans un seul cas : le primaire sur noyer.
+ *
+ * Direction NOYER + OR : le DORÉ porte l'action principale — c'est son rôle
+ * visuel, pas un simple filet. Le noyer porte la bordure du secondaire.
  *
  * Couleur et gabarit sont séparés : deux classes Tailwind réglant la même
  * propriété sur un même élément ne s'ordonnent pas de façon fiable.
@@ -26,11 +28,14 @@ const BASE =
 
 /** Couleurs et bordures — aucune métrique. */
 const TONES: Record<ButtonVariant, string> = {
+  /* Direction NOYER + OR (23/09/2026) : l'action principale est DORÉE à texte
+     noyer, sur ivoire comme sur noyer. Contraste Walnut-900 sur Gold : 7,4:1,
+     au-dessus du plancher de 7:1. */
   primary: cn(
-    'bg-walnut-900 text-on-dark font-semibold',
-    'hover:bg-walnut-700 active:bg-walnut-active',
+    'bg-gold text-walnut-900 font-semibold',
+    'hover:bg-gold-hover active:bg-gold-hover',
     'focus-visible:outline-walnut-900',
-    'disabled:opacity-[.38] disabled:hover:bg-walnut-900',
+    'disabled:opacity-[.38] disabled:hover:bg-gold',
   ),
   primaryOnWalnut: cn(
     'bg-gold text-walnut-900 font-semibold',
@@ -38,9 +43,10 @@ const TONES: Record<ButtonVariant, string> = {
     'focus-visible:outline-gold',
     'disabled:opacity-[.38] disabled:hover:bg-gold',
   ),
+  /* Action secondaire : transparente, bordure noyer franche. */
   secondary: cn(
-    'border border-line-secondary bg-transparent text-text font-medium',
-    'hover:border-line-secondary-hover hover:text-walnut-900',
+    'border border-walnut-700 bg-transparent text-walnut-900 font-medium',
+    'hover:border-walnut-900 hover:bg-cover-plate',
     'active:bg-cover-plate',
     'focus-visible:outline-walnut-900',
     'disabled:border-line disabled:text-disabled-text',
