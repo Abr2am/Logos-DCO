@@ -387,6 +387,9 @@ dans aucun token, aucune classe, aucune famille de couverture.
 - **Ombres réservées aux couvertures**, et **très légères** : un ouvrage est
   posé sur sa tablette, il n'y flotte pas. Panneaux, champs et boutons ont
   une bordure, jamais une ombre.
+  Une seule exception, validée le 23/09/2026 : `--shadow-niche`, **ombre
+  interne** du renfoncement d'une niche du meuble. Elle n'est jamais portée et
+  ne sort jamais du meuble.
 - **Rayons :** 3 px contrôles · 4 px panneaux · **0 couvertures, bandeaux et
   tablettes** (un livre a des angles vifs). Jamais d'arrondi complet, sauf la
   pastille de rosace.
@@ -394,6 +397,9 @@ dans aucun token, aucune classe, aucune famille de couverture.
   propre à un mot-clé.
 - **Bandeau noyer 4-5 px + filet doré** en tête de chaque page : c'est la
   signature architecturale du produit.
+- **Montant doré de 3 px devant chaque titre de section** (`SectionHeading`) :
+  la même arête qu'en nez de tablette et en corniche. Le doré ponctue la
+  structure, il ne décore pas.
 - **Motion :** 150 ms (survols) / 200 ms (menu, listes), courbe
   `cubic-bezier(.2,.6,.3,1)`. Aucun déplacement de plus de 2 px, aucune mise à
   l'échelle, aucune animation d'entrée au défilement, aucun toast, aucun
@@ -415,7 +421,14 @@ dans aucun token, aucune classe, aucune famille de couverture.
 Marque (pastille 22-40 px) · Hero (une occurrence par écran, **élément
 architectural d'arrière-plan**) · Couverture (filigrane ≤ 26 %, au plus 1 sur 5) · État vide (pastille dorée 34 px).
 
-**Le hero — arbitrage du 23/09/2026.** La rosace y est **très agrandie**, son
+**Le hero de l'accueil est un ANGLE DE SALLE** (décision du 23/09/2026) :
+le texte à gauche, la rosace au fond comme une pierre sculptée, et le **meuble
+pris en bord d'écran à droite** (`HeroShelf` — claustra en imposte, trois
+tablettes d'ouvrages). La rosace passe DERRIÈRE le meuble : c'est la façon
+juste de lire la profondeur. Sous 640 px le panneau se retire — il prendrait
+la moitié de l'écran — et la rosace reste, derrière le texte.
+
+**La rosace du hero — arbitrage du 23/09/2026.** Elle est **très agrandie**, son
 centre nettement **décalé vers la droite**, son opacité **très faible**
 (6 %). Elle **sort de l'écran par le côté**, jamais par le haut ni par le bas :
 sa taille est portée par la HAUTEUR de sa section (`inset-y-0 h-full w-auto`),
@@ -457,25 +470,57 @@ filets dorés très fins.
 Ni musée, ni brocante, ni bibliothèque ancienne, ni décor chargé.
 
 **Le meuble (`Bookcase`) — « Explorer par thème ».** Les neuf thèmes sont neuf
-**niches d'une même façade**, pas neuf cartes :
+**niches d'un même meuble**, jamais neuf cartes. Ce qui en fait un meuble :
 
+- une **corniche** moulurée le couronne (larmier, filet doré, frise de
+  losanges), une **grecque de socle** en `walnut-900` le pose au sol, et deux
+  **joues** ajourées — claustra + médaillons — le ferment de part et d'autre
+  (masquées sous 640 px, où elles prendraient la place des niches) ;
 - la **carcasse** est le fond de la grille, en `walnut-700` ; les **niches**
-  sont des cellules `walnut-900`, plus sombres — c'est ce contraste de
-  matière, et non une ombre, qui creuse le renfoncement ;
+  sont des cellules `walnut-900`, plus sombres ;
 - les **montants** sont les gouttières verticales de la grille : la carcasse y
   transparaît, exactement entre deux niches, à tous les paliers et **sans une
   seule règle conditionnelle** ;
 - chaque niche est couronnée d'un **arc surbaissé** (l'écoinçon est plein,
   l'ouverture se découpe en négatif), bordée de deux **piédroits** dorés très
   pâles, et fermée en pied par une **tablette** ;
-- une **frise de losanges** court en corniche et en socle ;
 - une rangée incomplète laisse voir la carcasse : une travée fermée, en bois
   plein. C'est un meuble, pas une grille trouée.
 
-**La menuiserie (`Arabesque.tsx`)** — arcs, frises, montants — dérive de la
-géométrie de la rosace : losanges entrelacés, arcs, étoiles. Chaque tracé est
-une **pièce d'architecture** étirée sur la pièce qu'elle habille. **Jamais une
-texture de fond**, jamais un motif répété sous une page.
+**Rangées du meuble** (décision du 23/09/2026) : **5 niches puis 4** en
+desktop — une grille de 20 colonnes, 4 colonnes par niche du haut, 5 par niche
+du bas —, **3** en tablette, **2** en mobile. Le mobile garde donc une vraie
+logique de meuble, jamais une liste de cartes.
+
+**La profondeur** vient de trois choses, jamais d'un dégradé ni d'une texture
+de bois : l'étagement des aplats, les arêtes dorées d'un pixel, et une **ombre
+INTERNE très discrète** (`--shadow-niche`) — le linteau projette son ombre sur
+le fond de la niche. C'est la seule ombre autorisée hors couverture, et elle
+est toujours `inset` : un panneau, un champ ou un bouton n'a jamais d'ombre.
+
+**Les ouvrages dans les niches.** Une tranche = **une ressource publiée dans
+ce thème**, au plus six ; hauteur, largeur, teinte et inclinaison sont tirées
+de l'identifiant, donc stables. Ce n'est ni un compteur, ni un décor inventé :
+**une niche sans ressource reste vide**, et c'est exact. Seul le panneau du
+hero — `aria-hidden`, sans lien — complète ses rangées de tranches muettes :
+c'est du mobilier, pas une liste. Ne jamais étendre ce remplissage aux niches
+de thème.
+
+> Sur `/bibliotheque`, les niches sont volontairement **sans ouvrages** : la
+> page « n'affiche pas immédiatement toutes les ressources » et ne charge donc
+> aucune liste tant qu'aucun critère n'est actif.
+
+**La menuiserie (`Arabesque.tsx`)** — arc, frise de corniche, grecque de
+socle, claustra, médaillon — dérive de la géométrie de la rosace : losanges
+entrelacés, arcs, méandres, étoiles. Chaque tracé est une **pièce
+d'architecture** étirée sur la pièce qu'elle habille. **Jamais une texture de
+fond**, jamais un motif répété sous une page, jamais sous du texte courant.
+
+⚠️ Le **médaillon** des joues est une étoile géométrique à douze branches,
+**pas la rosace de la marque** — dont les usages restent au nombre de quatre.
+Chaque `<pattern>` exige un `id` unique dans la page, et son `viewBox` doit
+rester large : `slice` met le tracé à l'échelle du plus grand côté, si bien
+qu'un petit `viewBox` donnerait un claustra grossier.
 
 **Le rayonnage (`Bookshelf`) — « À découvrir » et la bibliothèque :**
 
@@ -488,6 +533,11 @@ texture de fond**, jamais un motif répété sous une page.
   **sans une seule règle conditionnelle**.
 - **Montants** : un filet d'un pixel de part et d'autre, en desktop seulement.
 - **Ouvrages par rangée :** 2 en mobile · 3 en tablette · 4 en desktop.
+  Exception : « À découvrir » en accueil montre **2 ouvrages par rangée
+  jusqu'en tablette et 4 en desktop**, sur une tablette d'apparat plus
+  épaisse. Quatre ressources remplissent ainsi toujours leurs rangées (2 + 2,
+  puis 4) et la tablette reste continue ; trois colonnes couperaient à la fois
+  la rangée et les titres de couverture.
 - L'étagère reste **discrète** et ne domine jamais les couvertures.
 
 Où le langage s'applique : accueil (« Explorer par thème » en niches,

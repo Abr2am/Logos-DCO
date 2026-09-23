@@ -66,12 +66,71 @@ export function Bookshelf({
 }
 
 /** Tablette à chant : arête dorée, plateau noyer clair, tasseau noyer sombre. */
-function ShelfPlank({ className }: { className?: string }) {
+export function ShelfPlank({
+  strong,
+  className,
+}: {
+  /** Tablette d'apparat — « À découvrir » en accueil. */
+  strong?: boolean;
+  className?: string;
+}) {
   return (
     <div aria-hidden className={cn('shrink-0', className)}>
       <div className="h-px bg-[rgb(195_154_84/0.6)]" />
-      <div className="h-[7px] bg-walnut-700 tablet:h-[9px]" />
-      <div className="h-[4px] bg-walnut-900 tablet:h-[5px]" />
+      <div
+        className={cn(
+          'bg-walnut-700',
+          strong ? 'h-[11px] tablet:h-[13px]' : 'h-[7px] tablet:h-[9px]',
+        )}
+      />
+      <div
+        className={cn(
+          'bg-walnut-900',
+          strong ? 'h-[6px] tablet:h-[8px]' : 'h-[4px] tablet:h-[5px]',
+        )}
+      />
+    </div>
+  );
+}
+
+/*
+ * « À découvrir » — le rayonnage d'apparat de l'accueil.
+ *
+ * Deux ouvrages par rangée jusqu'en tablette, QUATRE en desktop : le nombre
+ * affiché (quatre) remplit donc toujours ses rangées — 2 + 2, puis 4 — et les
+ * tablettes se rejoignent en une ligne continue sur toute la largeur. Trois
+ * colonnes couperaient à la fois la rangée et les titres de couverture. La tablette y est plus épaisse
+ * qu'en bibliothèque — c'est la vitrine de l'accueil, les ouvrages y ont de
+ * l'air autour d'eux.
+ */
+export function DiscoveryShelf({
+  resources,
+  className,
+}: {
+  resources: ReadonlyArray<ResourceSummary>;
+  className?: string;
+}) {
+  return (
+    <div className={cn('grid grid-cols-2 desktop:grid-cols-4', className)}>
+      {resources.map((resource) => (
+        <div
+          key={resource.id}
+          className="flex flex-col px-[7px] pb-34 tablet:px-16 tablet:pb-44 desktop:px-22"
+        >
+          <ResourceCard
+            href={`/ressource/${resource.id}`}
+            title={resource.title}
+            category={resource.subcategoryName ?? resource.categoryName}
+            family={coverFamilyFromKey(resource.id)}
+            meta={resourceMetaLine(resource)}
+            className="mb-16"
+          />
+          <ShelfPlank
+            strong
+            className="-mx-[7px] mt-auto tablet:-mx-16 desktop:-mx-22"
+          />
+        </div>
+      ))}
     </div>
   );
 }

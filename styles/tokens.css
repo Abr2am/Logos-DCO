@@ -181,6 +181,15 @@
   --shadow-cover-light: 0 4px 10px rgb(46 30 21 / 0.1); /* plats clairs */
   --shadow-cover-detail: 0 12px 26px rgb(46 30 21 / 0.2);
   --shadow-shelf: 0 4px 10px rgb(46 30 21 / 0.16);
+
+  /* Renfoncement d'une niche du meuble (décision du 23/09/2026 : la
+     profondeur des niches est un point PRIORITAIRE de la direction
+     architecturale). C'est une ombre INTERNE, jamais portée : le linteau
+     projette son ombre sur le fond de la niche. Aucune teinte nouvelle —
+     l'alpha est celui de `--color-cover-spine`. */
+  --shadow-niche:
+    inset 0 10px 20px -8px rgb(31 20 13 / 0.85),
+    inset 0 1px 0 rgb(31 20 13 / 0.55);
   /* Survol : seule la géométrie s'ouvre, la teinte reste celle de `cover`. */
   --shadow-cover-hover: 0 8px 18px rgb(46 30 21 / 0.14);
 
