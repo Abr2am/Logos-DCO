@@ -3,7 +3,11 @@ import Link from 'next/link';
 import { cn } from '@/lib/cn';
 
 /*
- * « Explorer par thème » — les neuf thèmes installés dans le meuble.
+ * LE MEUBLE — les neuf thèmes installés dans leurs niches.
+ *
+ * Employé par l'accueil ET par `/bibliotheque` : c'est le même meuble, donc
+ * le même composant. Toute modification ici se voit sur les deux pages —
+ * vérifier les deux.
  *
  * ── La menuiserie est un ASSET, pas du CSS ──────────────────────────────────
  * Le meuble vient des deux fichiers validés : `bookcase-horizontal` en

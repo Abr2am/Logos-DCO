@@ -443,6 +443,9 @@ dessin (964 / 907), jamais saisie à la main.
 
 Tailles : **26 px** en mobile · **32 px** en desktop · **58 px** en hero,
 toujours accompagnées du mot-marque « LOGOS », que l'emblème ne contient pas.
+L'emblème SEUL — sans mot-marque — n'a qu'un emploi : l'**état vide**, à
+34 px. `Emblem` porte l'image ; `BrandMark` n'est que l'emblème plus le
+mot-marque.
 
 ⚠️ **L'emblème porte une croix, et c'est la seule de l'interface.** La règle
 « aucune croix, icône, bougie, plante ou objet liturgique » vise la
@@ -455,10 +458,16 @@ dessin, les bruns se fondent dans le fond. Aucune variante recolorée.
 ### Rosace — 3 usages depuis l'emblème officiel
 
 ~~Marque (pastille 22-40 px)~~ — **remplacée par l'emblème officiel le
-23/09/2026.** Restent : Hero (une occurrence par écran, **élément
-architectural d'arrière-plan**) · Couverture (filigrane ≤ 26 %, au plus 1 sur 5) · État vide (pastille dorée 34 px). La grande rosace décorative du hero est
-un élément **distinct du logo** : ne jamais employer l'emblème comme motif de
-fond, ni la rosace comme marque.
+23/09/2026.** ~~État vide (pastille dorée 34 px)~~ — **remplacée par l'emblème
+officiel le 24/09/2026** : `EmptyState` porte l'emblème à 34 px de haut,
+proportionné et discret. Restent donc **deux usages** : Hero (une occurrence
+par écran, **élément architectural d'arrière-plan**) · Couverture (filigrane
+≤ 26 %, au plus 1 sur 5). La grande rosace décorative est un élément
+**distinct du logo** : ne jamais employer l'emblème comme motif de fond, ni la
+rosace comme marque.
+
+`RosacePastille` n'a plus d'emploi dans le produit — seule la page
+`/design-system` la montre encore, à titre de pièce documentée.
 
 ⚠️ **Depuis la maquette finale (24/09/2026), l'accueil n'emploie plus la
 rosace en hero** : son décor est un ASSET validé, où la rosace est sculptée
@@ -507,18 +516,20 @@ filets dorés très fins.
 **Les étagères sont une STRUCTURE GRAPHIQUE, pas une bibliothèque réaliste.**
 Ni musée, ni brocante, ni bibliothèque ancienne, ni décor chargé.
 
-### L'accueil — assets validés, composition figée (24/09/2026)
+### L'accueil et la bibliothèque — assets validés (24/09/2026)
 
-`/` reproduit la **maquette finale**. Sa menuiserie n'est plus dessinée en
-CSS : elle vient de quatre fichiers validés, masters dans `assets/home/`,
-versions web produites par `npm run assets:home` dans `public/home/`.
+`/` reproduit la **maquette finale**, et `/bibliotheque` porte **le même
+meuble** : on doit reconnaître le même mobilier d'une page à l'autre. Cette
+menuiserie n'est plus dessinée en CSS — elle vient de quatre fichiers validés,
+masters dans `assets/home/`, versions web produites par `npm run assets:home`
+dans `public/home/`.
 
-| Asset                      | Usage                                      |
-| -------------------------- | ------------------------------------------ |
-| `hero-desktop.webp`        | hero, à partir de 640 px                   |
-| `hero-mobile.webp`         | hero, sous 640 px — composition distincte  |
-| `bookcase-horizontal.webp` | « Explorer par thème », à partir de 640 px |
-| `bookcase-vertical.webp`   | « Explorer par thème », sous 640 px        |
+| Asset                      | Usage                                     |
+| -------------------------- | ----------------------------------------- |
+| `hero-desktop.webp`        | hero, à partir de 640 px                  |
+| `hero-mobile.webp`         | hero, sous 640 px — composition distincte |
+| `bookcase-horizontal.webp` | le meuble, à partir de 640 px             |
+| `bookcase-vertical.webp`   | le meuble, sous 640 px                    |
 
 **Interdits :** les redessiner, les recréer en CSS, les recadrer sur une
 partie de leur dessin, les déformer, les remplacer par une approximation.
@@ -530,7 +541,8 @@ partie de leur dessin, les déformer, les remplacer par une approximation.
   appels à l'action restent du HTML. L'image ne porte que le décor (`alt`
   vide, `aria-hidden`).
 - **Les neuf thèmes sont de vrais liens posés DANS les niches**
-  (`components/home/ThemeBookcase.tsx`). Leur géométrie est en **pourcentages
+  (`components/library/ThemeBookcase.tsx`, partagé par `/` et
+  `/bibliotheque` — toute retouche se voit sur les deux pages). Leur géométrie est en **pourcentages
   de l'image**, mesurés une fois sur les fichiers : l'image étant l'élément de
   flux, tout se met à l'échelle ensemble, sans point de rupture supplémentaire
   et sans JavaScript. Desktop et tablette : 5 thèmes puis 4, la seconde rangée
@@ -546,8 +558,11 @@ partie de leur dessin, les déformer, les remplacer par une approximation.
   largeur.
 
 > `Bookcase`, `HeroShelf` et `BookSpines` — la menuiserie dessinée en CSS —
-> restent en place : `/bibliotheque` et les branches s'en servent toujours, et
-> ces pages ne sont PAS concernées par la maquette de l'accueil.
+> ne servent plus qu'aux **sous-thèmes d'une branche**
+> (`/bibliotheque/[categorie]`), où le meuble à neuf niches n'aurait pas de
+> sens pour trois sous-catégories. ⚠️ **Point à trancher** : cette page montre
+> donc encore l'ancien meuble sombre, à côté du meuble clair des deux autres.
+> Ne pas l'harmoniser sans décision — aucun asset ne couvre trois niches.
 
 **Le meuble (`Bookcase`) — « Explorer par thème » hors accueil.** Les neuf thèmes sont neuf
 **niches d'un même meuble**, jamais neuf cartes. Ce qui en fait un meuble :

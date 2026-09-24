@@ -1,6 +1,6 @@
-import Image from 'next/image';
-
 import { cn } from '@/lib/cn';
+
+import { Emblem } from './Emblem';
 
 /*
  * EMBLÈME OFFICIEL + mot-marque.
@@ -9,20 +9,9 @@ import { cn } from '@/lib/cn';
  * logo validé du diocèse, et il fait foi. Il est servi tel quel depuis
  * `public/brand/embleme-256.webp`, généré du master par `npm run assets:brand`.
  *
- * ⚠️ Le fichier n'est ni redessiné, ni redécoupé, ni recoloré, ni filtré.
- * Seule sa HAUTEUR est imposée ; la largeur reste `auto`, donc le rapport
- * d'aspect est exactement celui du fichier — il ne peut être ni déformé, ni
- * coupé, même si le master était remplacé par une version au cadrage
- * différent.
- *
- * ⚠️ Les attributs `width` / `height` valent le DOUBLE de la taille affichée :
- * ils ne dimensionnent rien (le style s'en charge), ils disent seulement à
- * `next/image` quelle définition servir. Sans cela, l'emblème serait servi à
- * 1× et paraîtrait flou sur un écran à forte densité.
- *
- * Le centrage dans son conteneur est purement géométrique — le fichier servi
- * est rogné sur la boîte englobante du dessin, donc aucune translation de
- * compensation n'est appliquée, et il ne faut pas en introduire.
+ * L'image elle-même vit dans `Emblem` : mêmes règles, un seul endroit — le
+ * fichier n'y est ni redessiné, ni recoloré, ni déformé, et son centrage est
+ * purement géométrique.
  *
  * « Aucune autre déclinaison : pas de monogramme, pas de version sans
  * emblème, pas d'emblème seul en favicon inférieur à 22 px. »
@@ -30,11 +19,6 @@ import { cn } from '@/lib/cn';
  * Le mot-marque est la seule exception à la règle « les titres Bodoni ne sont
  * jamais en capitales ». L'emblème ne le contient pas : il reste du texte.
  */
-
-const SRC = '/brand/embleme-256.webp';
-
-/** Rapport largeur / hauteur du DESSIN, mesuré sur le master : 964 × 907. */
-const RATIO = 964 / 907;
 
 type BrandMarkSize = 'sm' | 'md' | 'hero';
 
@@ -78,22 +62,10 @@ export function BrandMark({
   className,
 }: BrandMarkProps) {
   const spec = SIZES[size];
-  const height = spec.emblem;
-  /* Définition servie : 2× la taille affichée, arrondie sur le rapport réel. */
-  const served = { h: height * 2, w: Math.round(height * 2 * RATIO) };
 
   return (
     <span className={cn('inline-flex items-center', spec.gap, className)}>
-      <Image
-        src={SRC}
-        alt=""
-        aria-hidden
-        width={served.w}
-        height={served.h}
-        priority
-        className="block shrink-0"
-        style={{ height, width: 'auto' }}
-      />
+      <Emblem height={spec.emblem} priority />
       <span
         className={cn(
           'font-display uppercase leading-none',

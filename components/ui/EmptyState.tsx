@@ -1,10 +1,11 @@
 import type { ReactNode } from 'react';
 
-import { RosacePastille } from '@/components/brand/Rosace';
+import { Emblem } from '@/components/brand/Emblem';
 
 /*
- * « L'état vide est le seul endroit où la rosace apparaît en petit format
- *   hors marque — pastille dorée de 34 px. »
+ * L'état vide porte l'EMBLÈME OFFICIEL, 34 px de haut — proportionné et
+ * discret. Il a remplacé la pastille de rosace le 24/09/2026 : la rosace ne
+ * porte plus l'identité.
  */
 export function EmptyState({
   title,
@@ -17,7 +18,7 @@ export function EmptyState({
 }) {
   return (
     <div className="rounded-panel border border-line bg-surface px-[26px] py-34 text-center">
-      <RosacePastille size={34} tone="gold" className="mx-auto" />
+      <Emblem height={34} className="mx-auto" />
       <p className="mt-16 font-display text-[22px] leading-[1.2]">{title}</p>
       {description ? (
         <p className="mt-[8px] text-body text-text-secondary">{description}</p>

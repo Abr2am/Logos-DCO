@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { Header } from '@/components/layout/Header';
 import { FilterBar } from '@/components/library/FilterBar';
 import { LibraryResults } from '@/components/library/LibraryResults';
-import { Bookcase } from '@/components/library/Bookcase';
+import { ThemeBookcase } from '@/components/library/ThemeBookcase';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { SearchBar } from '@/components/ui/SearchBar';
 import {
@@ -21,6 +21,11 @@ import { libraryHref, readFlags, readQuery } from '@/lib/library/url';
  *
  * Les neuf thèmes laissent place aux résultats dès qu'une recherche ou un
  * filtre est actif : c'est le seul endroit où une recherche globale aboutit.
+ *
+ * Le meuble est exactement celui de l'accueil — mêmes assets validés, même
+ * composant (`ThemeBookcase`) : on doit reconnaître le même mobilier d'une
+ * page à l'autre. Rien du fonctionnement de la page ne change pour autant :
+ * recherche, filtres, flags, tri et navigation restent intacts.
  */
 
 export const dynamic = 'force-dynamic';
@@ -84,10 +89,9 @@ export default async function BibliothequePage({
           {hasCriteria ? (
             <LibraryResults resources={resources} resetHref={libraryHref({})} />
           ) : (
-            <Bookcase
-              friezeId="bibliotheque"
-              items={categories.map((category) => ({
-                key: category.slug,
+            <ThemeBookcase
+              themes={categories.map((category) => ({
+                slug: category.slug,
                 name: category.name,
                 href: libraryHref({ categorySlug: category.slug }),
                 subthemes: category.subcategories.map((sub) => sub.name),
