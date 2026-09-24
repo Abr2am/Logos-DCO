@@ -62,7 +62,13 @@ export function HomeHero() {
             </h1>
 
             <p className="mt-[6px] font-display text-[13px] italic leading-[1.45] text-text-secondary tablet:mt-12 tablet:text-signature-mobile desktop:text-signature">
-              Une même foi, pour aujourd&apos;hui et pour demain.
+              Toute Écriture est inspirée de Dieu, et utile pour enseigner, pour
+              convaincre, pour corriger, pour instruire dans la justice.
+            </p>
+            {/* La référence accompagne le verset sans prendre son style :
+                même corps, même couleur, sans italique. */}
+            <p className="mt-[4px] font-display text-[13px] leading-[1.45] text-text-secondary tablet:mt-[6px] tablet:text-signature-mobile desktop:text-signature">
+              2 Timothée 3:16
             </p>
           </div>
 
