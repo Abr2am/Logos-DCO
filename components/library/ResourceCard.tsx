@@ -26,6 +26,13 @@ export type ResourceCardProps = {
   family: CoverFamily;
   /** `type · format · pagination` — la pagination est omise si inconnue. */
   meta: string;
+  /**
+   * Légende sous la couverture. `false` en accueil : la maquette validée y
+   * présente les ouvrages nus sur leur tablette, la couverture portant déjà
+   * son titre. Partout ailleurs, la légende reste — c'est la valeur par
+   * défaut, et aucun appel existant n'est modifié.
+   */
+  caption?: boolean;
   className?: string;
 };
 
@@ -35,6 +42,7 @@ export function ResourceCard({
   category,
   family,
   meta,
+  caption = true,
   className,
 }: ResourceCardProps) {
   return (
@@ -54,10 +62,14 @@ export function ResourceCard({
           'group-hover:-translate-y-[2px] group-hover:shadow-cover-hover',
         )}
       />
-      <p className="mt-16 text-[13.5px] font-medium leading-[1.35] tablet:text-[14.5px]">
-        {title}
-      </p>
-      <p className="mt-[5px] text-[12px] text-help">{meta}</p>
+      {caption ? (
+        <>
+          <p className="mt-16 text-[13.5px] font-medium leading-[1.35] tablet:text-[14.5px]">
+            {title}
+          </p>
+          <p className="mt-[5px] text-[12px] text-help">{meta}</p>
+        </>
+      ) : null}
     </Link>
   );
 }

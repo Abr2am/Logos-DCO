@@ -7,10 +7,11 @@ Orthodoxe de Paris**.
 
 ## Sources de vérité
 
-| Document                              | Rôle                                                                                                     |
-| ------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `docs/LOGOS_Cahier_des_charges_V1.md` | **Source de vérité produit.** Prime sur toute autre considération.                                       |
-| `docs/Logos - Design System V2.html`  | **Référence visuelle et UI.** Document bundlé : le contenu réel est dans le script `__bundler/template`. |
+| Document                                                 | Rôle                                                                                                                                                                                                           |
+| -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `docs/LOGOS_Cahier_des_charges_V1.md`                    | **Source de vérité produit.** Prime sur toute autre considération.                                                                                                                                             |
+| `docs/Logos - Design System V2.html`                     | **Référence visuelle et UI.** Document bundlé : le contenu réel est dans le script `__bundler/template`.                                                                                                       |
+| **Maquette finale de l'accueil** (validée le 24/09/2026) | **Source de vérité visuelle de `/`, et d'elle seule.** Elle prime sur toute interprétation et sur les règles de composition antérieures pour cette page. Les autres pages restent régies par le Design System. |
 
 Ces deux documents ne se contredisent pas. En cas de doute sur le **quoi**,
 c'est le cahier des charges ; sur le **comment ça se présente**, c'est le
@@ -459,14 +460,13 @@ architectural d'arrière-plan**) · Couverture (filigrane ≤ 26 %, au plus 1 su
 un élément **distinct du logo** : ne jamais employer l'emblème comme motif de
 fond, ni la rosace comme marque.
 
-**Le hero de l'accueil est un ANGLE DE SALLE** (décision du 23/09/2026) :
-le texte à gauche, la rosace au fond comme une pierre sculptée, et le **meuble
-pris en bord d'écran à droite** (`HeroShelf` — claustra en imposte, trois
-tablettes d'ouvrages). La rosace passe DERRIÈRE le meuble : c'est la façon
-juste de lire la profondeur. Sous 640 px le panneau se retire — il prendrait
-la moitié de l'écran — et la rosace reste, derrière le texte.
+⚠️ **Depuis la maquette finale (24/09/2026), l'accueil n'emploie plus la
+rosace en hero** : son décor est un ASSET validé, où la rosace est sculptée
+dans le mur. Le composant `RosaceHero` n'y sert plus qu'au filigrane du
+panneau de contribution. Les règles ci-dessous restent la référence pour tout
+autre hero.
 
-**La rosace du hero — arbitrage du 23/09/2026.** Elle est **très agrandie**, son
+**La rosace en hero — arbitrage du 23/09/2026.** Elle est **très agrandie**, son
 centre nettement **décalé vers la droite**, son opacité **très faible**
 (6 %). Elle **sort de l'écran par le côté**, jamais par le haut ni par le bas :
 sa taille est portée par la HAUTEUR de sa section (`inset-y-0 h-full w-auto`),
@@ -507,7 +507,49 @@ filets dorés très fins.
 **Les étagères sont une STRUCTURE GRAPHIQUE, pas une bibliothèque réaliste.**
 Ni musée, ni brocante, ni bibliothèque ancienne, ni décor chargé.
 
-**Le meuble (`Bookcase`) — « Explorer par thème ».** Les neuf thèmes sont neuf
+### L'accueil — assets validés, composition figée (24/09/2026)
+
+`/` reproduit la **maquette finale**. Sa menuiserie n'est plus dessinée en
+CSS : elle vient de quatre fichiers validés, masters dans `assets/home/`,
+versions web produites par `npm run assets:home` dans `public/home/`.
+
+| Asset                      | Usage                                      |
+| -------------------------- | ------------------------------------------ |
+| `hero-desktop.webp`        | hero, à partir de 640 px                   |
+| `hero-mobile.webp`         | hero, sous 640 px — composition distincte  |
+| `bookcase-horizontal.webp` | « Explorer par thème », à partir de 640 px |
+| `bookcase-vertical.webp`   | « Explorer par thème », sous 640 px        |
+
+**Interdits :** les redessiner, les recréer en CSS, les recadrer sur une
+partie de leur dessin, les déformer, les remplacer par une approximation.
+
+- **`<picture>` + `<source media>`, jamais deux `next/image` superposés** :
+  c'est le seul moyen de ne télécharger QUE la composition du palier courant.
+  Deux images en `hidden` seraient toutes deux chargées.
+- **Le hero n'est jamais une image aplatie** : surtitre, titre, signature et
+  appels à l'action restent du HTML. L'image ne porte que le décor (`alt`
+  vide, `aria-hidden`).
+- **Les neuf thèmes sont de vrais liens posés DANS les niches**
+  (`components/home/ThemeBookcase.tsx`). Leur géométrie est en **pourcentages
+  de l'image**, mesurés une fois sur les fichiers : l'image étant l'élément de
+  flux, tout se met à l'échelle ensemble, sans point de rupture supplémentaire
+  et sans JavaScript. Desktop et tablette : 5 thèmes puis 4, la seconde rangée
+  à colonnes inégales — « Vie chrétienne » porte trois sous-thèmes. Mobile :
+  cinq tablettes, deux thèmes chacune, « Vie chrétienne » seule sur la
+  sienne.
+- Les sous-thèmes sont des **pastilles** en mobile et en desktop ; en
+  tablette, la niche est trop étroite et la maquette y met une **ligne à
+  points médians**.
+- « À découvrir » : fond ivoire, **une seule tablette**, cinq ouvrages nus —
+  pas de panneau sombre, pas de meuble. Cinq en desktop, quatre en tablette,
+  et en mobile la rangée **défile horizontalement** sous une tablette pleine
+  largeur.
+
+> `Bookcase`, `HeroShelf` et `BookSpines` — la menuiserie dessinée en CSS —
+> restent en place : `/bibliotheque` et les branches s'en servent toujours, et
+> ces pages ne sont PAS concernées par la maquette de l'accueil.
+
+**Le meuble (`Bookcase`) — « Explorer par thème » hors accueil.** Les neuf thèmes sont neuf
 **niches d'un même meuble**, jamais neuf cartes. Ce qui en fait un meuble :
 
 - une **corniche** moulurée le couronne (larmier, filet doré, frise de
@@ -571,11 +613,9 @@ qu'un petit `viewBox` donnerait un claustra grossier.
   **sans une seule règle conditionnelle**.
 - **Montants** : un filet d'un pixel de part et d'autre, en desktop seulement.
 - **Ouvrages par rangée :** 2 en mobile · 3 en tablette · 4 en desktop.
-  Exception : « À découvrir » en accueil montre **2 ouvrages par rangée
-  jusqu'en tablette et 4 en desktop**, sur une tablette d'apparat plus
-  épaisse. Quatre ressources remplissent ainsi toujours leurs rangées (2 + 2,
-  puis 4) et la tablette reste continue ; trois colonnes couperaient à la fois
-  la rangée et les titres de couverture.
+  Exception : « À découvrir » en accueil suit la maquette — cinq ouvrages
+  posés sur UNE tablette, sans légende sous la couverture
+  (`ResourceCard caption={false}`, la couverture portant déjà son titre).
 - L'étagère reste **discrète** et ne domine jamais les couvertures.
 
 Où le langage s'applique : accueil (« Explorer par thème » en niches,
@@ -718,13 +758,14 @@ Supabase (PostgreSQL + Auth + Storage) · Vercel.**
 
 ```
 app/              routes (App Router)
-components/       ui · brand · library · layout · contribution
+components/       ui · brand · home · library · layout · contribution
 lib/              auth · supabase · domain · library · cover · files ·
                   contributions · questions
 styles/           tokens du Design System
 supabase/         migrations SQL + tests (aucun seed de contenu)
 scripts/          assets de marque, vérification du schéma, crochets de test
 public/brand/     emblème officiel, rosace, marqueterie
+public/home/      assets d'architecture de l'accueil (hero, meubles)
 docs/             cahier des charges + Design System
 ```
 
@@ -738,6 +779,8 @@ npm run test          # tests de logique pure (lanceur natif de Node)
 npm run build         # build de production
 npm run format:check  # Prettier (vérification)
 npm run db:verify     # migrations + tests SQL sur une base jetable
+npm run assets:brand  # assets de marque (masters → public/brand)
+npm run assets:home   # assets d'architecture de l'accueil (→ public/home)
 ```
 
 Avant tout commit :
@@ -780,6 +823,7 @@ composants, pas de nouveau framework — décision du 23/09/2026.
 | 10  | Durcissement : états d'erreur et harnais de test   | ✅   |
 | 11  | Refonte visuelle — direction Noyer                 | ✅   |
 | 12  | Bibliothèque architecturale copte (meuble, arcs)   | ✅   |
+| 13  | Accueil final — maquette validée et assets         | ✅   |
 
 <!-- BEGIN:nextjs-agent-rules -->
 

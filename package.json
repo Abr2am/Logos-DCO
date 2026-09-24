@@ -17,6 +17,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "assets:brand": "node scripts/build-brand-assets.mjs",
+    "assets:home": "node scripts/build-home-assets.mjs",
     "db:verify": "./scripts/verify-schema.sh"
   },
   "dependencies": {
