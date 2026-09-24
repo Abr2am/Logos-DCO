@@ -313,14 +313,58 @@ directement, sans passer par l'interface.
     `Content-Disposition: attachment`.
     ⚠️ PPTX, DOCX et XLSX **sont** des conteneurs ZIP : ne pas les rejeter par
     une détection générique « c'est une archive ».
-    En pratique : `lib/files/validate.ts` contrôle l'extension, le type MIME
-    **et la signature** des premiers octets, puis borne la taille à
-    `MAX_UPLOAD_BYTES`. L'attribut `accept` du champ et tout ce qu'affiche le
-    navigateur sont du confort, jamais un contrôle.
-    ⚠️ **La taille maximale n'est pas spécifiée** par le cahier des charges :
-    10 Mo est une valeur d'attente, à deux endroits qui vont de pair —
-    `lib/files/formats.ts` et `serverActions.bodySizeLimit` dans
-    `next.config.ts`.
+
+    **Upload DIRECT depuis le navigateur — architecture validée le
+    24/09/2026.** Le fichier ne transite plus par la fonction serveur : il va
+    du navigateur à Storage, par URL signée. C'est ce qui permet des ressources
+    de plusieurs dizaines de méga-octets, la limite de corps de requête de
+    l'hébergeur (≈ 4,5 Mo) ne s'appliquant plus.
+
+    ```
+    1. prepareUpload()      serveur : requireMember, extension et taille
+                            annoncées, chemin <uid>/<uuid>.<ext>, URL signée
+    2. PUT navigateur → Storage      (avec progression ; ne passe pas par
+                                      la fonction)
+    3. submitResource()     serveur : le chemin appartient-il au demandeur,
+                            taille + type + signature RELUS DANS STORAGE,
+                            puis `submit_resource`
+    ```
+
+    Trois gardes, et il faut les trois :
+    - `isOwnedBy` (`lib/files/storage-path.ts`) et son **miroir en base**,
+      `owns_storage_path` — un serviteur ne peut revendiquer QUE son propre
+      préfixe. La version SQL fait foi ;
+    - `validateStoredFile` (`lib/files/validate.ts`) — extension, type **et
+      signature** de l'objet réellement déposé, jamais de ce qu'annonce le
+      formulaire ;
+    - les policies Storage, inchangées : l'URL est signée par le client de
+      session, donc `resources_objects_insert_own` s'applique au moment de la
+      signature.
+
+    L'attribut `accept`, la barre de progression et tout ce qu'affiche le
+    navigateur restent du confort, jamais un contrôle.
+
+    ⚠️ **Taille maximale : 50 Mo**, tranché le 24/09/2026 (`MAX_UPLOAD_BYTES`
+    dans `lib/files/formats.ts`). Deux plafonds l'encadrent hors du code : la
+    limite d'un envoi simple vers Storage, et le `file_size_limit` du bucket,
+    à régler côté Supabase — sans quoi un appel direct à l'API la
+    contournerait. `serverActions.bodySizeLimit` ne la borne plus : il est
+    redescendu à 1 Mo, puisque les actions ne transportent que des
+    métadonnées.
+
+    **Dette assumée — objets orphelins.** Un dépôt interrompu après l'envoi
+    laisse un objet non revendiqué dans le bucket. Aucun nettoyage n'est prévu
+    au MVP : il n'y a pas de tâche planifiée, et en ajouter une supposerait un
+    service de plus. L'objet reste privé, invisible, et sans ressource
+    associée.
+
+    **Pagination.** `page_count` n'est plus détecté au-delà de 15 Mo
+    (`PDF_PAGINATION_MAX_BYTES`) : `pdf-lib` exige le document entier. Une
+    pagination inconnue est un cas normal, que l'interface omet. Les
+    diapositives d'un PPTX, elles, restent comptées à toutes les tailles — le
+    répertoire central se lit dans la QUEUE du conteneur, par une requête de
+    plage.
+
 11. L'architecture d'authentification reste **isolée et remplaçable**
     (`lib/auth/`), pour pouvoir passer au SSO / OIDC du diocèse sans
     reconstruire l'application.
@@ -812,9 +856,10 @@ Deux harnais, deux périmètres, aucun framework :
   dépendance ajoutée ; `scripts/test-hooks.mjs` ne fait que résoudre l'alias
   `@/` et neutraliser les modules réservés au serveur.
 
-Sont couverts : validation des téléversements, détection de pagination,
-libellés du cahier des charges, URL de bibliothèque, `safeReturnPath` et le
-lien `mailto:` de réponse.
+Sont couverts : validation des téléversements (déclaration du client **et**
+objet réellement stocké), propriété d'un chemin de stockage, détection de
+pagination par plages, libellés du cahier des charges, URL de bibliothèque,
+`safeReturnPath` et le lien `mailto:` de réponse.
 
 **Ne sont PAS couverts, volontairement :** les composants React, le rendu, et
 tout ce qui exige un navigateur. Pas de Playwright, pas de tests de
@@ -839,6 +884,7 @@ composants, pas de nouveau framework — décision du 23/09/2026.
 | 11  | Refonte visuelle — direction Noyer                 | ✅   |
 | 12  | Bibliothèque architecturale copte (meuble, arcs)   | ✅   |
 | 13  | Accueil final — maquette validée et assets         | ✅   |
+| 14  | Upload direct navigateur → Storage (50 Mo)         | ✅   |
 
 <!-- BEGIN:nextjs-agent-rules -->
 

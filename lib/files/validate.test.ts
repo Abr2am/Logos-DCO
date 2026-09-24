@@ -10,7 +10,9 @@ import {
 import {
   isValidationError,
   sanitizeFilename,
-  validateUpload,
+  validateStoredFile,
+  validateUploadRequest,
+  type StoredObjectReader,
 } from './validate';
 
 /*
@@ -19,6 +21,11 @@ import {
  * Ce que ces tests protègent : un fichier n'est accepté que si son extension,
  * son type MIME ET ses premiers octets concordent. Un conteneur ZIP n'est pas
  * rejeté au motif que c'en est un : PPTX, DOCX et XLSX en sont.
+ *
+ * Depuis l'upload direct, la preuve ne vient plus du formulaire mais de
+ * STORAGE : `validateStoredFile` lit la taille, le type et la signature de
+ * l'objet réellement déposé. La doublure ci-dessous joue ce rôle — aucun
+ * réseau, aucune base.
  */
 
 const SIGNATURES = {
@@ -27,11 +34,34 @@ const SIGNATURES = {
   ole: [0xd0, 0xcf, 0x11, 0xe0],
 };
 
-function upload(name: string, type: string, head: number[], extra = 64): File {
-  const bytes = new Uint8Array(head.length + extra);
-  bytes.set(head, 0);
-  return new File([bytes], name, { type });
+/** Objet tel que Storage le rapporte : taille, type, premiers octets. */
+function stored(
+  head: number[],
+  options: { sizeBytes?: number; mimeType?: string | null } = {},
+): StoredObjectReader {
+  return {
+    async stat() {
+      return {
+        sizeBytes: options.sizeBytes ?? 4096,
+        mimeType: options.mimeType === undefined ? null : options.mimeType,
+      };
+    },
+    async head(_path, length) {
+      const bytes = new Uint8Array(length);
+      bytes.set(head.slice(0, length), 0);
+      return bytes;
+    },
+  };
 }
+
+const ABSENT: StoredObjectReader = {
+  async stat() {
+    return null;
+  },
+  async head() {
+    return null;
+  },
+};
 
 describe('formatFromExtension', () => {
   test('reconnaît les sept formats, casse indifférente', () => {
@@ -88,100 +118,166 @@ describe('sanitizeFilename', () => {
   });
 });
 
-describe('validateUpload', () => {
-  test('accepte un PDF cohérent', async () => {
-    const result = await validateUpload(
-      upload('cours.pdf', 'application/pdf', SIGNATURES.pdf),
-    );
+describe('validateUploadRequest — ce que le client déclare', () => {
+  const PDF = { filename: 'cours.pdf', mimeType: 'application/pdf' };
+
+  test('accepte une demande cohérente', () => {
+    const result = validateUploadRequest({ ...PDF, sizeBytes: 4096 });
     assert.ok(!isValidationError(result));
     assert.equal(result.format, 'PDF');
     assert.equal(result.filename, 'cours.pdf');
+    assert.equal(result.mimeType, 'application/pdf');
   });
 
-  test('accepte les conteneurs ZIP que SONT les formats OOXML', async () => {
-    for (const [name, mime] of [
-      ['cours.docx', ACCEPTED_FORMATS.DOCX.mimeType],
-      ['cours.pptx', ACCEPTED_FORMATS.PPTX.mimeType],
-      ['cours.xlsx', ACCEPTED_FORMATS.XLSX.mimeType],
-    ] as const) {
-      const result = await validateUpload(upload(name, mime, SIGNATURES.ooxml));
-      assert.ok(!isValidationError(result), name);
-    }
+  test('le type renvoyé est CELUI DU FORMAT, jamais celui du client', () => {
+    const result = validateUploadRequest({
+      filename: 'cours.pptx',
+      mimeType: '',
+      sizeBytes: 4096,
+    });
+    assert.ok(!isValidationError(result));
+    assert.equal(result.mimeType, ACCEPTED_FORMATS.PPTX.mimeType);
   });
 
-  test('accepte les conteneurs OLE2 des formats binaires', async () => {
-    for (const [name, mime] of [
-      ['cours.doc', ACCEPTED_FORMATS.DOC.mimeType],
-      ['cours.ppt', ACCEPTED_FORMATS.PPT.mimeType],
-      ['cours.xls', ACCEPTED_FORMATS.XLS.mimeType],
-    ] as const) {
-      const result = await validateUpload(upload(name, mime, SIGNATURES.ole));
-      assert.ok(!isValidationError(result), name);
-    }
-  });
-
-  test('refuse une extension hors liste blanche', async () => {
-    const result = await validateUpload(
-      upload('archive.zip', 'application/zip', SIGNATURES.ooxml),
-    );
+  test('refuse une extension hors liste blanche', () => {
+    const result = validateUploadRequest({
+      filename: 'archive.zip',
+      mimeType: 'application/zip',
+      sizeBytes: 4096,
+    });
     assert.ok(isValidationError(result));
     assert.match(result.error, /Formats acceptés/);
   });
 
-  test('refuse un type MIME qui ment sur l’extension', async () => {
-    const result = await validateUpload(
-      upload('cours.pdf', 'application/zip', SIGNATURES.pdf),
-    );
+  test('refuse un type MIME qui ment sur l’extension', () => {
+    const result = validateUploadRequest({
+      filename: 'cours.pdf',
+      mimeType: 'application/zip',
+      sizeBytes: 4096,
+    });
     assert.ok(isValidationError(result));
     assert.match(result.error, /ne correspond pas à son extension/);
   });
 
-  test('refuse un contenu qui ment sur son format', async () => {
-    const result = await validateUpload(
-      upload('cours.pdf', 'application/pdf', [0x4d, 0x5a, 0x00, 0x00]),
+  test('refuse une taille nulle ou au-delà du plafond', () => {
+    assert.ok(
+      isValidationError(validateUploadRequest({ ...PDF, sizeBytes: 0 })),
     );
+    const trop = validateUploadRequest({
+      ...PDF,
+      sizeBytes: MAX_UPLOAD_BYTES + 1,
+    });
+    assert.ok(isValidationError(trop));
+    assert.match(trop.error, /taille maximale/);
+  });
+
+  test('le nom retenu est assaini', () => {
+    const result = validateUploadRequest({
+      filename: '../../cours.pdf',
+      mimeType: 'application/pdf',
+      sizeBytes: 4096,
+    });
+    assert.ok(!isValidationError(result));
+    assert.equal(result.filename, 'cours.pdf');
+  });
+});
+
+describe('validateStoredFile — ce que Storage rapporte', () => {
+  test('accepte un PDF cohérent', async () => {
+    const result = await validateStoredFile(stored(SIGNATURES.pdf), {
+      path: 'u/1.pdf',
+      filename: 'cours.pdf',
+    });
+    assert.ok(!isValidationError(result));
+    assert.equal(result.format, 'PDF');
+    assert.equal(result.sizeBytes, 4096);
+  });
+
+  test('accepte les conteneurs ZIP que SONT les formats OOXML', async () => {
+    for (const [filename, mimeType] of [
+      ['cours.docx', ACCEPTED_FORMATS.DOCX.mimeType],
+      ['cours.pptx', ACCEPTED_FORMATS.PPTX.mimeType],
+      ['cours.xlsx', ACCEPTED_FORMATS.XLSX.mimeType],
+    ] as const) {
+      const result = await validateStoredFile(
+        stored(SIGNATURES.ooxml, { mimeType }),
+        { path: 'u/1', filename },
+      );
+      assert.ok(!isValidationError(result), filename);
+    }
+  });
+
+  test('accepte les conteneurs OLE2 des formats binaires', async () => {
+    for (const [filename, mimeType] of [
+      ['cours.doc', ACCEPTED_FORMATS.DOC.mimeType],
+      ['cours.ppt', ACCEPTED_FORMATS.PPT.mimeType],
+      ['cours.xls', ACCEPTED_FORMATS.XLS.mimeType],
+    ] as const) {
+      const result = await validateStoredFile(
+        stored(SIGNATURES.ole, { mimeType }),
+        { path: 'u/1', filename },
+      );
+      assert.ok(!isValidationError(result), filename);
+    }
+  });
+
+  test('refuse un contenu qui ment sur son format', async () => {
+    const result = await validateStoredFile(stored([0x4d, 0x5a, 0x00, 0x00]), {
+      path: 'u/1.pdf',
+      filename: 'cours.pdf',
+    });
     assert.ok(isValidationError(result));
     assert.match(result.error, /contenu du fichier/);
   });
 
   test('un exécutable renommé en .pdf est refusé', async () => {
-    const result = await validateUpload(
-      upload('innocent.pdf', 'application/pdf', [0x7f, 0x45, 0x4c, 0x46]),
-    );
+    const result = await validateStoredFile(stored([0x7f, 0x45, 0x4c, 0x46]), {
+      path: 'u/1.pdf',
+      filename: 'innocent.pdf',
+    });
     assert.ok(isValidationError(result));
   });
 
-  test('refuse un fichier vide ou absent', async () => {
-    assert.ok(isValidationError(await validateUpload(null)));
-    const vide = new File([], 'cours.pdf', { type: 'application/pdf' });
-    assert.ok(isValidationError(await validateUpload(vide)));
+  test('le type est celui de STORAGE, pas celui du formulaire', async () => {
+    const result = await validateStoredFile(
+      stored(SIGNATURES.pdf, { mimeType: 'application/zip' }),
+      { path: 'u/1.pdf', filename: 'cours.pdf' },
+    );
+    assert.ok(isValidationError(result));
+    assert.match(result.error, /ne correspond pas à son extension/);
   });
 
-  test('refuse au-delà de la taille maximale', async () => {
-    const trop = upload(
-      'cours.pdf',
-      'application/pdf',
-      SIGNATURES.pdf,
-      MAX_UPLOAD_BYTES,
+  test('la taille est celle de STORAGE : un gros fichier est refusé même si le formulaire annonçait petit', async () => {
+    const result = await validateStoredFile(
+      stored(SIGNATURES.pdf, { sizeBytes: MAX_UPLOAD_BYTES + 1 }),
+      { path: 'u/1.pdf', filename: 'cours.pdf' },
     );
-    const result = await validateUpload(trop);
     assert.ok(isValidationError(result));
     assert.match(result.error, /taille maximale/);
   });
 
-  test('le nom retenu est assaini, jamais celui du client', async () => {
-    const result = await validateUpload(
-      upload('../../cours.pdf', 'application/pdf', SIGNATURES.pdf),
+  test('refuse un objet absent ou vide', async () => {
+    const absent = await validateStoredFile(ABSENT, {
+      path: 'u/1.pdf',
+      filename: 'cours.pdf',
+    });
+    assert.ok(isValidationError(absent));
+    assert.match(absent.error, /introuvable/);
+
+    const vide = await validateStoredFile(
+      stored(SIGNATURES.pdf, { sizeBytes: 0 }),
+      { path: 'u/1.pdf', filename: 'cours.pdf' },
     );
-    assert.ok(!isValidationError(result));
-    assert.equal(result.filename, 'cours.pdf');
+    assert.ok(isValidationError(vide));
   });
 
-  test('un type MIME absent ne bloque pas — la signature tranche', async () => {
-    const result = await validateUpload(
-      upload('cours.pdf', '', SIGNATURES.pdf),
-    );
-    assert.ok(!isValidationError(result));
+  test('refuse une extension hors liste blanche sans même lire l’objet', async () => {
+    const result = await validateStoredFile(stored(SIGNATURES.ooxml), {
+      path: 'u/1.zip',
+      filename: 'archive.zip',
+    });
+    assert.ok(isValidationError(result));
+    assert.match(result.error, /Formats acceptés/);
   });
 });
 

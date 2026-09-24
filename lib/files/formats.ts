@@ -55,13 +55,19 @@ export const ACCEPT_ATTRIBUTE = Object.values(ACCEPTED_FORMATS)
   .join(',');
 
 /**
- * Taille maximale d'un téléversement.
+ * Taille maximale d'un téléversement — **50 Mo, tranché le 24/09/2026**.
  *
- * ⚠️ NON SPÉCIFIÉE par le cahier des charges, qui exige une limite sans en
- * fixer la valeur. 10 Mo est une valeur d'attente : c'est la SEULE constante à
- * changer, ici et dans `next.config.ts`, le jour où elle sera tranchée.
+ * Le cahier des charges exige une limite sans en fixer la valeur ; celle-ci
+ * est une décision produit. Elle vaut pour l'upload DIRECT vers Storage : le
+ * fichier ne traverse plus la fonction serveur, dont la limite de corps de
+ * requête ne s'applique donc plus.
+ *
+ * ⚠️ Deux plafonds la bornent en dehors du code, et il faut les tenir
+ * alignés : la limite de l'API Storage pour un envoi simple (50 Mo), et le
+ * `file_size_limit` du bucket, à régler côté Supabase — défense en
+ * profondeur, pour qu'un appel direct à l'API ne puisse pas la contourner.
  */
-export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+export const MAX_UPLOAD_BYTES = 50 * 1024 * 1024;
 
 export function formatFromExtension(filename: string): FileFormat | null {
   const extension = filename.split('.').pop()?.toLowerCase() ?? '';

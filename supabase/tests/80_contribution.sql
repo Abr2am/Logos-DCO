@@ -70,6 +70,87 @@ end;
 $$;
 rollback;
 
+-- ── 2 bis. Un chemin de stockage étranger → refus ────────────────────────────
+-- Depuis l'upload direct, le chemin fait l'aller-retour par le client : il ne
+-- doit jamais permettre de revendiquer l'objet d'un autre dépositaire.
+begin;
+set local role authenticated;
+do $$
+declare v_alice uuid; v_bob uuid; v_id uuid;
+begin
+  v_alice := current_setting('t.c_alice')::uuid;
+  v_bob   := current_setting('t.c_bob')::uuid;
+  perform set_config('app.user_id', v_alice::text, true);
+
+  -- a. le préfixe d'un AUTRE serviteur
+  begin
+    perform public.submit_resource(
+      'Vol de chemin', 'Description de test.', 6::smallint, null::smallint,
+      'COURS_PRESENTATION', array['ADOLESCENTS'],
+      array['Un','Deux','Trois','Quatre','Cinq'],
+      v_bob || '/' || gen_random_uuid() || '.pdf', 'cours.pdf',
+      'PDF', 'application/pdf', 4096, 32, null);
+    raise exception 'Revendiquer le chemin d''un autre doit être refusé.';
+  exception when insufficient_privilege then null;
+  end;
+
+  -- b. aucun préfixe du tout
+  begin
+    perform public.submit_resource(
+      'Chemin nu', 'Description de test.', 6::smallint, null::smallint,
+      'COURS_PRESENTATION', array['ADOLESCENTS'],
+      array['Un','Deux','Trois','Quatre','Cinq'],
+      'cours.pdf', 'cours.pdf', 'PDF', 'application/pdf', 4096, 32, null);
+    raise exception 'Un chemin sans préfixe doit être refusé.';
+  exception when insufficient_privilege then null;
+  end;
+
+  -- c. une traversée de répertoire
+  begin
+    perform public.submit_resource(
+      'Traversée', 'Description de test.', 6::smallint, null::smallint,
+      'COURS_PRESENTATION', array['ADOLESCENTS'],
+      array['Un','Deux','Trois','Quatre','Cinq'],
+      v_alice || '/../' || v_bob || '/vol.pdf', 'cours.pdf',
+      'PDF', 'application/pdf', 4096, 32, null);
+    raise exception 'Une traversée de répertoire doit être refusée.';
+  exception when insufficient_privilege then null;
+  end;
+
+  -- d. le préfixe seul, sans nom de fichier
+  begin
+    perform public.submit_resource(
+      'Préfixe nu', 'Description de test.', 6::smallint, null::smallint,
+      'COURS_PRESENTATION', array['ADOLESCENTS'],
+      array['Un','Deux','Trois','Quatre','Cinq'],
+      v_alice || '/', 'cours.pdf', 'PDF', 'application/pdf', 4096, 32, null);
+    raise exception 'Un chemin réduit au préfixe doit être refusé.';
+  exception when insufficient_privilege then null;
+  end;
+
+  -- e. le chemin du dépositaire lui-même passe
+  v_id := public.submit_resource(
+    'Chemin légitime', 'Description de test.', 6::smallint, null::smallint,
+    'COURS_PRESENTATION', array['ADOLESCENTS'],
+    array['Un','Deux','Trois','Quatre','Cinq'],
+    v_alice || '/' || gen_random_uuid() || '.pdf', 'cours.pdf',
+    'PDF', 'application/pdf', 4096, 32, null);
+  if v_id is null then
+    raise exception 'Le dépositaire doit pouvoir revendiquer son propre chemin.';
+  end if;
+
+  -- f. même règle au remplacement du fichier
+  begin
+    perform public.replace_resource_file(
+      v_id, v_bob || '/' || gen_random_uuid() || '.pdf', 'cours.pdf',
+      'PDF', 'application/pdf', 4096, 32, null);
+    raise exception 'Remplacer par le chemin d''un autre doit être refusé.';
+  exception when insufficient_privilege then null;
+  end;
+end;
+$$;
+rollback;
+
 -- ── 3. Fichier de type interdit → refus ──────────────────────────────────────
 do $$
 declare v_id uuid;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState, useState, useTransition } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { ChipGroup } from '@/components/ui/ChipGroup';
@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/Input';
 import { Panel } from '@/components/ui/Panel';
 import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
+import { prepareUpload } from '@/lib/contributions/actions';
 import {
   EMPTY_FORM_STATE,
   type EditableResource,
@@ -17,6 +18,7 @@ import {
 } from '@/lib/contributions/types';
 import { AUDIENCES, RESOURCE_TYPES } from '@/lib/domain/resource';
 import { ACCEPT_ATTRIBUTE } from '@/lib/files/formats';
+import { putToSignedUrl } from '@/lib/files/upload-client';
 import type { Category } from '@/lib/library/types';
 
 /*
@@ -27,6 +29,17 @@ import type { Category } from '@/lib/library/types';
  *
  * Le même formulaire sert au dépôt, à la correction par le dépositaire et à
  * la modification par l'administration : seule l'action change.
+ *
+ * ── Le fichier part AVANT le formulaire (24/09/2026) ────────────────────────
+ * La soumission se fait en trois temps : demander une URL signée, envoyer le
+ * fichier directement à Storage — avec sa progression —, puis soumettre les
+ * métadonnées accompagnées du seul CHEMIN de l'objet. Le fichier ne traverse
+ * donc jamais la fonction serveur, ce qui lève la limite de corps de requête
+ * de l'hébergeur.
+ *
+ * ⚠️ `formData.delete('file')` n'est pas une précaution de style : sans lui,
+ * le fichier repartirait dans l'action et la requête serait de nouveau
+ * refusée au-delà de quelques méga-octets.
  */
 export function ResourceForm({
   categories,
@@ -45,16 +58,71 @@ export function ResourceForm({
   fileRequired?: boolean;
 }) {
   const [state, formAction, pending] = useActionState(action, EMPTY_FORM_STATE);
+  const [submitting, startSubmitting] = useTransition();
   const [categoryId, setCategoryId] = useState<number>(
     resource?.categoryId ?? 0,
   );
+  const [progress, setProgress] = useState<number | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const category = categories.find((item) => item.id === categoryId);
   const subcategories = category?.subcategories ?? [];
   const errors = state.fieldErrors;
 
+  const uploading = progress !== null && progress < 1;
+  const busy = uploading || submitting || pending;
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setUploadError(null);
+
+    const formData = new FormData(event.currentTarget);
+    const picked = formData.get('file');
+    /* Le fichier ne doit JAMAIS partir dans l'action : il va à Storage. */
+    formData.delete('file');
+
+    if (picked instanceof File && picked.size > 0) {
+      setProgress(0);
+
+      const prepared = await prepareUpload({
+        filename: picked.name,
+        sizeBytes: picked.size,
+        mimeType: picked.type,
+      });
+
+      if ('error' in prepared) {
+        setProgress(null);
+        setUploadError(prepared.error);
+        return;
+      }
+
+      try {
+        await putToSignedUrl({
+          signedUrl: prepared.signedUrl,
+          file: picked,
+          mimeType: prepared.mimeType,
+          onProgress: setProgress,
+        });
+      } catch {
+        setProgress(null);
+        setUploadError(
+          'Le téléversement a été interrompu. Vérifiez votre connexion, puis reprenez le dépôt.',
+        );
+        return;
+      }
+
+      formData.set('storagePath', prepared.path);
+      formData.set('filename', picked.name);
+    } else if (fileRequired) {
+      setUploadError('Joignez un fichier.');
+      return;
+    }
+
+    startSubmitting(() => formAction(formData));
+  }
+
   return (
-    <form action={formAction} className="grid gap-22">
+    <form onSubmit={handleSubmit} className="grid gap-22">
       {resource ? <input type="hidden" name="id" value={resource.id} /> : null}
 
       {state.error ? <Panel accent="walnut">{state.error}</Panel> : null}
@@ -88,8 +156,9 @@ export function ResourceForm({
         accept={ACCEPT_ATTRIBUTE}
         required={fileRequired}
         help="PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX"
-        error={errors['file']}
+        error={uploadError ?? errors['file']}
         currentFilename={resource?.filename}
+        progress={progress}
       />
 
       {/* Paires courtes sur deux colonnes à partir de la tablette. */}
@@ -170,8 +239,8 @@ export function ResourceForm({
       />
 
       <div>
-        <Button type="submit" disabled={pending}>
-          {pending ? 'Envoi…' : submitLabel}
+        <Button type="submit" disabled={busy}>
+          {uploading ? 'Téléversement…' : busy ? 'Envoi…' : submitLabel}
         </Button>
         {note ? <p className="mt-12 text-small text-help">{note}</p> : null}
       </div>

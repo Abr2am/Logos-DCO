@@ -1,15 +1,27 @@
 'use server';
 
-import { randomUUID } from 'node:crypto';
-
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { requireAdmin, requireMember } from '@/lib/auth/session';
 import { AUDIENCES, RESOURCE_TYPES } from '@/lib/domain/resource';
 import { ACCEPTED_FORMATS } from '@/lib/files/formats';
-import { detectPagination } from '@/lib/files/pagination';
-import { isValidationError, validateUpload } from '@/lib/files/validate';
+import {
+  detectPaginationFromStorage,
+  type Pagination,
+} from '@/lib/files/pagination';
+import {
+  STORAGE_BUCKET,
+  buildStoragePath,
+  isOwnedBy,
+} from '@/lib/files/storage-path';
+import { storageReader } from '@/lib/files/storage-reader';
+import {
+  isValidationError,
+  validateStoredFile,
+  validateUploadRequest,
+  type ValidatedFile,
+} from '@/lib/files/validate';
 import { createSessionClient } from '@/lib/supabase/server-client';
 
 import type { FormState } from './types';
@@ -21,9 +33,19 @@ import type { FormState } from './types';
  * les règles structurantes — cinq flags, fichier obligatoire, transitions de
  * statut, dépositaire immuable — sont de toute façon appliquées par la base.
  * Cette couche produit des messages lisibles ; elle n'est pas la garde.
+ *
+ * ── Le fichier ne passe plus par ici (24/09/2026) ───────────────────────────
+ * Le navigateur dépose directement dans Storage, par URL signée. Ces actions
+ * ne voient donc qu'un CHEMIN, jamais des octets. Deux gardes le rendent sûr :
+ *
+ *   · `isOwnedBy` — le chemin revendiqué doit commencer par l'identifiant du
+ *     demandeur. La même règle est répétée en base, dans `submit_resource` et
+ *     `replace_resource_file` : c'est elle qui fait foi ;
+ *   · `validateStoredFile` — taille, type et signature sont relus DEPUIS
+ *     STORAGE, pas depuis le formulaire.
  */
 
-const BUCKET = 'resources';
+const BUCKET = STORAGE_BUCKET;
 const MIN_FLAGS = 5;
 
 function fail(fieldErrors: Record<string, string>, error?: string): FormState {
@@ -103,28 +125,88 @@ function readMetadata(
   };
 }
 
-/** Dépose l'objet dans le bucket privé, sous le préfixe du dépositaire. */
-async function uploadFile(
-  userId: string,
-  file: { filename: string; mimeType: string; bytes: Uint8Array },
-): Promise<{ path: string } | { error: string }> {
-  const supabase = await createSessionClient();
-  const extension = file.filename.split('.').pop()?.toLowerCase() ?? 'bin';
-
-  /* Nom généré : le nom d'origine n'est conservé que comme métadonnée. */
-  const path = `${userId}/${randomUUID()}.${extension}`;
-
-  const { error } = await supabase.storage
-    .from(BUCKET)
-    .upload(path, file.bytes, { contentType: file.mimeType, upsert: false });
-
-  if (error) return { error: `Téléversement : ${error.message}` };
-  return { path };
-}
-
 async function removeFile(path: string): Promise<void> {
   const supabase = await createSessionClient();
   await supabase.storage.from(BUCKET).remove([path]);
+}
+
+export type PreparedUpload =
+  { path: string; signedUrl: string; mimeType: string } | { error: string };
+
+/**
+ * Temps 1 du dépôt : signer une URL d'écriture, pour UN chemin précis.
+ *
+ * Le chemin est construit par le serveur sous le préfixe du demandeur — le
+ * client ne le choisit jamais. La signature passe par le client de session,
+ * donc la policy `resources_objects_insert_own` s'applique ici : un visiteur
+ * sans compte n'obtient rien. Le jeton expire, et `upsert: false` interdit
+ * d'écraser un objet existant.
+ */
+export async function prepareUpload(request: {
+  filename: string;
+  sizeBytes: number;
+  mimeType?: string;
+}): Promise<PreparedUpload> {
+  const user = await requireMember('/partager');
+
+  const declared = validateUploadRequest(request);
+  if (isValidationError(declared)) return { error: declared.error };
+
+  const path = buildStoragePath(user.id, declared.format);
+  const supabase = await createSessionClient();
+  const { data, error } = await supabase.storage
+    .from(BUCKET)
+    .createSignedUploadUrl(path);
+
+  if (error || !data) {
+    return {
+      error: `Téléversement impossible : ${error?.message ?? 'erreur'}`,
+    };
+  }
+
+  /* Le type renvoyé est celui du FORMAT retenu, pas celui qu'annonce le
+     système du visiteur : c'est lui que Storage enregistrera, et que la
+     validation d'après dépôt comparera. */
+  return { path, signedUrl: data.signedUrl, mimeType: declared.mimeType };
+}
+
+/**
+ * Temps 2 : l'objet est en place, la ressource n'existe pas encore.
+ *
+ * Renvoie les métadonnées du fichier RÉELLEMENT stocké, ou une erreur — et
+ * dans ce cas l'objet est retiré, pour ne pas laisser d'orphelin de plus.
+ */
+type ClaimedFile =
+  { error: string } | { file: ValidatedFile; pagination: Pagination };
+
+async function claimUploadedFile(
+  userId: string,
+  storagePath: string,
+  declaredFilename: string,
+): Promise<ClaimedFile> {
+  if (!storagePath || !isOwnedBy(storagePath, userId)) {
+    return { error: 'Fichier introuvable : reprenez le dépôt.' };
+  }
+
+  const supabase = await createSessionClient();
+  const reader = storageReader(supabase);
+
+  const file = await validateStoredFile(reader, {
+    path: storagePath,
+    filename: declaredFilename,
+  });
+  if (isValidationError(file)) {
+    await removeFile(storagePath);
+    return { error: file.error };
+  }
+
+  const pagination = await detectPaginationFromStorage(reader, {
+    path: storagePath,
+    format: file.format,
+    sizeBytes: file.sizeBytes,
+  });
+
+  return { file, pagination };
 }
 
 // ═══════════════════════════════════════════════════════════ SERVITEUR ══════
@@ -138,13 +220,15 @@ export async function submitResource(
   const metadata = readMetadata(formData);
   if ('errors' in metadata) return fail(metadata.errors);
 
-  const file = await validateUpload(formData.get('file') as File | null);
-  if (isValidationError(file)) return fail({ file: file.error });
+  const storagePath = String(formData.get('storagePath') ?? '');
+  const claimed = await claimUploadedFile(
+    user.id,
+    storagePath,
+    String(formData.get('filename') ?? ''),
+  );
+  if ('error' in claimed) return fail({ file: claimed.error });
+  const { file, pagination } = claimed;
 
-  const uploaded = await uploadFile(user.id, file);
-  if ('error' in uploaded) return fail({}, uploaded.error);
-
-  const pagination = await detectPagination(file.bytes, file.format);
   const supabase = await createSessionClient();
 
   const { data, error } = await supabase.rpc('submit_resource', {
@@ -155,7 +239,7 @@ export async function submitResource(
     p_resource_type: metadata.data.resourceType,
     p_audiences: metadata.data.audiences,
     p_flags: metadata.data.flags,
-    p_storage_path: uploaded.path,
+    p_storage_path: storagePath,
     p_filename: file.filename,
     p_format: file.format,
     p_mime_type: ACCEPTED_FORMATS[file.format].mimeType,
@@ -166,7 +250,7 @@ export async function submitResource(
 
   if (error || !data) {
     /* Le dépôt a échoué : l'objet téléversé ne doit pas rester orphelin. */
-    await removeFile(uploaded.path);
+    await removeFile(storagePath);
     return fail({}, `La ressource n'a pas pu être soumise : ${error?.message}`);
   }
 
@@ -199,19 +283,20 @@ export async function updateResource(
   });
   if (error) return fail({}, `Modification refusée : ${error.message}`);
 
-  /* Le fichier n'est remplacé que si un nouveau est joint. */
-  const replacement = formData.get('file') as File | null;
-  if (replacement && replacement.size > 0) {
-    const file = await validateUpload(replacement);
-    if (isValidationError(file)) return fail({ file: file.error });
+  /* Le fichier n'est remplacé que si un nouveau a été déposé. */
+  const storagePath = String(formData.get('storagePath') ?? '');
+  if (storagePath) {
+    const claimed = await claimUploadedFile(
+      user.id,
+      storagePath,
+      String(formData.get('filename') ?? ''),
+    );
+    if ('error' in claimed) return fail({ file: claimed.error });
+    const { file, pagination } = claimed;
 
-    const uploaded = await uploadFile(user.id, file);
-    if ('error' in uploaded) return fail({}, uploaded.error);
-
-    const pagination = await detectPagination(file.bytes, file.format);
     const { error: fileError } = await supabase.rpc('replace_resource_file', {
       p_id: id,
-      p_storage_path: uploaded.path,
+      p_storage_path: storagePath,
       p_filename: file.filename,
       p_format: file.format,
       p_mime_type: ACCEPTED_FORMATS[file.format].mimeType,
@@ -221,7 +306,7 @@ export async function updateResource(
     });
 
     if (fileError) {
-      await removeFile(uploaded.path);
+      await removeFile(storagePath);
       return fail({}, `Remplacement du fichier : ${fileError.message}`);
     }
   }

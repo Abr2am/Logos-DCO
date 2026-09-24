@@ -12,6 +12,12 @@ import { FieldError, FieldHelp, FieldLabel } from './Field';
  * L'attribut `accept` et l'affichage du nom sont du CONFORT : la validation du
  * type, de l'extension, de la signature et de la taille se fait entièrement
  * côté serveur. Rien de ce qui est affiché ici n'a valeur de contrôle.
+ *
+ * La barre de progression est l'exception utile : le fichier partant
+ * directement vers Storage, un envoi de plusieurs dizaines de méga-octets
+ * demande un retour visible. C'est un filet noyer qui se remplit, sans
+ * animation ni couleur d'état — la valeur est aussi annoncée en texte, donc
+ * jamais portée par la seule couleur.
  */
 export function FileUpload({
   id,
@@ -22,6 +28,7 @@ export function FileUpload({
   help,
   error,
   currentFilename,
+  progress,
 }: {
   id: string;
   name: string;
@@ -32,6 +39,8 @@ export function FileUpload({
   error?: string;
   /** Fichier déjà déposé, lors d'une correction. */
   currentFilename?: string | null;
+  /** Fraction envoyée, de 0 à 1. `null` tant qu'aucun envoi n'a commencé. */
+  progress?: number | null;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [selected, setSelected] = useState<{
@@ -92,6 +101,29 @@ export function FileUpload({
               <span className="text-small text-help">Fichier actuel</span>
             )}
           </p>
+        ) : null}
+
+        {typeof progress === 'number' ? (
+          <div className="mt-12">
+            <div
+              role="progressbar"
+              aria-label="Téléversement du fichier"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(progress * 100)}
+              className="h-[3px] w-full bg-line"
+            >
+              <div
+                className="h-full bg-walnut-900 transition-[width] duration-[150ms] ease-logos"
+                style={{ width: `${Math.round(progress * 100)}%` }}
+              />
+            </div>
+            <p className="mt-[7px] text-small text-help">
+              {progress < 1
+                ? `Téléversement… ${Math.round(progress * 100)} %`
+                : 'Fichier téléversé.'}
+            </p>
+          </div>
         ) : null}
       </div>
 
