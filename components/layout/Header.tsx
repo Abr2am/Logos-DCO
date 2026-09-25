@@ -7,7 +7,7 @@ import { cn } from '@/lib/cn';
 
 import { MobileMenu } from './MobileMenu';
 import { SignOutButton } from './SignOutButton';
-import { ACCOUNT_ITEM, ACCOUNT_LABEL_SIGNED_IN, NAV_ITEMS } from './nav-items';
+import { ACCOUNT_ITEM, MEMBER_NAV_ITEMS, NAV_ITEMS } from './nav-items';
 
 /*
  * Header : bandeau noyer + filet doré, puis barre de 76 px (60 px mobile).
@@ -19,12 +19,14 @@ import { ACCOUNT_ITEM, ACCOUNT_LABEL_SIGNED_IN, NAV_ITEMS } from './nav-items';
  * une page publique. La lecture passe par `currentUser`, seul point d'entrée
  * de `lib/auth` — le rôle est relu en base, jamais dans un jeton.
  *
- * ⚠️ Le point ouvert « T » reste entier : « Mon compte » n'est pas un lien,
- * faute de destination tranchée. Voir `nav-items.ts`.
+ * Deux barres, selon la session (25/09/2026) : celle d'un visiteur ne change
+ * pas ; celle d'un membre connecté échange « Partager un cours » — désormais
+ * proposé depuis « Mon compte » — contre un VRAI lien vers `/compte`.
  */
 export async function Header({ currentPath }: { currentPath?: string }) {
   const user = await currentUser();
   const signedIn = user !== null;
+  const items = signedIn ? MEMBER_NAV_ITEMS : NAV_ITEMS;
 
   return (
     <header className="border-b border-line bg-surface">
@@ -50,7 +52,7 @@ export async function Header({ currentPath }: { currentPath?: string }) {
           aria-label="Navigation principale"
           className="hidden items-center gap-[30px] text-[13.5px] font-medium nav:flex"
         >
-          {NAV_ITEMS.map((item) => {
+          {items.map((item) => {
             const active = currentPath === item.href;
             return (
               <Link
@@ -71,10 +73,7 @@ export async function Header({ currentPath }: { currentPath?: string }) {
           })}
 
           {signedIn ? (
-            <>
-              <span className="text-help">{ACCOUNT_LABEL_SIGNED_IN}</span>
-              <SignOutButton />
-            </>
+            <SignOutButton />
           ) : (
             <Link
               href={ACCOUNT_ITEM.href}
@@ -86,9 +85,8 @@ export async function Header({ currentPath }: { currentPath?: string }) {
         </nav>
 
         <MobileMenu
-          items={signedIn ? NAV_ITEMS : [...NAV_ITEMS, ACCOUNT_ITEM]}
+          items={signedIn ? items : [...items, ACCOUNT_ITEM]}
           currentPath={currentPath}
-          accountLabel={signedIn ? ACCOUNT_LABEL_SIGNED_IN : undefined}
           action={signedIn ? <SignOutButton /> : undefined}
         />
       </div>

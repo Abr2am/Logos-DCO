@@ -17,6 +17,7 @@ import { createProxyClient } from '@/lib/supabase/server-client';
  */
 
 const PROTECTED = [
+  '/compte',
   '/partager',
   '/mes-contributions',
   '/mes-questions',

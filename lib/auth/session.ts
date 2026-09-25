@@ -20,6 +20,17 @@ import { createSessionClient } from '@/lib/supabase/server-client';
 
 export type MemberRole = 'SERVANT' | 'ADMIN';
 
+/**
+ * Libellés d'affichage des deux rôles.
+ *
+ * `User.role` ne connaît que `SERVANT` et `ADMIN` ; PUBLIC est l'absence de
+ * compte, jamais une valeur en base. Ces libellés sont donc exhaustifs.
+ */
+export const ROLE_LABELS: Record<MemberRole, string> = {
+  SERVANT: 'Serviteur',
+  ADMIN: 'Administrateur',
+};
+
 export type AuthenticatedUser = {
   id: string;
   email: string;
