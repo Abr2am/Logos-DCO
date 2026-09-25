@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test, { describe } from 'node:test';
 
-import { SIGNED_URL_TTL, safeFilename } from './download';
+import { SIGNED_URL_TTL, safeFilename, signedFileRedirect } from './download';
 
 /*
  * Le nom de fichier part dans `Content-Disposition`. Ce qui est vérifié ici
@@ -34,6 +34,38 @@ describe('safeFilename', () => {
     assert.equal(safeFilename(''), 'ressource');
     assert.equal(safeFilename('"""'), 'ressource');
     assert.equal(safeFilename('   '), 'ressource');
+  });
+});
+
+describe('signedFileRedirect', () => {
+  const URL_SIGNEE =
+    'https://projet.supabase.co/storage/v1/object/sign/resources/a/b.pdf?token=xyz';
+
+  test('redirige en 302 vers l’URL signée', () => {
+    const response = signedFileRedirect(URL_SIGNEE);
+    assert.equal(response.status, 302);
+    assert.equal(response.headers.get('location'), URL_SIGNEE);
+  });
+
+  test('interdit toute mise en cache de la redirection', () => {
+    assert.equal(
+      signedFileRedirect(URL_SIGNEE).headers.get('cache-control'),
+      'no-store',
+    );
+  });
+
+  test('ne porte aucun corps', async () => {
+    assert.equal(await signedFileRedirect(URL_SIGNEE).text(), '');
+  });
+
+  /* `Response.redirect()` rendrait des en-têtes immuables : la réponse doit
+     être construite à la main, sans quoi `no-store` ne pourrait pas être
+     posé. Ce test fige la raison de ce choix. */
+  test('les en-têtes restent modifiables', () => {
+    const response = signedFileRedirect(URL_SIGNEE);
+    assert.doesNotThrow(() =>
+      response.headers.set('cache-control', 'no-store'),
+    );
   });
 });
 

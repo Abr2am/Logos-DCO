@@ -16,6 +16,28 @@
 export const SIGNED_URL_TTL = 60;
 
 /**
+ * Redirection vers l'URL signée — **jamais mise en cache**.
+ *
+ * L'URL porte un jeton valable une minute. Un cache partagé — proxy
+ * d'entreprise, cache de navigateur, intermédiaire quelconque — qui
+ * conserverait ce 302 le rejouerait pour un autre visiteur, et servirait le
+ * fichier sans repasser par la vérification de statut ni de rôle.
+ *
+ * ⚠️ La réponse est construite à la main : les en-têtes de
+ * `Response.redirect()` sont immuables, `headers.set()` y lève un
+ * `TypeError`.
+ */
+export function signedFileRedirect(signedUrl: string): Response {
+  return new Response(null, {
+    status: 302,
+    headers: {
+      location: signedUrl,
+      'cache-control': 'no-store',
+    },
+  });
+}
+
+/**
  * Le nom de fichier vient de la base et finit dans un en-tête HTTP.
  *
  * On en retire donc tout ce qui pourrait en sortir — guillemets, retours à la

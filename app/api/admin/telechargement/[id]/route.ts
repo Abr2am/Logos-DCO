@@ -1,5 +1,9 @@
 import { currentUser } from '@/lib/auth/session';
-import { SIGNED_URL_TTL, safeFilename } from '@/lib/files/download';
+import {
+  SIGNED_URL_TTL,
+  safeFilename,
+  signedFileRedirect,
+} from '@/lib/files/download';
 import { STORAGE_BUCKET } from '@/lib/files/storage-path';
 import { createSessionClient } from '@/lib/supabase/server-client';
 
@@ -90,5 +94,5 @@ export async function GET(
     );
   }
 
-  return Response.redirect(signed.signedUrl, 302);
+  return signedFileRedirect(signed.signedUrl);
 }

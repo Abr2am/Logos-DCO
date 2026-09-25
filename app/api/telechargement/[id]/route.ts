@@ -1,3 +1,4 @@
+import { signedFileRedirect } from '@/lib/files/download';
 import { serviceClient } from '@/lib/supabase/service-client';
 
 /*
@@ -84,5 +85,5 @@ export async function GET(
     );
   }
 
-  return Response.redirect(signed.signedUrl, 302);
+  return signedFileRedirect(signed.signedUrl);
 }
