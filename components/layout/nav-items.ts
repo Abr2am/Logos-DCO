@@ -1,14 +1,20 @@
 /**
- * Entrées de navigation du Design System, dans l'ordre imposé.
- * Liste fermée : Accueil · Bibliothèque · Partager un cours · compte.
+ * Entrées de navigation, dans l'ordre imposé.
+ * Liste fermée : Accueil · Bibliothèque · compte.
  */
 export type NavItem = { label: string; href: string };
 
-/** Navigation d'un VISITEUR — inchangée. */
+/**
+ * Navigation d'un VISITEUR.
+ *
+ * « Partager un cours » n'y figure plus (25/09/2026) : la barre n'a pas à
+ * proposer une action qui exige un compte. L'accueil, lui, la propose
+ * toujours — en appel à l'action du hero et du bloc « Enrichir la
+ * bibliothèque » —, et le visiteur qui la suit passe par la connexion.
+ */
 export const NAV_ITEMS: ReadonlyArray<NavItem> = [
   { label: 'Accueil', href: '/' },
   { label: 'Bibliothèque', href: '/bibliotheque' },
-  { label: 'Partager un cours', href: '/partager' },
 ];
 
 /** Entrée de compte d'un visiteur : un lien vers la connexion. */
@@ -30,14 +36,12 @@ export const ACCOUNT_ITEM_SIGNED_IN: NavItem = {
 };
 
 /**
- * Navigation d'un MEMBRE connecté.
+ * Navigation d'un MEMBRE connecté : la même, plus l'entrée de compte.
  *
- * « Partager un cours » en sort : le dépôt est proposé depuis « Mon compte »,
- * avec « Mes contributions » et « Mes questions ». La barre publique, elle,
- * ne bouge pas — un visiteur y trouve toujours l'entrée, qui le mène à la
- * connexion.
+ * Le dépôt se rejoint depuis « Mon compte », avec « Mes contributions » et
+ * « Mes questions ».
  */
 export const MEMBER_NAV_ITEMS: ReadonlyArray<NavItem> = [
-  ...NAV_ITEMS.filter((item) => item.href !== '/partager'),
+  ...NAV_ITEMS,
   ACCOUNT_ITEM_SIGNED_IN,
 ];

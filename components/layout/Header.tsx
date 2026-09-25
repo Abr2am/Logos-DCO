@@ -19,9 +19,11 @@ import { ACCOUNT_ITEM, MEMBER_NAV_ITEMS, NAV_ITEMS } from './nav-items';
  * une page publique. La lecture passe par `currentUser`, seul point d'entrée
  * de `lib/auth` — le rôle est relu en base, jamais dans un jeton.
  *
- * Deux barres, selon la session (25/09/2026) : celle d'un visiteur ne change
- * pas ; celle d'un membre connecté échange « Partager un cours » — désormais
- * proposé depuis « Mon compte » — contre un VRAI lien vers `/compte`.
+ * Deux barres, selon la session (25/09/2026), qui ne diffèrent que par leur
+ * entrée de compte : « Connexion » pour un visiteur, « Mon compte » — un VRAI
+ * lien, vers `/compte` — pour un membre. « Partager un cours » n'est plus de
+ * la navigation : l'accueil le propose en appel à l'action, et « Mon compte »
+ * le rassemble avec les autres espaces du serviteur.
  */
 export async function Header({ currentPath }: { currentPath?: string }) {
   const user = await currentUser();

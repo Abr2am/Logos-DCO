@@ -92,12 +92,17 @@ modification par un administrateur.
 > tranche le point ouvert « T » en donnant une destination à l'entrée
 > « Mon compte ». La page ne crée AUCUNE fonctionnalité — elle affiche
 > l'adresse et le rôle du compte, rassemble les routes existantes en cartes, et
-> porte la déconnexion. Conséquence sur la navigation : chez un membre
-> connecté, « Partager un cours » quitte le header et le menu mobile (on y
-> accède depuis « Mon compte ») ; la **barre publique, elle, ne change pas**.
-> Aucun écran de gestion de compte, aucun changement de mot de passe, aucune
-> modification de profil : ce serait une fonctionnalité, et elle n'est pas au
-> cahier des charges.
+> porte la déconnexion. Aucun écran de gestion de compte, aucun changement de
+> mot de passe, aucune modification de profil : ce serait une fonctionnalité,
+> et elle n'est pas au cahier des charges.
+>
+> **Conséquence sur la navigation** (25/09/2026) : « Partager un cours » quitte
+> le header et le menu mobile, connecté ou non — la barre se réduit à
+> `Accueil · Bibliothèque · Connexion`, et `Accueil · Bibliothèque ·
+Mon compte` une fois connecté. L'entrée n'est pas perdue pour autant :
+> **l'accueil la porte toujours**, en appel à l'action du hero et du bloc
+> « Enrichir la bibliothèque » — ces deux CTA ne bougent pas —, et un membre la
+> retrouve dans « Mon compte ».
 >
 > `/mes-questions` est un **ajout validé** (décision produit du 22/09/2026) :
 > le workflow Q&A du MVP fait du serviteur celui qui répond, et le cahier des

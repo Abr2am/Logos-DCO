@@ -10,8 +10,9 @@ import {
 
 /*
  * La navigation est une LISTE FERMÉE, et elle diffère selon la session. Ces
- * tests tiennent les deux règles du 25/09/2026 : la barre publique ne change
- * pas, et celle d'un membre connecté ne porte plus « Partager un cours ».
+ * tests tiennent les règles du 25/09/2026 : aucune barre ne porte plus
+ * « Partager un cours » — l'accueil s'en charge, par ses appels à l'action —
+ * et « Mon compte » est un vrai lien.
  */
 
 /** Les routes de la liste fermée de CLAUDE.md, seules destinations permises. */
@@ -28,10 +29,10 @@ const ROUTES = [
 ];
 
 describe('navigation du visiteur', () => {
-  test('reste inchangée : accueil, bibliothèque, partager', () => {
+  test('se réduit à l’accueil et à la bibliothèque', () => {
     assert.deepEqual(
       NAV_ITEMS.map((item) => item.href),
-      ['/', '/bibliotheque', '/partager'],
+      ['/', '/bibliotheque'],
     );
   });
 
@@ -39,16 +40,25 @@ describe('navigation du visiteur', () => {
     assert.equal(ACCOUNT_ITEM.label, 'Connexion');
     assert.equal(ACCOUNT_ITEM.href, '/connexion');
   });
+
+  test('le visiteur voit donc : Accueil · Bibliothèque · Connexion', () => {
+    assert.deepEqual(
+      [...NAV_ITEMS, ACCOUNT_ITEM].map((item) => item.label),
+      ['Accueil', 'Bibliothèque', 'Connexion'],
+    );
+  });
+});
+
+describe('« Partager un cours »', () => {
+  test('ne figure dans aucune barre, connecté ou non', () => {
+    for (const bar of [NAV_ITEMS, MEMBER_NAV_ITEMS]) {
+      assert.ok(!bar.some((item) => item.href === '/partager'));
+      assert.ok(!bar.some((item) => item.label === 'Partager un cours'));
+    }
+  });
 });
 
 describe('navigation d’un membre connecté', () => {
-  test('ne porte plus « Partager un cours »', () => {
-    assert.ok(!MEMBER_NAV_ITEMS.some((item) => item.href === '/partager'));
-    assert.ok(
-      !MEMBER_NAV_ITEMS.some((item) => item.label === 'Partager un cours'),
-    );
-  });
-
   test('« Mon compte » est un vrai lien, en dernière position', () => {
     assert.equal(ACCOUNT_ITEM_SIGNED_IN.label, 'Mon compte');
     assert.equal(ACCOUNT_ITEM_SIGNED_IN.href, '/compte');
