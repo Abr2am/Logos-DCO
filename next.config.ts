@@ -1,5 +1,7 @@
 import type { NextConfig } from 'next';
 
+import { securityHeaders } from './lib/security/headers';
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -20,6 +22,23 @@ const nextConfig: NextConfig = {
        */
       bodySizeLimit: '1mb',
     },
+  },
+
+  /*
+   * En-têtes de sécurité, sur toutes les routes — pages, routes techniques et
+   * ressources statiques. La politique est construite dans
+   * `lib/security/headers.ts`, où elle est documentée et testée.
+   */
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: securityHeaders({
+          supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+          development: process.env.NODE_ENV === 'development',
+        }),
+      },
+    ];
   },
 };
 

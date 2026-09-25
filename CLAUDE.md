@@ -434,7 +434,26 @@ directement, sans passer par l'interface.
     `admin_resource`, qui alimente le HTML de l'écran de modération, ne le
     renvoie pas — et ne doit jamais le renvoyer.
 
-11. L'architecture d'authentification reste **isolée et remplaçable**
+11. **En-têtes de sécurité HTTP** — posés le 25/09/2026 sur toutes les routes
+    (`lib/security/headers.ts`, branché dans `next.config.ts`) :
+    `Content-Security-Policy`, `Strict-Transport-Security` (2 ans,
+    sous-domaines compris, **sans `preload`** — c'est un engagement de
+    domaine, pas un réglage), `X-Frame-Options: DENY`, `X-Content-Type-Options`,
+    `Referrer-Policy: strict-origin-when-cross-origin` et une
+    `Permissions-Policy` qui refuse caméra, micro, position, paiement et USB.
+
+    Ce que la CSP tient vraiment : aucun script d'une autre origine, aucun
+    encadrement du site, aucun formulaire envoyé ailleurs, et le navigateur ne
+    parle qu'à nous et au projet Supabase (`connect-src`, indispensable au
+    téléversement direct).
+    ⚠️ `script-src` admet `'unsafe-inline'` : Next place la charge utile du
+    rendu dans des balises en ligne. La parade propre est un **nonce par
+    requête** posé dans `proxy.ts` — elle impose un rendu dynamique à chaque
+    page, ce que la 404 prérendue n'est pas. C'est une évolution à décider,
+    pas un réglage à changer. `'unsafe-eval'` n'est accordé qu'en
+    développement, jamais en production.
+
+12. L'architecture d'authentification reste **isolée et remplaçable**
     (`lib/auth/`), pour pouvoir passer au SSO / OIDC du diocèse sans
     reconstruire l'application.
     En pratique : les pages ne connaissent que `currentUser`, `requireMember`
@@ -887,7 +906,7 @@ Supabase (PostgreSQL + Auth + Storage) · Vercel.**
 app/              routes (App Router)
 components/       ui · brand · home · library · layout · contribution
 lib/              auth · supabase · domain · library · cover · files ·
-                  contributions · questions
+                  contributions · questions · security
 styles/           tokens du Design System
 supabase/         migrations SQL + tests (aucun seed de contenu)
 scripts/          assets de marque, vérification du schéma, crochets de test
@@ -931,8 +950,8 @@ Sont couverts : validation des téléversements (déclaration du client **et**
 objet réellement stocké), propriété d'un chemin de stockage, détection de
 pagination par plages, assainissement du nom de fichier servi en pièce
 jointe, libellés du cahier des charges, entrées de navigation selon la
-session, jeton et leurre du formulaire de question, URL de bibliothèque,
-`safeReturnPath` et le lien `mailto:` de réponse.
+session, jeton et leurre du formulaire de question, en-têtes de sécurité,
+URL de bibliothèque, `safeReturnPath` et le lien `mailto:` de réponse.
 
 **Ne sont PAS couverts, volontairement :** les composants React, le rendu, et
 tout ce qui exige un navigateur. Pas de Playwright, pas de tests de
