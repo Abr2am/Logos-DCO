@@ -261,4 +261,145 @@ end;
 $$;
 rollback;
 
+-- ── Limitation de débit : les trois plafonds ────────────────────────────────
+--
+-- Ces bornes sont la SEULE garde anti-spam qui résiste à un appel direct de
+-- l'API : le leurre et le jeton horodaté vivent dans l'application, et la clé
+-- anonyme est publique. On les éprouve donc sous le rôle `anon`, exactement
+-- comme le ferait un robot qui ignore le formulaire.
+
+begin;
+
+-- Treize ressources publiées fraîches : douze pour remplir, une pour la
+-- question de trop.
+do $$
+declare
+  v_alice uuid := current_setting('t.q_alice')::uuid;
+  v_ids   text := '';
+  v_r     uuid;
+  i       int;
+begin
+  for i in 1 .. 13 loop
+    v_r := t.new_resource(v_alice, 'Ressource de débit ' || i);
+    perform t.add_flags(v_r);
+    perform t.add_file(v_r);
+    update public.resources set status = 'PENDING'   where id = v_r;
+    update public.resources set status = 'PUBLISHED' where id = v_r;
+    v_ids := v_ids || case when i = 1 then '' else ',' end || v_r::text;
+  end loop;
+  perform set_config('t.q_rate', v_ids, true);
+end;
+$$;
+
+set local role anon;
+
+do $$
+declare
+  v_ids uuid[] := string_to_array(current_setting('t.q_rate'), ',')::uuid[];
+  i     int;
+begin
+  -- a. Dix questions passent sur une même ressource ; la onzième est refusée.
+  for i in 1 .. 10 loop
+    perform public.ask_question(v_ids[1], 'visiteur-' || i || '@example.test',
+      'Une question parfaitement légitime, numéro ' || i || '.');
+  end loop;
+
+  begin
+    perform public.ask_question(v_ids[1], 'visiteur-onze@example.test',
+      'La onzième question de l''heure sur cette même ressource.');
+    raise exception 'La onzième question sur une ressource doit être refusée.';
+  exception when program_limit_exceeded then null;
+  end;
+
+  -- b. La limite est PAR ressource : une autre fiche accepte toujours.
+  perform public.ask_question(v_ids[2], 'visiteur-douze@example.test',
+    'Une question sur une autre ressource, qui doit passer.');
+
+  -- c. Cinq questions depuis une même adresse, réparties sur cinq fiches ;
+  --    la sixième est refusée — la casse et les espaces n'y changent rien.
+  for i in 3 .. 7 loop
+    perform public.ask_question(v_ids[i], 'repete@example.test',
+      'Une question de plus depuis la même adresse, numéro ' || i || '.');
+  end loop;
+
+  begin
+    perform public.ask_question(v_ids[8], '  REPETE@Example.TEST  ',
+      'La sixième question de la journée depuis cette adresse.');
+    raise exception 'La sixième question d''une même adresse doit être refusée.';
+  exception when program_limit_exceeded then null;
+  end;
+
+end;
+$$;
+
+/* Le remplissage exige de COMPTER, ce que le rôle anonyme ne peut pas faire —
+   c'est précisément l'invariant n° 7. On reprend donc la main pour amener la
+   fenêtre à cent questions, puis on rend la parole à `anon` pour la question
+   de trop. */
+reset role;
+
+do $$
+declare
+  v_ids   uuid[] := string_to_array(current_setting('t.q_rate'), ',')::uuid[];
+  v_total int;
+  v_used  int;
+  v_res   int := 2;
+  v_k     int := 0;
+begin
+  select count(*) into v_total
+    from public.questions where created_at > now() - interval '1 hour';
+
+  while v_total < 100 loop
+    select count(*) into v_used
+      from public.questions
+     where resource_id = v_ids[v_res]
+       and created_at > now() - interval '1 hour';
+
+    if v_used >= 10 then
+      v_res := v_res + 1;
+      if v_res > 12 then
+        raise exception 'Le banc manque de ressources pour atteindre le plafond global.';
+      end if;
+      continue;
+    end if;
+
+    v_k := v_k + 1;
+    perform public.ask_question(v_ids[v_res],
+      'flot-' || (v_k / 5) || '@example.test',
+      'Question de remplissage numéro ' || v_k || '.');
+    v_total := v_total + 1;
+  end loop;
+end;
+$$;
+
+-- d. Le filet global : cent questions dans l'heure, et plus rien ne passe,
+--    sur aucune ressource — y compris une fiche restée vierge.
+set local role anon;
+
+do $$
+declare v_ids uuid[] := string_to_array(current_setting('t.q_rate'), ',')::uuid[];
+begin
+  begin
+    perform public.ask_question(v_ids[13], 'ultime@example.test',
+      'La question de trop, toutes ressources confondues.');
+    raise exception 'Au-delà de cent questions dans l''heure, tout doit être refusé.';
+  exception when program_limit_exceeded then null;
+  end;
+end;
+$$;
+rollback;
+
+-- Le plafond ne laisse aucune trace : la transaction annulée, une question
+-- passe de nouveau.
+begin;
+set local role anon;
+do $$
+begin
+  perform public.ask_question(current_setting('t.q_pub')::uuid,
+    'apres-le-plafond@example.test',
+    'Une question posée une fois la fenêtre revenue à la normale.');
+end;
+$$;
+rollback;
+
 \echo '  ✓ questions'

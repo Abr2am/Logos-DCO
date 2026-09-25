@@ -267,6 +267,32 @@ stockée en base** : Logos ne voit jamais le texte de la réponse.
 aucune notification automatique, aucune messagerie interne, aucun lien signé,
 aucun écran de modération des questions.
 
+### Anti-spam — validé le 25/09/2026 (tranche le point `R`)
+
+Le formulaire est public et sans compte. Deux barrières, et elles n'ont pas le
+même poids :
+
+- **Dans l'application** (`lib/questions/antispam.ts`) : un **leurre** — champ
+  hors écran, hors tabulation, `aria-hidden` — et un **jeton horodaté signé**,
+  émis au rendu de la fiche, qui refuse une soumission de moins de 3 secondes
+  ou de plus de 2 heures. La clé de signature est **dérivée** de
+  `SUPABASE_SERVICE_ROLE_KEY` : aucune variable d'environnement nouvelle. Un
+  leurre rempli reçoit une confirmation d'envoi **sans rien insérer** — dire
+  non apprendrait au robot comment s'adapter.
+- **En base** (`enforce_question_rate_limit`, déclencheur `BEFORE INSERT`) :
+  **10 questions par heure et par ressource · 5 par 24 h et par adresse · 100
+  par heure au total**. Refus par `SQLSTATE 54000`, traduit en un message
+  neutre.
+
+⚠️ **Seule la seconde barrière est une garde.** La clé anonyme est inlinée
+dans le bundle du navigateur — c'est sa nature —, si bien qu'un appel direct à
+`rpc/ask_question` ne verrait jamais le leurre ni le jeton. Ne jamais déplacer
+les plafonds hors de PostgreSQL.
+
+Aucune donnée nouvelle n'est stockée : les compteurs se lisent dans
+`questions`. Aucune table, aucune colonne, aucune policy, aucun `grant` n'ont
+changé — et l'IP du visiteur n'est ni lue, ni conservée.
+
 ### ⚠️ Dette technique — anonymat partiel
 
 Le cahier des charges (§12) pose « l'e-mail n'est jamais communiqué à
@@ -791,11 +817,11 @@ Ces points **n'ont pas été décidés**. Les signaler plutôt que de choisir.
 | ~~L~~ | ~~Valeurs de `Question.status`~~ — **tranché le 22/09/2026** : `PENDING` et `ANSWERED`, rien d'autre                                                                                                |
 | N     | Couverture : déterminisme par identifiant _vs_ contraintes de rythme par rangée                                                                                                                     |
 | O     | Format d'optimisation de la rosace (SVG vectorisé / WebP multi-tailles)                                                                                                                             |
-| R     | Anti-spam du formulaire de question anonyme                                                                                                                                                         |
+| ~~R~~ | ~~Anti-spam du formulaire de question anonyme~~ — **tranché le 25/09/2026** : leurre et jeton horodaté côté application, plafonds de débit en base. Voir « Questions ».                             |
 | S     | Renommage du fichier du Design System (espaces dans le chemin)                                                                                                                                      |
 | ~~T~~ | ~~Destination de l'entrée « Mon compte »~~ — **tranché le 25/09/2026** : `/compte`. Le libellé bascule toujours « Connexion » → « Mon compte », mais c'est désormais un vrai lien. Voir « Routes ». |
 
-> **F, L et T sont tranchés ; K et M ne sont plus des points ouverts.** Le cycle
+> **F, L, R et T sont tranchés ; K et M ne sont plus des points ouverts.** Le cycle
 > question → notification → réponse du §12 tient debout sans service d'envoi :
 > le serviteur répond depuis sa propre messagerie. Ce qui manque encore est
 > **hors périmètre**, pas indécis — voir la section ci-dessous.
@@ -821,8 +847,7 @@ l'exposition de l'adresse du questionneur au dépositaire. Tant que ce jour
 n'est pas venu, l'adresse reste visible — c'est le prix du MVP, et il est
 documenté, pas subi.
 
-**Reste ouvert sur les questions :** `R` (anti-spam du formulaire anonyme),
-qui n'est ni tranché ni écarté.
+**Plus rien d'ouvert sur les questions :** `R` a été tranché le 25/09/2026.
 
 ---
 
@@ -906,8 +931,8 @@ Sont couverts : validation des téléversements (déclaration du client **et**
 objet réellement stocké), propriété d'un chemin de stockage, détection de
 pagination par plages, assainissement du nom de fichier servi en pièce
 jointe, libellés du cahier des charges, entrées de navigation selon la
-session, URL de bibliothèque, `safeReturnPath` et le lien `mailto:` de
-réponse.
+session, jeton et leurre du formulaire de question, URL de bibliothèque,
+`safeReturnPath` et le lien `mailto:` de réponse.
 
 **Ne sont PAS couverts, volontairement :** les composants React, le rendu, et
 tout ce qui exige un navigateur. Pas de Playwright, pas de tests de

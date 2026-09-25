@@ -7,7 +7,12 @@ import { Input } from '@/components/ui/Input';
 import { Panel } from '@/components/ui/Panel';
 import { Textarea } from '@/components/ui/Textarea';
 import { askQuestion } from '@/lib/questions/actions';
-import { EMPTY_ASK_STATE, QUESTION_MAX_LENGTH } from '@/lib/questions/types';
+import {
+  EMPTY_ASK_STATE,
+  FORM_TOKEN_FIELD,
+  HONEYPOT_FIELD,
+  QUESTION_MAX_LENGTH,
+} from '@/lib/questions/types';
 
 /*
  * Bloc « Poser une question » du Design System.
@@ -19,8 +24,19 @@ import { EMPTY_ASK_STATE, QUESTION_MAX_LENGTH } from '@/lib/questions/types';
  * Ce n'est pas une messagerie : un seul envoi, pas de fil, pas d'historique
  * côté visiteur. La confirmation remplace le formulaire — succès = noyer
  * et filet doré, jamais de vert, jamais de toast.
+ *
+ * Deux champs cachés portent l'anti-spam (25/09/2026) : un jeton horodaté,
+ * émis au rendu par la page, et un leurre. Ni l'un ni l'autre n'a d'existence
+ * visuelle — le formulaire est exactement celui du Design System.
  */
-export function QuestionForm({ resourceId }: { resourceId: string }) {
+export function QuestionForm({
+  resourceId,
+  formToken,
+}: {
+  resourceId: string;
+  /** Jeton signé au rendu : il date le formulaire, il n'identifie personne. */
+  formToken: string;
+}) {
   const [state, action, pending] = useActionState(askQuestion, EMPTY_ASK_STATE);
 
   if (state.sent) {
@@ -35,6 +51,25 @@ export function QuestionForm({ resourceId }: { resourceId: string }) {
   return (
     <form action={action} className="grid gap-12">
       <input type="hidden" name="ressource" value={resourceId} />
+      <input type="hidden" name={FORM_TOKEN_FIELD} value={formToken} />
+
+      {/* Leurre : hors flux, hors écran, hors tabulation et masqué aux
+          technologies d'assistance. Un visiteur ne peut pas le remplir ; un
+          robot qui remplit tout le remplira. */}
+      <div
+        aria-hidden
+        className="absolute left-[-9999px] h-[1px] w-[1px] overflow-hidden"
+      >
+        <label htmlFor="site">Ne remplissez pas ce champ</label>
+        <input
+          id="site"
+          name={HONEYPOT_FIELD}
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          defaultValue=""
+        />
+      </div>
 
       <Textarea
         id="question"

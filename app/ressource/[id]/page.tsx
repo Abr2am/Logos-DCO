@@ -17,6 +17,7 @@ import {
 } from '@/lib/domain/resource';
 import { getPublishedResource } from '@/lib/library/queries';
 import { libraryHref } from '@/lib/library/url';
+import { issueFormToken } from '@/lib/questions/antispam';
 
 import { QuestionForm } from './QuestionForm';
 
@@ -166,7 +167,10 @@ export default async function RessourcePage({ params }: PageProps) {
             commentaires : rien de ce que vous écrivez ici n&apos;est publié.
           </p>
           <div className="mt-22">
-            <QuestionForm resourceId={resource.id} />
+            <QuestionForm
+              resourceId={resource.id}
+              formToken={issueFormToken()}
+            />
           </div>
         </section>
       </main>

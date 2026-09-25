@@ -35,6 +35,20 @@ export const EMAIL_MAX_LENGTH = 254;
 /** Contrôle de forme, pas de validité — identique à `questions_email_shape`. */
 export const EMAIL_SHAPE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
+/*
+ * Anti-spam — noms de champs (décision du 25/09/2026, point ouvert « R »).
+ *
+ * Ils vivent ici, et non dans `antispam.ts`, parce que le formulaire est un
+ * composant CLIENT : il ne peut pas importer un module marqué `server-only`.
+ * Seuls les noms traversent ; la signature, elle, reste au serveur.
+ */
+
+/** Champ leurre, invisible et hors parcours de tabulation. */
+export const HONEYPOT_FIELD = 'site';
+
+/** Jeton horodaté et signé, émis au rendu de la page. */
+export const FORM_TOKEN_FIELD = 'jeton';
+
 export type AskQuestionState = {
   error: string | null;
   fieldErrors: Record<string, string>;
