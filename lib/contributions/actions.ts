@@ -24,6 +24,7 @@ import {
 } from '@/lib/files/validate';
 import { createSessionClient } from '@/lib/supabase/server-client';
 
+import { logDatabaseError, userMessage } from './errors';
 import { readUploadedFileRef } from './uploaded-file';
 
 import type { FormState } from './types';
@@ -35,6 +36,11 @@ import type { FormState } from './types';
  * les règles structurantes — cinq flags, fichier obligatoire, transitions de
  * statut, dépositaire immuable — sont de toute façon appliquées par la base.
  * Cette couche produit des messages lisibles ; elle n'est pas la garde.
+ *
+ * ⚠️ Un refus de la base ne s'affiche JAMAIS tel quel (25/09/2026) : son
+ * message nomme des tables, des colonnes et des policies. `userMessage` rend
+ * une phrase écrite pour le serviteur, `logDatabaseError` garde le détail
+ * dans le journal du serveur — voir `errors.ts`.
  *
  * ── Le fichier ne passe plus par ici (24/09/2026) ───────────────────────────
  * Le navigateur dépose directement dans Storage, par URL signée. Ces actions
@@ -161,8 +167,9 @@ export async function prepareUpload(request: {
     .createSignedUploadUrl(path);
 
   if (error || !data) {
+    logDatabaseError('prepareUpload', error);
     return {
-      error: `Téléversement impossible : ${error?.message ?? 'erreur'}`,
+      error: "Le dépôt n'a pas pu être préparé. Réessayez dans un instant.",
     };
   }
 
@@ -255,9 +262,16 @@ async function replaceUploadedFile(
   });
 
   if (error) {
+    logDatabaseError('replace_resource_file', error);
     /* Le fichier n'a pas été attaché : il ne doit pas rester dans le bucket. */
     await removeFile(uploaded.storagePath);
-    return fail({}, `Remplacement du fichier : ${error.message}`);
+    return fail(
+      {},
+      userMessage(
+        error,
+        "Le fichier n'a pas pu être remplacé. Réessayez dans un instant.",
+      ),
+    );
   }
 
   return null;
@@ -303,9 +317,16 @@ export async function submitResource(
   });
 
   if (error || !data) {
+    logDatabaseError('submit_resource', error);
     /* Le dépôt a échoué : l'objet téléversé ne doit pas rester orphelin. */
     await removeFile(storagePath);
-    return fail({}, `La ressource n'a pas pu être soumise : ${error?.message}`);
+    return fail(
+      {},
+      userMessage(
+        error,
+        "La ressource n'a pas pu être soumise. Réessayez dans un instant.",
+      ),
+    );
   }
 
   revalidatePath('/mes-contributions');
@@ -335,7 +356,13 @@ export async function updateResource(
     p_audiences: metadata.data.audiences,
     p_flags: metadata.data.flags,
   });
-  if (error) return fail({}, `Modification refusée : ${error.message}`);
+  if (error) {
+    logDatabaseError('update_resource', error);
+    return fail(
+      {},
+      userMessage(error, "La modification n'a pas pu être enregistrée."),
+    );
+  }
 
   const failure = await replaceUploadedFile(supabase, user.id, id, formData);
   if (failure) return failure;
@@ -405,7 +432,16 @@ export async function requestChanges(
     p_id: id,
     p_comment: comment,
   });
-  if (error) return fail({}, `Demande refusée : ${error.message}`);
+  if (error) {
+    logDatabaseError('request_changes', error);
+    return fail(
+      {},
+      userMessage(
+        error,
+        "La demande de correction n'a pas pu être enregistrée.",
+      ),
+    );
+  }
 
   revalidatePath('/admin');
   redirect('/admin?corrections=1');
@@ -432,7 +468,13 @@ export async function updateResourceAsAdmin(
     p_audiences: metadata.data.audiences,
     p_flags: metadata.data.flags,
   });
-  if (error) return fail({}, `Modification refusée : ${error.message}`);
+  if (error) {
+    logDatabaseError('update_resource', error);
+    return fail(
+      {},
+      userMessage(error, "La modification n'a pas pu être enregistrée."),
+    );
+  }
 
   /* Le formulaire de modération porte le même champ « Fichier » que celui du
      dépositaire : il doit produire le même effet. Sans cette étape, l'objet
