@@ -12,7 +12,7 @@ Orthodoxe de Paris**.
 | Document                                                                     | Rôle                                                                                    |
 | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
 | [`docs/LOGOS_Cahier_des_charges_V1.md`](docs/LOGOS_Cahier_des_charges_V1.md) | Source de vérité **produit**                                                            |
-| `docs/Logos - Design System V2.html`                                         | Référence **visuelle et UI**                                                            |
+| `docs/LOGOS_Design_System_V2.html`                                           | Référence **visuelle et UI**                                                            |
 | [`CLAUDE.md`](CLAUDE.md)                                                     | Règles permanentes du projet (rôles, routes, sécurité, anti-régression, points ouverts) |
 
 **Lire `CLAUDE.md` avant toute contribution.** Il condense les règles

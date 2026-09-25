@@ -10,7 +10,7 @@ Orthodoxe de Paris**.
 | Document                                                 | Rôle                                                                                                                                                                                                           |
 | -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `docs/LOGOS_Cahier_des_charges_V1.md`                    | **Source de vérité produit.** Prime sur toute autre considération.                                                                                                                                             |
-| `docs/Logos - Design System V2.html`                     | **Référence visuelle et UI.** Document bundlé : le contenu réel est dans le script `__bundler/template`.                                                                                                       |
+| `docs/LOGOS_Design_System_V2.html`                       | **Référence visuelle et UI.** Document bundlé : le contenu réel est dans le script `__bundler/template`.                                                                                                       |
 | **Maquette finale de l'accueil** (validée le 24/09/2026) | **Source de vérité visuelle de `/`, et d'elle seule.** Elle prime sur toute interprétation et sur les règles de composition antérieures pour cette page. Les autres pages restent régies par le Design System. |
 
 Ces deux documents ne se contredisent pas. En cas de doute sur le **quoi**,
