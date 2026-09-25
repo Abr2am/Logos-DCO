@@ -97,8 +97,13 @@ modification par un administrateur.
 **Interdits :** `/categories` (page d'index indépendante) · `/admin/flags`.
 
 Les routes techniques sous `/api/` ne sont pas des pages : elles ne figurent
-pas dans cette liste. À ce jour, une seule existe —
-`/api/telechargement/[id]`, qui délivre le fichier d'une ressource publiée.
+pas dans cette liste. À ce jour, il en existe deux, et elles ne se
+recouvrent pas :
+
+- `/api/telechargement/[id]` — public, ressources **PUBLIÉES** uniquement ;
+- `/api/admin/telechargement/[id]` — **administration seule**, tous statuts
+  (décision du 25/09/2026 : on ne publie pas une ressource sans l'avoir
+  ouverte). Voir « Téléchargement en modération ».
 
 La correction d'une ressource « À corriger » réutilise `/partager?ressource=<id>` :
 le cahier des charges prévoit « Modifier la ressource » sans définir de route
@@ -364,6 +369,27 @@ directement, sans passer par l'interface.
     diapositives d'un PPTX, elles, restent comptées à toutes les tailles — le
     répertoire central se lit dans la QUEUE du conteneur, par une requête de
     plage.
+
+    **Téléchargement en modération — validé le 25/09/2026.** L'administration
+    télécharge le fichier d'une ressource **quel que soit son statut**, par
+    `/api/admin/telechargement/[id]`. Cette route n'emprunte RIEN au
+    téléchargement public : celui-ci reste anonyme, sous `service_role`, et
+    garde pour seule garde le filtre `status = 'PUBLISHED'` de
+    `get_published_file` — qu'il ne faut pas élargir. La route
+    d'administration, elle, passe par le **client de session**, jamais
+    `serviceClient()`, et superpose trois gardes :
+
+    - la route écarte tout ce qui n'est pas ADMIN par un **404 muet** — jamais
+      une redirection, qui révélerait l'existence de la ressource ;
+    - `admin_resource_file` lève `42501` hors administration, sous
+      `files_select_admin` (elle reste SECURITY INVOKER) ;
+    - la policy Storage `resources_objects_select_own` revérifie `is_admin()`
+      au moment de signer.
+
+    L'URL signée vit 60 secondes et force `Content-Disposition: attachment`.
+    ⚠️ `storage_path` ne sort de la base que vers du code serveur :
+    `admin_resource`, qui alimente le HTML de l'écran de modération, ne le
+    renvoie pas — et ne doit jamais le renvoyer.
 
 11. L'architecture d'authentification reste **isolée et remplaçable**
     (`lib/auth/`), pour pouvoir passer au SSO / OIDC du diocèse sans
@@ -858,8 +884,9 @@ Deux harnais, deux périmètres, aucun framework :
 
 Sont couverts : validation des téléversements (déclaration du client **et**
 objet réellement stocké), propriété d'un chemin de stockage, détection de
-pagination par plages, libellés du cahier des charges, URL de bibliothèque,
-`safeReturnPath` et le lien `mailto:` de réponse.
+pagination par plages, assainissement du nom de fichier servi en pièce
+jointe, libellés du cahier des charges, URL de bibliothèque, `safeReturnPath`
+et le lien `mailto:` de réponse.
 
 **Ne sont PAS couverts, volontairement :** les composants React, le rendu, et
 tout ce qui exige un navigateur. Pas de Playwright, pas de tests de

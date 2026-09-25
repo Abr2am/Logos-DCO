@@ -421,4 +421,108 @@ end;
 $$;
 rollback;
 
+-- ── Téléchargement administrateur : tous statuts, administration seule ──────
+--
+-- `admin_resource_file` est la contrepartie interne de `get_published_file` :
+-- aucun filtre de statut, mais une garde de rôle. Les deux moitiés sont
+-- vérifiées ici — ce qu'elle délivre à l'administration, et ce qu'elle ne
+-- délivre à personne d'autre.
+
+begin;
+set local role authenticated;
+do $$
+declare
+  v_alice    uuid := current_setting('t.c_alice')::uuid;
+  v_pending  uuid;
+  v_rejected uuid;
+  v_archived uuid := current_setting('t.c_res')::uuid;
+  v_path     text;
+  v_n        int;
+  v_cols     text[];
+begin
+  v_pending  := t.submit_as(v_alice, 'À relire',
+                            array['Un','Deux','Trois','Quatre','Cinq']);
+  v_rejected := t.submit_as(v_alice, 'À corriger',
+                            array['Un','Deux','Trois','Quatre','Cinq']);
+
+  perform set_config('app.user_id', current_setting('t.c_admin'), true);
+  perform public.request_changes(v_rejected, 'Préciser la source.');
+  if (select status from public.resources where id = v_rejected) <> 'REJECTED' then
+    raise exception 'La ressource de test aurait dû passer en REJECTED.';
+  end if;
+
+  -- a. En attente : c'est le cas qui motive la fonction.
+  select storage_path into v_path from public.admin_resource_file(v_pending);
+  if v_path is null then
+    raise exception 'Une ressource PENDING doit être téléchargeable par l''administration.';
+  end if;
+
+  -- b. À corriger.
+  select count(*) into v_n from public.admin_resource_file(v_rejected);
+  if v_n <> 1 then
+    raise exception 'Une ressource REJECTED doit rester téléchargeable (vu %).', v_n;
+  end if;
+
+  -- c. Archivée : publiquement introuvable, mais toujours lisible en modération.
+  select count(*) into v_n from public.admin_resource_file(v_archived);
+  if v_n <> 1 then
+    raise exception 'Une ressource ARCHIVED doit rester téléchargeable (vu %).', v_n;
+  end if;
+
+  -- d. Publiée : la fonction ne fait aucune exception de statut.
+  perform public.publish_resource(v_pending);
+  select count(*) into v_n from public.admin_resource_file(v_pending);
+  if v_n <> 1 then
+    raise exception 'Une ressource PUBLISHED doit être téléchargeable (vu %).', v_n;
+  end if;
+
+  -- e. Ressource inexistante : aucune ligne, aucune erreur.
+  select count(*) into v_n
+    from public.admin_resource_file('00000000-0000-0000-0000-000000000000');
+  if v_n <> 0 then
+    raise exception 'Une ressource inexistante ne doit rien renvoyer (vu %).', v_n;
+  end if;
+
+  -- f. Le dépositaire lui-même est refusé — le cas qu'on oublie.
+  perform set_config('app.user_id', current_setting('t.c_alice'), true);
+  begin
+    perform public.admin_resource_file(v_pending);
+    raise exception 'Un serviteur ne doit pas atteindre le fichier, fût-il le sien.';
+  exception when insufficient_privilege then null;
+  end;
+
+  -- g. Un autre serviteur, a fortiori.
+  perform set_config('app.user_id', current_setting('t.c_bob'), true);
+  begin
+    perform public.admin_resource_file(v_pending);
+    raise exception 'Un serviteur ne doit pas atteindre le fichier d''un autre.';
+  exception when insufficient_privilege then null;
+  end;
+
+  -- h. Le chemin de stockage n'entre pas dans ce qui alimente l'écran.
+  select p.proargnames into v_cols
+    from pg_proc p
+    join pg_namespace n on n.oid = p.pronamespace
+   where n.nspname = 'public' and p.proname = 'admin_resource';
+  if 'storage_path' = any(v_cols) then
+    raise exception 'admin_resource ne doit jamais renvoyer le chemin de stockage.';
+  end if;
+end;
+$$;
+rollback;
+
+-- Le rôle anonyme n'a aucun accès, pas même pour se voir refuser par la garde.
+begin;
+set local role anon;
+do $$
+begin
+  begin
+    perform public.admin_resource_file(current_setting('t.c_res')::uuid);
+    raise exception 'Le rôle anonyme ne doit jamais atteindre admin_resource_file.';
+  exception when insufficient_privilege then null;
+  end;
+end;
+$$;
+rollback;
+
 \echo '  ✓ contribution et modération'

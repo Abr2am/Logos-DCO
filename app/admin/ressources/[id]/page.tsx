@@ -199,6 +199,20 @@ export default async function ModerationPage({ params }: PageProps) {
                 </Link>
               </>
             ) : null}
+
+            {/* Tous statuts, dès qu'un fichier existe : on ne publie pas une
+                ressource sans l'avoir ouverte, et une ressource à corriger ou
+                archivée reste à relire. `<a>` et non `<Link>` : la cible n'est
+                pas une page, c'est une route qui redirige vers une URL signée
+                hors de l'application. */}
+            {resource.filename ? (
+              <a
+                href={`/api/admin/telechargement/${resource.id}`}
+                className={buttonClassName('tertiary')}
+              >
+                Télécharger la ressource
+              </a>
+            ) : null}
           </div>
 
           {resource.status === 'PENDING' ? (
