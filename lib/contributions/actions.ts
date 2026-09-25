@@ -24,6 +24,8 @@ import {
 } from '@/lib/files/validate';
 import { createSessionClient } from '@/lib/supabase/server-client';
 
+import { readUploadedFileRef } from './uploaded-file';
+
 import type { FormState } from './types';
 
 /*
@@ -209,6 +211,58 @@ async function claimUploadedFile(
   return { file, pagination };
 }
 
+/**
+ * Remplace le fichier d'une ressource — et seulement si un nouveau a été
+ * déposé. Renvoie `null` quand il n'y a rien à faire ou que le remplacement a
+ * réussi, un état d'erreur sinon.
+ *
+ * Les deux formulaires de modification passent par ici, celui du dépositaire
+ * comme celui de l'administration : c'est ce qui garantit qu'un fichier
+ * téléversé est réellement attaché, et que l'ancien ne survit pas à son
+ * remplaçant. `replace_resource_file` retire l'ancienne ligne avant d'écrire
+ * la nouvelle, et la RLS décide si l'appelant en a le droit.
+ *
+ * `userId` est celui de l'appelant — dépositaire ou administrateur : le chemin
+ * a été construit sous SON préfixe par `prepareUpload`, et `isOwnedBy` comme
+ * `owns_storage_path` le revérifient.
+ */
+async function replaceUploadedFile(
+  supabase: Awaited<ReturnType<typeof createSessionClient>>,
+  userId: string,
+  resourceId: string,
+  formData: FormData,
+): Promise<FormState | null> {
+  const uploaded = readUploadedFileRef(formData);
+  if (!uploaded) return null;
+
+  const claimed = await claimUploadedFile(
+    userId,
+    uploaded.storagePath,
+    uploaded.filename,
+  );
+  if ('error' in claimed) return fail({ file: claimed.error });
+  const { file, pagination } = claimed;
+
+  const { error } = await supabase.rpc('replace_resource_file', {
+    p_id: resourceId,
+    p_storage_path: uploaded.storagePath,
+    p_filename: file.filename,
+    p_format: file.format,
+    p_mime_type: ACCEPTED_FORMATS[file.format].mimeType,
+    p_size_bytes: file.sizeBytes,
+    p_page_count: pagination.pageCount,
+    p_slide_count: pagination.slideCount,
+  });
+
+  if (error) {
+    /* Le fichier n'a pas été attaché : il ne doit pas rester dans le bucket. */
+    await removeFile(uploaded.storagePath);
+    return fail({}, `Remplacement du fichier : ${error.message}`);
+  }
+
+  return null;
+}
+
 // ═══════════════════════════════════════════════════════════ SERVITEUR ══════
 
 export async function submitResource(
@@ -283,33 +337,8 @@ export async function updateResource(
   });
   if (error) return fail({}, `Modification refusée : ${error.message}`);
 
-  /* Le fichier n'est remplacé que si un nouveau a été déposé. */
-  const storagePath = String(formData.get('storagePath') ?? '');
-  if (storagePath) {
-    const claimed = await claimUploadedFile(
-      user.id,
-      storagePath,
-      String(formData.get('filename') ?? ''),
-    );
-    if ('error' in claimed) return fail({ file: claimed.error });
-    const { file, pagination } = claimed;
-
-    const { error: fileError } = await supabase.rpc('replace_resource_file', {
-      p_id: id,
-      p_storage_path: storagePath,
-      p_filename: file.filename,
-      p_format: file.format,
-      p_mime_type: ACCEPTED_FORMATS[file.format].mimeType,
-      p_size_bytes: file.sizeBytes,
-      p_page_count: pagination.pageCount,
-      p_slide_count: pagination.slideCount,
-    });
-
-    if (fileError) {
-      await removeFile(storagePath);
-      return fail({}, `Remplacement du fichier : ${fileError.message}`);
-    }
-  }
+  const failure = await replaceUploadedFile(supabase, user.id, id, formData);
+  if (failure) return failure;
 
   revalidatePath('/mes-contributions');
   redirect('/mes-contributions?corrigee=1');
@@ -387,7 +416,7 @@ export async function updateResourceAsAdmin(
   formData: FormData,
 ): Promise<FormState> {
   const id = String(formData.get('id') ?? '');
-  await requireAdmin(`/admin/ressources/${id}`);
+  const admin = await requireAdmin(`/admin/ressources/${id}`);
 
   const metadata = readMetadata(formData);
   if ('errors' in metadata) return fail(metadata.errors);
@@ -404,6 +433,13 @@ export async function updateResourceAsAdmin(
     p_flags: metadata.data.flags,
   });
   if (error) return fail({}, `Modification refusée : ${error.message}`);
+
+  /* Le formulaire de modération porte le même champ « Fichier » que celui du
+     dépositaire : il doit produire le même effet. Sans cette étape, l'objet
+     était bien téléversé mais jamais attaché — l'ancien fichier restait en
+     place, et l'écran annonçait pourtant une modification réussie. */
+  const failure = await replaceUploadedFile(supabase, admin.id, id, formData);
+  if (failure) return failure;
 
   revalidatePath(`/admin/ressources/${id}`);
   redirect(`/admin/ressources/${id}?modifiee=1`);

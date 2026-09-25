@@ -525,4 +525,106 @@ end;
 $$;
 rollback;
 
+-- ── Remplacement du fichier en modération ───────────────────────────────────
+--
+-- L'écran d'administration porte le même champ « Fichier » que celui du
+-- dépositaire. Ces cas tiennent les deux moitiés de la règle : ce que
+-- l'administration PEUT faire, et ce que personne d'autre ne peut.
+
+begin;
+set local role authenticated;
+do $$
+declare
+  v_alice uuid := current_setting('t.c_alice')::uuid;
+  v_bob   uuid := current_setting('t.c_bob')::uuid;
+  v_admin uuid := current_setting('t.c_admin')::uuid;
+  v_id    uuid;
+  v_first text;
+  v_new   text;
+  r       record;
+  v_n     int;
+begin
+  v_id := t.submit_as(v_alice, 'À relire en modération',
+                      array['Un','Deux','Trois','Quatre','Cinq']);
+  select storage_path into v_first from public.files where resource_id = v_id;
+
+  -- a. Modification des seules métadonnées : le fichier ne bouge pas.
+  perform set_config('app.user_id', current_setting('t.c_admin'), true);
+  perform public.update_resource(v_id, 'Titre corrigé par l''administration',
+    'Description corrigée.', 6::smallint, null::smallint, 'DOCUMENT',
+    array['ADULTES'], array['Un','Deux','Trois','Quatre','Cinq']);
+
+  select storage_path into v_new from public.files where resource_id = v_id;
+  if v_new is distinct from v_first then
+    raise exception 'Une modification sans dépôt ne doit pas toucher au fichier.';
+  end if;
+
+  -- b. Dépôt d'un nouveau fichier par l'administration : il remplace l'ancien.
+  v_new := v_admin || '/' || gen_random_uuid() || '.pptx';
+  perform public.replace_resource_file(
+    v_id, v_new, 'seance-2026.pptx',
+    'PPTX',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    8192, null, 24);
+
+  select count(*) into v_n from public.files where resource_id = v_id;
+  if v_n <> 1 then
+    raise exception 'Une ressource ne porte qu''un fichier (vu %).', v_n;
+  end if;
+
+  -- c. Le fichier attaché est bien le NOUVEAU, l'ancien a disparu.
+  select * into r from public.files where resource_id = v_id;
+  if r.storage_path <> v_new then
+    raise exception 'Le chemin attaché doit être celui du nouveau dépôt (vu %).',
+      r.storage_path;
+  end if;
+  if r.filename <> 'seance-2026.pptx' or r.format <> 'PPTX'
+     or r.size_bytes <> 8192 or r.slide_count <> 24 then
+    raise exception 'Les métadonnées du nouveau fichier doivent être enregistrées.';
+  end if;
+  if exists (select 1 from public.files where storage_path = v_first) then
+    raise exception 'L''ancien fichier ne doit plus être attaché à quoi que ce soit.';
+  end if;
+
+  -- d. Un autre serviteur ne remplace pas le fichier d'autrui, fût-ce avec
+  --    un chemin qui lui appartient.
+  perform set_config('app.user_id', current_setting('t.c_bob'), true);
+  begin
+    perform public.replace_resource_file(
+      v_id, v_bob || '/' || gen_random_uuid() || '.pdf', 'detourne.pdf',
+      'PDF', 'application/pdf', 4096, 3, null);
+    raise exception 'Un serviteur ne doit pas remplacer le fichier d''autrui.';
+  exception when insufficient_privilege then null;
+  end;
+
+  -- e. Le dépositaire lui-même ne touche pas au fichier d'une ressource en
+  --    cours d'examen : elle n'est plus à lui tant qu'elle est PENDING.
+  perform set_config('app.user_id', current_setting('t.c_alice'), true);
+  begin
+    perform public.replace_resource_file(
+      v_id, v_alice || '/' || gen_random_uuid() || '.pdf', 'repris.pdf',
+      'PDF', 'application/pdf', 4096, 3, null);
+    raise exception 'Le dépositaire ne doit pas remplacer le fichier d''une ressource PENDING.';
+  exception when insufficient_privilege then null;
+  end;
+
+  -- f. La garde de chemin n'a pas d'exemption pour l'administration.
+  perform set_config('app.user_id', current_setting('t.c_admin'), true);
+  begin
+    perform public.replace_resource_file(
+      v_id, v_alice || '/' || gen_random_uuid() || '.pdf', 'chemin-d-autrui.pdf',
+      'PDF', 'application/pdf', 4096, 3, null);
+    raise exception 'Un administrateur ne doit pas revendiquer le préfixe d''autrui.';
+  exception when insufficient_privilege then null;
+  end;
+
+  -- g. Après ces refus, le fichier attaché est toujours celui de l'étape b.
+  select storage_path into v_first from public.files where resource_id = v_id;
+  if v_first <> v_new then
+    raise exception 'Un refus ne doit rien changer au fichier attaché.';
+  end if;
+end;
+$$;
+rollback;
+
 \echo '  ✓ contribution et modération'
