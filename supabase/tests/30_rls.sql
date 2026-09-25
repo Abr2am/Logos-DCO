@@ -250,4 +250,128 @@ begin
 end;
 $$;
 
+-- ── Contexte privilégié : une identité absente n'est pas l'administration ───
+--
+-- Les trois rôles clients de PostgREST n'ont pas d'identité quand aucun jeton
+-- utilisateur n'accompagne la requête. Les déclencheurs ne doivent alors PAS
+-- les prendre pour l'administration.
+--
+-- La RLS les arrête aujourd'hui avant même le déclencheur : pour éprouver la
+-- garde elle-même, chaque scénario ajoute la policy trop large qu'un futur
+-- développeur pourrait écrire, et l'annule ensuite. C'est bien la défense EN
+-- PROFONDEUR qui est testée ici, pas la policy.
+
+-- a. `authenticated` sans identité ne publie pas.
+begin;
+create policy tmp_read_i10 on public.resources
+  for select to authenticated using (true);
+create policy tmp_write_i10 on public.resources
+  for update to authenticated using (true) with check (true);
+set local role authenticated;
+do $$
+begin
+  update public.resources set status = 'PUBLISHED'
+   where id = current_setting('t.pending')::uuid;
+  raise exception 'Une identité absente ne doit jamais valoir administration.';
+exception when insufficient_privilege then null;
+end;
+$$;
+rollback;
+
+-- b. `service_role` sans identité non plus — la clé de service ne publie pas.
+begin;
+grant select, update on public.resources to service_role;
+create policy tmp_read_svc_i10 on public.resources
+  for select to service_role using (true);
+create policy tmp_write_svc_i10 on public.resources
+  for update to service_role using (true) with check (true);
+set local role service_role;
+do $$
+begin
+  update public.resources set status = 'PUBLISHED'
+   where id = current_setting('t.pending')::uuid;
+  raise exception 'La clé de service ne doit pas publier sans identité.';
+exception when insufficient_privilege then null;
+end;
+$$;
+rollback;
+
+-- c. Même règle pour la garde du RÔLE : personne ne se promeut sans identité.
+begin;
+create policy tmp_users_read_i10 on public.users
+  for select to authenticated using (true);
+create policy tmp_users_write_i10 on public.users
+  for update to authenticated using (true) with check (true);
+set local role authenticated;
+do $$
+begin
+  update public.users set role = 'ADMIN'
+   where id = current_setting('t.bob')::uuid;
+  raise exception 'Une identité absente ne doit pas pouvoir changer un rôle.';
+exception when insufficient_privilege then null;
+end;
+$$;
+rollback;
+
+-- d. Ce que le correctif PRÉSERVE : une connexion directe — migration, psql,
+--    éditeur SQL — reste privilégiée. C'est ce dont vivent les fixtures.
+do $$
+declare v_n int;
+begin
+  update public.users set role = 'ADMIN'
+   where id = current_setting('t.bob')::uuid;
+  get diagnostics v_n = row_count;
+  if v_n <> 1 then
+    raise exception 'Une connexion directe doit rester privilégiée.';
+  end if;
+  update public.users set role = 'SERVANT'
+   where id = current_setting('t.bob')::uuid;
+end;
+$$;
+
+-- e. Et l'administration authentifiée publie toujours, elle.
+begin;
+set local role authenticated;
+do $$
+declare v_n int;
+begin
+  perform set_config('app.user_id', current_setting('t.admin'), true);
+  update public.resources set status = 'PUBLISHED'
+   where id = current_setting('t.pending')::uuid;
+  get diagnostics v_n = row_count;
+  if v_n <> 1 then
+    raise exception 'L''administration authentifiée doit toujours publier.';
+  end if;
+end;
+$$;
+rollback;
+
+-- f. Un serviteur, lui, ne publie toujours pas — et c'est la POLICY qui
+--    l'arrête, avant même le déclencheur : la ligne lui est invisible en
+--    écriture, l'ordre ne touche rien. Le correctif ne change rien ici.
+begin;
+set local role authenticated;
+do $$
+declare v_n int; v_statut public.resource_status;
+begin
+  perform set_config('app.user_id', current_setting('t.alice'), true);
+  update public.resources set status = 'PUBLISHED'
+   where id = current_setting('t.pending')::uuid;
+  get diagnostics v_n = row_count;
+  if v_n <> 0 then
+    raise exception 'Un serviteur ne doit jamais publier (% ligne(s)).', v_n;
+  end if;
+end;
+$$;
+rollback;
+
+do $$
+begin
+  if (select status from public.resources
+       where id = current_setting('t.pending')::uuid) <> 'PENDING' then
+    raise exception 'La ressource devait rester en attente.';
+  end if;
+end;
+$$;
+
 \echo '  ✓ sécurité'
