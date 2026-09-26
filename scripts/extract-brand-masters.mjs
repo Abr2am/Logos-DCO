@@ -2,7 +2,7 @@
  * Réextrait les masters de marque depuis le Design System bundlé.
  *
  * Les deux images de marque (rosace, marqueterie) ne vivent dans le dépôt
- * qu'encapsulées en base64 dans `docs/Logos - Design System V2.html`.
+ * qu'encapsulées en base64 dans `docs/LOGOS_Design_System_V2.html`.
  * Ce script les réécrit bit-à-bit dans `assets/brand/`, sans aucune
  * transformation. Il sert de filet de sécurité : les masters versionnés
  * restent la référence, ce script prouve qu'ils sont reproductibles.
@@ -15,7 +15,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const BUNDLE = join(ROOT, 'docs', 'Logos - Design System V2.html');
+const BUNDLE = join(ROOT, 'docs', 'LOGOS_Design_System_V2.html');
 const OUT = join(ROOT, 'assets', 'brand');
 
 /** Identifiants des ressources dans le manifeste du bundle. */
