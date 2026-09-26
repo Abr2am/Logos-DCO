@@ -1,0 +1,238 @@
+/* ==========================================================================
+   LOGOS — Tokens du Design System V2 (direction Noyer)
+   --------------------------------------------------------------------------
+   Source unique de vérité visuelle. Toute valeur ci-dessous provient
+   littéralement de `docs/LOGOS_Design_System_V2.html`. Rien n'est extrapolé.
+
+   Verrous du Design System appliqués ici :
+     8 tokens de couleur · 3 familles typographiques · 1 échelle d'espacement
+     3 rayons · 2 ombres (+ tablette) · 2 durées de transition
+
+   Les palettes, échelles et rayons par défaut de Tailwind sont DÉSACTIVÉS
+   (`--namespace-*: initial`). Écrire `bg-blue-500`, `rounded-xl` ou `p-7`
+   ne produit donc aucune classe : l'anti-régression visuelle est mécanique,
+   pas déclarative.
+   ========================================================================== */
+
+@theme {
+  /* ── Couleur — 8 tokens, aucun ajout ──────────────────────────────────── */
+  --color-*: initial;
+
+  --color-ivory: #f7f3ea; /* Fond de page — la surface dominante */
+  --color-surface: #fdfaf3; /* Surface élevée : champs, panneaux, header */
+  --color-walnut-900: #2e1e15; /* COULEUR IDENTITAIRE : structure ET action */
+  --color-walnut-700: #4a3123; /* Nuance architecturale secondaire */
+  --color-gold: #c39a54; /* Accent discret — filets, jamais en aplat large */
+  --color-text: #241810; /* Texte principal — jamais #000 */
+  --color-text-secondary: #4c3b30; /* Texte secondaire — jamais sous 12,5 px */
+
+  /* Dérivés autorisés — aucune teinte nouvelle, uniquement des valeurs de la
+     même famille. Le survol d'une action noyer emprunte `walnut-700`. */
+  --color-walnut-active: #1f140d; /* appui d'une action noyer */
+  --color-gold-hover: #b48c48;
+  --color-gold-overline: #dcb979; /* surtitre doré sur fond noyer */
+  --color-cover-spine: #1f140d; /* tranche de couverture noyer */
+  --color-cover-plate: #f1eadc; /* plat de couverture ivoire / état actif */
+  --color-cover-edge: #ede3cf; /* tranche de couverture ivoire */
+  --color-theme-hover: #f5efe3; /* survol de carte de thème */
+  --color-disabled-surface: #f2ede2;
+  --color-disabled-text: #a3927f;
+  --color-placeholder: #8a7866;
+  --color-help: #7a6656;
+  --color-on-dark: #f9f4ea; /* texte sur noyer */
+
+  /* Bordures & séparateurs — uniquement des alphas de --color-text. */
+  --color-line-hairline: rgb(36 24 16 / 0.07);
+  --color-line: rgb(36 24 16 / 0.12);
+  --color-line-field: rgb(36 24 16 / 0.22);
+  --color-line-secondary: rgb(36 24 16 / 0.28);
+  --color-line-field-hover: rgb(36 24 16 / 0.32);
+  --color-line-secondary-hover: rgb(36 24 16 / 0.45);
+  --color-line-on-dark: rgb(249 244 234 / 0.4);
+
+  /* Direction NOYER (validée le 23/09/2026) : le bordeaux est retiré de la
+     direction visuelle. Le noyer porte l'identité ET l'action ; le doré reste
+     un accent de filet ; l'ivoire reste le fond.
+
+     AUCUNE couleur d'état : pas de rouge d'erreur, pas de vert de succès,
+     pas d'orange. Erreur = noyer + « ! » textuel et bordure renforcée,
+     succès = noyer + filet doré, attente = doré.
+     AUCUNE couleur par catégorie : les neuf thèmes partagent le même
+     traitement. AUCUN bleu, AUCUN vert, AUCUN bordeaux.                    */
+
+  /* ── Typographie — 3 familles, 10 rôles ───────────────────────────────── */
+  --font-*: initial;
+
+  /* Les variables --font-bodoni-moda / --font-archivo / --font-jetbrains-mono
+     seront fournies par next/font à l'étape 2 ; les replis restent valides
+     tant qu'elles ne le sont pas.                                          */
+  --font-display:
+    var(--font-bodoni-moda, Georgia), Georgia, 'Times New Roman', serif;
+  --font-sans:
+    var(--font-archivo, system-ui), system-ui, -apple-system, sans-serif;
+  --font-mono:
+    var(--font-jetbrains-mono, ui-monospace), ui-monospace, monospace;
+
+  /* Échelle typographique — desktop puis mobile, valeurs du Design System.
+     Bodoni Moda : jamais en corps de texte, jamais sous 18 px, jamais en
+     capitales (sauf le mot-marque LOGOS).
+     JetBrains Mono : 500 uniquement, jamais en paragraphe ni en bouton.
+     Aucune graisse au-delà de 600.                                         */
+  --text-*: initial;
+
+  --text-hero: 68px;
+  --text-hero--line-height: 1.12;
+  --text-hero-mobile: 34px;
+  --text-hero-mobile--line-height: 1.08;
+
+  --text-h1: 46px;
+  --text-h1--line-height: 1.1;
+  --text-h1-mobile: 30px;
+  --text-h1-mobile--line-height: 1.14;
+
+  --text-h2: 36px;
+  --text-h2--line-height: 1.18;
+  --text-h2-mobile: 24px;
+  --text-h2-mobile--line-height: 1.2;
+
+  --text-h3: 28px;
+  --text-h3--line-height: 1.2;
+  --text-h3-mobile: 22px;
+  --text-h3-mobile--line-height: 1.25;
+
+  --text-cover: 21px;
+  --text-cover--line-height: 1.15;
+  --text-cover-detail: 30px;
+  --text-cover-detail--line-height: 1.15;
+  --text-cover-mobile: 16px;
+  --text-cover-mobile--line-height: 1.15;
+
+  --text-signature: 22px;
+  --text-signature--line-height: 1.5;
+  --text-signature-mobile: 17px;
+  --text-signature-mobile--line-height: 1.5;
+
+  --text-body-lg: 16.5px;
+  --text-body-lg--line-height: 1.85;
+  --text-body-lg-mobile: 14.5px;
+  --text-body-lg-mobile--line-height: 1.75;
+
+  --text-body: 15px;
+  --text-body--line-height: 1.7;
+  --text-body-mobile: 14px;
+  --text-body-mobile--line-height: 1.7;
+
+  --text-ui: 14.5px;
+  --text-ui--line-height: 1.2;
+
+  --text-small: 12.5px;
+  --text-small--line-height: 1.6;
+  --text-small-mobile: 11.5px;
+  --text-small-mobile--line-height: 1.6;
+
+  --text-label: 13px;
+  --text-label--line-height: 1.4;
+
+  --text-mono: 9.5px;
+  --text-mono--line-height: 1;
+  --text-mono-mobile: 8.5px;
+  --text-mono-mobile--line-height: 1;
+
+  /* ── Espacement — échelle fermée ──────────────────────────────────────── */
+  /* Le multiplicateur dynamique de Tailwind est désactivé : seules les onze
+     valeurs du Design System existent. Les classes sont nommées d'après leur
+     valeur en pixels (`p-22` = 22 px), car le Design System raisonne en px.
+     96 est admis pour le seul rembourrage vertical du hero desktop.        */
+  --spacing: initial;
+
+  --spacing-0: 0px;
+  --spacing-4: 4px;
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-22: 22px;
+  --spacing-26: 26px;
+  --spacing-34: 34px;
+  --spacing-44: 44px;
+  --spacing-56: 56px;
+  --spacing-78: 78px;
+  --spacing-96: 96px;
+
+  /* ── Rayons — 3 valeurs ───────────────────────────────────────────────── */
+  /* 0 pour les couvertures, bandeaux et tablettes : un livre a des angles
+     vifs. Jamais d'arrondi complet, sauf la pastille de rosace (cercle).   */
+  --radius-*: initial;
+
+  --radius-none: 0px;
+  --radius-control: 3px; /* contrôles, cartes, chips, boutons */
+  --radius-panel: 4px; /* panneaux, blocs de métadonnées */
+  --radius-status: 2px; /* pastilles de statut */
+  --radius-full: 9999px; /* pastille de rosace uniquement */
+
+  /* ── Ombres — réservées aux couvertures ───────────────────────────────── */
+  /* Cartes, panneaux, champs et boutons n'ont JAMAIS d'ombre : ils ont une
+     bordure.                                                               */
+  --shadow-*: initial;
+
+  /* Direction NOYER : l'ombre est TRÈS LÉGÈRE. Un ouvrage est posé sur la
+     tablette, il n'y flotte pas. L'étagère ne doit jamais dominer la
+     couverture. */
+  --shadow-cover: 0 6px 14px rgb(46 30 21 / 0.14);
+  --shadow-cover-light: 0 4px 10px rgb(46 30 21 / 0.1); /* plats clairs */
+  --shadow-cover-detail: 0 12px 26px rgb(46 30 21 / 0.2);
+  --shadow-shelf: 0 4px 10px rgb(46 30 21 / 0.16);
+
+  /* Renfoncement d'une niche du meuble (décision du 23/09/2026 : la
+     profondeur des niches est un point PRIORITAIRE de la direction
+     architecturale). C'est une ombre INTERNE, jamais portée : le linteau
+     projette son ombre sur le fond de la niche. Aucune teinte nouvelle —
+     l'alpha est celui de `--color-cover-spine`. */
+  --shadow-niche:
+    inset 0 10px 20px -8px rgb(31 20 13 / 0.85),
+    inset 0 1px 0 rgb(31 20 13 / 0.55);
+  /* Survol : seule la géométrie s'ouvre, la teinte reste celle de `cover`. */
+  --shadow-cover-hover: 0 8px 18px rgb(46 30 21 / 0.14);
+
+  /* ── Paliers responsive ───────────────────────────────────────────────── */
+  /* Mobile < 640 · Tablette 640-1023 · Desktop ≥ 1024
+     `nav` (900 px) est le seuil de bascule du header vers le hamburger.    */
+  --breakpoint-*: initial;
+
+  --breakpoint-tablet: 640px;
+  --breakpoint-nav: 900px;
+  --breakpoint-desktop: 1024px;
+
+  /* ── Largeurs de composition ──────────────────────────────────────────── */
+  --container-*: initial;
+
+  --container-content: 1240px; /* largeur de contenu maximale */
+  --container-reading: 880px; /* colonne de lecture (raison d'être) */
+  --container-search: 860px; /* bloc de recherche */
+  --container-form: 780px; /* colonne de formulaire */
+  --container-qa: 760px; /* colonne Q&R (620-760) */
+  --container-login: 420px; /* panneau de connexion */
+  --container-cover-detail: 330px; /* couverture en fiche ressource */
+
+  /* ── Motion — 2 durées, 1 courbe ──────────────────────────────────────── */
+  /* Aucun déplacement de plus de 2 px, aucune mise à l'échelle, aucune
+     animation d'entrée au défilement.                                      */
+  --ease-*: initial;
+  --ease-logos: cubic-bezier(0.2, 0.6, 0.3, 1);
+}
+
+:root {
+  /* Durées : 150 ms pour les survols de couleur et de bordure,
+     200 ms pour le menu mobile et les listes de filtres.                   */
+  --duration-hover: 150ms;
+  --duration-overlay: 200ms;
+
+  /* Mesures structurelles du Design System. */
+  --gutter-desktop: 44px;
+  --gutter-tablet: 26px;
+  --gutter-mobile: 20px;
+
+  --header-height: 76px;
+  --header-height-mobile: 60px;
+  --banner-height: 5px; /* bandeau noyer + filet doré : signature */
+  --banner-height-mobile: 4px;
+}
