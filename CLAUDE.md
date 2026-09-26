@@ -837,7 +837,7 @@ Ces points **n'ont pas été décidés**. Les signaler plutôt que de choisir.
 | N     | Couverture : déterminisme par identifiant _vs_ contraintes de rythme par rangée                                                                                                                     |
 | O     | Format d'optimisation de la rosace (SVG vectorisé / WebP multi-tailles)                                                                                                                             |
 | ~~R~~ | ~~Anti-spam du formulaire de question anonyme~~ — **tranché le 25/09/2026** : leurre et jeton horodaté côté application, plafonds de débit en base. Voir « Questions ».                             |
-| S     | Renommage du fichier du Design System (espaces dans le chemin)                                                                                                                                      |
+| ~~S~~ | ~~Renommage du fichier du Design System~~ — **résolu** : le fichier s'appelle `docs/LOGOS_Design_System_V2.html` depuis le 21/09/2026 sur `main`, et toutes les références du dépôt le suivent.     |
 | ~~T~~ | ~~Destination de l'entrée « Mon compte »~~ — **tranché le 25/09/2026** : `/compte`. Le libellé bascule toujours « Connexion » → « Mon compte », mais c'est désormais un vrai lien. Voir « Routes ». |
 
 > **F, L, R et T sont tranchés ; K et M ne sont plus des points ouverts.** Le cycle
