@@ -840,7 +840,7 @@ Ces points **n'ont pas été décidés**. Les signaler plutôt que de choisir.
 | ~~S~~ | ~~Renommage du fichier du Design System~~ — **résolu** : le fichier s'appelle `docs/LOGOS_Design_System_V2.html` depuis le 21/09/2026 sur `main`, et toutes les références du dépôt le suivent.     |
 | ~~T~~ | ~~Destination de l'entrée « Mon compte »~~ — **tranché le 25/09/2026** : `/compte`. Le libellé bascule toujours « Connexion » → « Mon compte », mais c'est désormais un vrai lien. Voir « Routes ». |
 
-> **F, L, R et T sont tranchés ; K et M ne sont plus des points ouverts.** Le cycle
+> **F, L, R, S et T sont tranchés ; K et M ne sont plus des points ouverts.** Le cycle
 > question → notification → réponse du §12 tient debout sans service d'envoi :
 > le serviteur répond depuis sa propre messagerie. Ce qui manque encore est
 > **hors périmètre**, pas indécis — voir la section ci-dessous.
